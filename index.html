@@ -150,10 +150,22 @@
           </fieldset>
         </div>
 
+        <fieldset class="form-section wide order-content-section">
+          <legend>SipariÅŸ iÃ§eriÄŸi</legend>
+          <div class="order-toolbar">
+            <div class="order-tabs"><button class="order-tab active" type="button" data-order-tab="products">ÃœrÃ¼n Listesi</button><button class="order-tab" type="button" data-order-tab="sets">Set Bilgisi</button></div>
+            <div class="order-actions"><input id="orderFileInput" type="file" accept=".xlsx,.xls,.csv" hidden><button id="importOrderButton" class="secondary-button" type="button">Dosya ekle</button><button id="addOrderProductButton" class="primary-button" type="button">ï¼‹ ÃœrÃ¼n ekle</button></div>
+          </div>
+          <div id="orderFileStatus" class="order-file-status">Excel sÃ¼tunlarÄ±: Part No, Description, Qty; opsiyonel: Set Bilgisi</div>
+          <div id="productsTabPanel" class="order-tab-panel">
+            <div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO</th><th>DESCRIPTION</th><th>QTY</th><th>SET BÄ°LGÄ°SÄ° <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="orderProductRows"></tbody></table></div>
+          </div>
+          <div id="setsTabPanel" class="order-tab-panel role-hidden"><div id="setGroups" class="set-groups"></div></div>
+        </fieldset>
+
         <fieldset class="form-section wide">
-          <legend>SipariÅŸ iÃ§eriÄŸi ve tarihler</legend>
+          <legend>Tarihler, notlar ve ekler</legend>
           <div class="section-grid">
-            <label class="wide">SipariÅŸ iÃ§eriÄŸi<textarea name="content" rows="3" required placeholder="ÃœrÃ¼n ve kurulum kapsamÄ±nÄ± yazÄ±n"></textarea></label>
             <label>Tahmini teslim tarihi <small>(varsa)</small><input name="estimatedDeliveryDate" type="date"></label>
             <label>Tahmini kurulum tarihi <small>(varsa)</small><input name="estimatedInstallationDate" type="date"></label>
             <label class="wide">Notlar<textarea name="notes" rows="2" placeholder="Varsa Ã¶nemli notlar"></textarea></label>
@@ -225,7 +237,23 @@
     </form>
   </dialog>
 
+  <dialog id="orderEditDialog" class="wide-dialog">
+    <form id="orderEditForm" method="dialog">
+      <input id="orderEditInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SATIÅ MÃœHENDÄ°SÄ°</p><h2>SipariÅŸ Ã¼rÃ¼nlerini dÃ¼zenle</h2><p id="orderEditRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">Ã—</button></div>
+      <div class="order-toolbar edit-order-toolbar">
+        <div class="order-tabs"><button class="order-tab active" type="button" data-edit-order-tab="products">ÃœrÃ¼n Listesi</button><button class="order-tab" type="button" data-edit-order-tab="sets">Set Bilgisi</button></div>
+        <div class="order-actions"><input id="editOrderFileInput" type="file" accept=".xlsx,.xls,.csv" hidden><button id="editImportOrderButton" class="secondary-button" type="button">Dosya ekle</button><button id="editAddOrderProductButton" class="primary-button" type="button">ï¼‹ ÃœrÃ¼n ekle</button></div>
+      </div>
+      <div id="editOrderFileStatus" class="order-file-status">Mevcut satÄ±rlarÄ± dÃ¼zenleyebilir veya yeni Ã¼rÃ¼n ekleyebilirsiniz.</div>
+      <div id="editProductsTabPanel" class="order-tab-panel"><div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO</th><th>DESCRIPTION</th><th>QTY</th><th>SET BÄ°LGÄ°SÄ° <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="editOrderProductRows"></tbody></table></div></div>
+      <div id="editSetsTabPanel" class="order-tab-panel role-hidden"><div id="editSetGroups" class="set-groups"></div></div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>VazgeÃ§</button><button class="primary-button" value="default">ÃœrÃ¼nleri kaydet</button></div>
+    </form>
+  </dialog>
+
   <div id="toast" class="toast" role="status"></div>
+  <script src="vendor/xlsx.full.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
