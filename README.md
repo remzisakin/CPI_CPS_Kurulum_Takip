@@ -2,10 +2,14 @@
 
 SatÄ±ÅŸ, sevkiyat ve saha kurulum sÃ¼reÃ§lerini izlemek iÃ§in hazÄ±rlanmÄ±ÅŸ ilk Ã§alÄ±ÅŸan prototip.
 
-## Demo giriÅŸi
+## Demo giriÅŸleri
 
-- KullanÄ±cÄ± adÄ±: `supervisor`
-- Åifre: `Demo123!`
+TÃ¼m demo hesaplarÄ±nÄ±n ÅŸifresi `Demo123!` ÅŸeklindedir.
+
+- YÃ¶netici: `admin`
+- SatÄ±ÅŸ MÃ¼hendisi: `sales`
+- Servis Supervisor: `supervisor`
+- Servis Teknisyeni: `technician`
 
 `index.html` dosyasÄ± modern bir tarayÄ±cÄ±da doÄŸrudan aÃ§Ä±larak arayÃ¼z incelenebilir. Yeni kurulum kayÄ±tlarÄ± prototip aÅŸamasÄ±nda yalnÄ±zca o tarayÄ±cÄ±nÄ±n yerel hafÄ±zasÄ±nda saklanÄ±r.
 
