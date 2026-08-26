@@ -201,4 +201,14 @@ dialog{background:#252526;color:#fff}
 .login-card input{background:#252526;border-color:#48484a;color:#fff}
 .language-button{background:#252526;border-color:#48484a;color:#fff}
 .official-logo{background:#fff}
+.role-hidden{display:none!important}
+.demo-accounts{margin-top:20px;border-top:1px solid #343434;padding-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.demo-accounts>p{grid-column:1/-1;margin:0 0 3px;color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.demo-accounts>button{border:1px solid #424244;background:#252526;color:#fff;padding:9px;display:flex;align-items:center;gap:9px;text-align:left}
+.demo-accounts>button:hover{border-color:#ec4936;background:#302525}
+.demo-accounts>button>span:last-child{display:flex;flex-direction:column;gap:2px}
+.demo-accounts>button b{font-size:11px}.demo-accounts>button small{font-size:10px;color:#aaa}
+.demo-accounts>small{grid-column:1/-1;color:#888;margin-top:4px}.demo-accounts>small b{color:#ddd}
+.demo-avatar{width:28px;height:28px;flex:0 0 28px;background:#ec4936;color:#fff;display:grid;place-items:center;font-size:9px;font-weight:800}
+@media(max-width:760px){.demo-accounts{grid-template-columns:1fr}.demo-accounts>p,.demo-accounts>small{grid-column:1}}
 
