@@ -25,9 +25,9 @@ const translations={
   en:{overview:'Overview',installations:'Installations',calendar:'Calendar',customers:'Customers',products:'Products',reports:'Reports',users:'Users'}
 };
 
-function statusClass(status){return {'Devam ediyor':'progress','PlanlandÄ±':'planned','Sevkiyat bekliyor':'waiting','SÃ¼re aÅŸÄ±ldÄ±':'overrun'}[status] || 'planned'}
+function statusClass(status){return {'Devam ediyor':'progress','PlanlandÄ±':'planned','Planlama bekliyor':'waiting','Sevkiyat bekliyor':'waiting','SÃ¼re aÅŸÄ±ldÄ±':'overrun'}[status] || 'planned'}
 function rowTemplate(item){return `<tr><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.salesOrderNumber)} Â· ${escapeHtml(item.ptd)}</small></td><td><span class="status ${statusClass(item.status)}">${item.status}</span></td><td><strong>${item.date}</strong><small>09:00</small></td><td><div class="technician"><span class="mini-avatar">${item.initials}</span>${escapeHtml(item.tech)}</div></td><td><span class="progress-bar"><i style="width:${item.progress}%"></i></span><small>%${item.progress}</small></td><td><button class="row-action" aria-label="Detay">â€º</button></td></tr>`}
-function installationRowTemplate(item){return `<tr><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.ptd)}</small></td><td><strong>${escapeHtml(item.salesOrderNumber)}</strong></td><td>${escapeHtml(item.requestDate)}</td><td><strong>${escapeHtml(item.salesEngineer)}</strong></td><td><span class="status ${statusClass(item.status)}">${item.status}</span></td><td><strong>${item.date}</strong><small>09:00</small></td><td><div class="technician"><span class="mini-avatar">${item.initials}</span>${escapeHtml(item.tech)}</div></td><td><span class="progress-bar"><i style="width:${item.progress}%"></i></span><small>%${item.progress}</small></td><td><button class="row-action" aria-label="Detay">â€º</button></td></tr>`}
+function installationRowTemplate(item){const canPlan=currentUser?.role==='supervisor';return `<tr><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.ptd)}</small></td><td><strong>${escapeHtml(item.salesOrderNumber)}</strong></td><td>${escapeHtml(item.requestDate)}</td><td><strong>${escapeHtml(item.salesEngineer)}</strong></td><td><span class="status ${statusClass(item.status)}">${item.status}</span></td><td><strong>${escapeHtml(item.date)}</strong>${item.plannedDuration?`<small>${item.plannedDuration} ${escapeHtml(item.plannedUnit)}</small>`:''}</td><td><div class="technician"><span class="mini-avatar">${item.initials}</span>${escapeHtml(item.tech)}</div></td><td><span class="progress-bar"><i style="width:${item.progress}%"></i></span><small>%${item.progress}</small></td><td><button class="row-action ${canPlan?'planning-action':''}" data-installation-id="${item.id}" aria-label="${canPlan?'Planla':'Detay'}">${canPlan?'Planla':'â€º'}</button></td></tr>`}
 function escapeHtml(value){return String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]))}
 function render(){
   const term=($('#searchInput')?.value||'').toLocaleLowerCase('tr');
@@ -50,6 +50,14 @@ function showView(name){
 }
 function showToast(message){const toast=$('#toast');toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)}
 function openNew(){if(!navigator.onLine){showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}const requestDate=$('[name="requestDate"]');if(requestDate&&!requestDate.value)requestDate.value=new Date().toISOString().slice(0,10);$('#installationDialog').showModal()}
+function openPlanning(id){
+  if(currentUser?.role!=='supervisor'){showToast('Servis planlamasÄ±nÄ± yalnÄ±zca Servis Supervisor dÃ¼zenleyebilir.');return}
+  if(!navigator.onLine){showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}
+  const item=installations.find(record=>record.id===id);if(!item)return;
+  $('#planningInstallationId').value=item.id;$('#planningRecordTitle').textContent=`${item.customer} Â· ${item.salesOrderNumber}`;
+  const form=$('#planningForm');form.elements.plannedDate.value=item.plannedDateIso||'';form.elements.plannedDuration.value=item.plannedDuration||8;form.elements.plannedUnit.value=item.plannedUnit||'Saat';form.elements.technician.value=item.tech==='Atama bekliyor'?'':item.tech;
+  $('#planningDialog').showModal();
+}
 function toggleLanguage(){language=language==='tr'?'en':'tr';document.documentElement.lang=language;$$('[data-i18n]').forEach(node=>node.textContent=translations[language][node.dataset.i18n]);$('#languageButton').textContent=language.toUpperCase();$('#loginLanguage').textContent=language==='tr'?'EN':'TR';showToast(language==='tr'?'Dil TÃ¼rkÃ§e olarak deÄŸiÅŸtirildi.':'Language changed to English.')}
 function applyUser(user){
   currentUser=user;
@@ -77,15 +85,24 @@ $('#newInstallationButton').addEventListener('click',openNew);$$('.open-new').fo
 $('#showAllButton').addEventListener('click',()=>showView('installations'));
 $('#languageButton').addEventListener('click',toggleLanguage);$('#loginLanguage').addEventListener('click',toggleLanguage);
 $('#searchInput').addEventListener('input',render);$('#statusFilter').addEventListener('change',render);
+$('#allInstallationRows').addEventListener('click',event=>{const button=event.target.closest('[data-installation-id]');if(button)openPlanning(Number(button.dataset.installationId))});
 $('#installationForm').addEventListener('submit',event=>{
   if(event.submitter?.value==='cancel')return;
   event.preventDefault();
   if(!navigator.onLine){$('#installationDialog').close();showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}
-  const data=new FormData(event.currentTarget);const date=new Date(`${data.get('date')}T12:00:00`);
-  const tech=data.get('technician');
+  const data=new FormData(event.currentTarget);
   const requestDate=new Date(`${data.get('requestDate')}T12:00:00`);
-  installations.unshift({id:Date.now(),customer:data.get('customer'),salesOrderNumber:data.get('salesOrderNumber'),requestDate:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(requestDate),salesEngineer:data.get('salesEngineer'),ptd:data.get('ptd')||'â€”',status:tech==='Atama bekliyor'?'Sevkiyat bekliyor':'PlanlandÄ±',date:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(date),tech,initials:tech==='Atama bekliyor'?'?':tech.split(' ').map(x=>x[0]).join(''),progress:10});
+  installations.unshift({id:Date.now(),customer:data.get('customer'),salesOrderNumber:data.get('salesOrderNumber'),requestDate:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(requestDate),salesEngineer:data.get('salesEngineer'),ptd:data.get('ptd')||'â€”',status:'Planlama bekliyor',date:'Planlama bekliyor',tech:'Atama bekliyor',initials:'?',plannedDuration:null,plannedUnit:'Saat',progress:5});
   localStorage.setItem('cps-installations',JSON.stringify(installations));render();event.currentTarget.reset();$('#installationDialog').close();showToast('Yeni kurulum kaydÄ± oluÅŸturuldu.');
+});
+$('#planningForm').addEventListener('submit',event=>{
+  if(event.submitter?.value==='cancel')return;
+  event.preventDefault();
+  if(currentUser?.role!=='supervisor'){showToast('Bu iÅŸlem iÃ§in Servis Supervisor yetkisi gerekir.');return}
+  const data=new FormData(event.currentTarget);const item=installations.find(record=>record.id===Number(data.get('installationId')));if(!item)return;
+  const plannedDateIso=data.get('plannedDate');const plannedDate=new Date(`${plannedDateIso}T12:00:00`);const technician=data.get('technician');
+  item.plannedDateIso=plannedDateIso;item.date=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(plannedDate);item.plannedDuration=Number(data.get('plannedDuration'));item.plannedUnit=data.get('plannedUnit');item.tech=technician;item.initials=technician.split(' ').map(part=>part[0]).join('');item.status='PlanlandÄ±';item.progress=Math.max(item.progress,15);
+  localStorage.setItem('cps-installations',JSON.stringify(installations));render();$('#planningDialog').close();showToast('Servis planlamasÄ± kaydedildi.');
 });
 
 const agenda=[['09:00','Anka EndÃ¼stri','1. Kurulum Â· Ahmet Kaya'],['13:30','Marmara Teknoloji','Ã–n kontrol Â· Selin Demir'],['16:00','Eksen Otomasyon','Devam ziyareti Â· Murat Ã‡elik']];
