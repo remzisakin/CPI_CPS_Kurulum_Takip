@@ -143,7 +143,7 @@ Mevcut prototipte:
 - Offline durumda yeni kayÄ±t engellenir.
 - Mobil uyumlu gÃ¶rÃ¼nÃ¼m vardÄ±r.
 - TÃ¼rkÃ§e/Ä°ngilizce geÃ§iÅŸinin yalnÄ±zca temel menÃ¼ bÃ¶lÃ¼mÃ¼ uygulanmÄ±ÅŸtÄ±r; tÃ¼m ekran Ã§evirisi henÃ¼z tamamlanmamÄ±ÅŸtÄ±r.
-- ArayÃ¼z Desoutter'Ä±n resmÃ® sitesindeki tasarÄ±m diline yaklaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. ResmÃ® Desoutter logo varlÄ±ÄŸÄ± kullanÄ±lÄ±r; ana renkler kÄ±rmÄ±zÄ±, sarÄ±, siyah ve aÃ§Ä±k gridir. Ãœst baÅŸlÄ±kta logo ve kullanÄ±cÄ± araÃ§larÄ±, ayrÄ± koyu satÄ±rda navigasyon bulunur. Mobil gÃ¶rÃ¼nÃ¼mde navigasyon yatay kaydÄ±rÄ±labilir.
+- ArayÃ¼z Desoutter'Ä±n resmÃ® sitesindeki tasarÄ±m diline yaklaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. ResmÃ® Desoutter logo varlÄ±ÄŸÄ± kullanÄ±lÄ±r. ResmÃ® CSS'ten doÄŸrulanan ana renkler `#0D0D0E` siyah, `#252526` koyu gri, beyaz/gri metinler ve `#EC4936` kÄ±rmÄ±zÄ±-turuncu vurgudur; sarÄ± kullanÄ±lmaz. Ãœst baÅŸlÄ±kta logo ve kullanÄ±cÄ± araÃ§larÄ±, ayrÄ± koyu satÄ±rda navigasyon bulunur. Mobil gÃ¶rÃ¼nÃ¼mde navigasyon yatay kaydÄ±rÄ±labilir.
 
 Demo hesabÄ± yalnÄ±zca prototip iÃ§indir:
 
