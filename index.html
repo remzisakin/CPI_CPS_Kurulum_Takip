@@ -12,7 +12,7 @@
 <body>
   <section id="loginView" class="login-page">
     <div class="login-brand">
-      <div class="brand-mark">CPS</div>
+      <img class="official-logo login-logo" src="assets/desoutter-logo.webp" alt="Desoutter">
       <p class="eyebrow">CPI / CPS OPERATIONS</p>
       <h1>KurulumlarÄ± tek bir yerden yÃ¶netin.</h1>
       <p>SatÄ±ÅŸtan sevkiyata, saha ziyaretinden mÃ¼ÅŸteri raporuna kadar tÃ¼m sÃ¼reÃ§ gÃ¶rÃ¼nÃ¼r ve dÃ¼zenli.</p>
@@ -36,28 +36,29 @@
   </section>
 
   <div id="appView" class="app-shell hidden">
-    <aside class="sidebar">
-      <div class="app-brand"><div class="brand-mark small">CPS</div><div><b>Kurulum Takip</b><small>Operations Hub</small></div></div>
-      <nav id="mainNav" aria-label="Ana menÃ¼">
+    <header class="site-header">
+      <div class="header-main">
+        <div class="app-brand"><img class="official-logo" src="assets/desoutter-logo.webp" alt="Desoutter"><div class="app-title"><b>Kurulum Takip</b><small>CPI / CPS Operations</small></div></div>
+        <div class="header-tools">
+          <div id="connectionState" class="connection online"><i></i><span>Ã‡evrimiÃ§i</span></div>
+          <button id="languageButton" class="header-button">TR</button>
+          <button class="header-button notification-button" aria-label="Bildirimler">Bildirimler<i class="notification-dot"></i></button>
+          <div class="user-summary"><div class="avatar">EA</div><div><b>Emre Aksoy</b><small>Servis Supervisor</small></div></div>
+          <button id="logoutButton" class="logout-button" title="Ã‡Ä±kÄ±ÅŸ">Ã‡Ä±kÄ±ÅŸ</button>
+        </div>
+      </div>
+      <nav id="mainNav" class="header-nav" aria-label="Ana menÃ¼">
         <button class="nav-item active" data-view="dashboard"><span>âŒ‚</span> <i data-i18n="overview">Genel BakÄ±ÅŸ</i></button>
         <button class="nav-item" data-view="installations"><span>â–¦</span> <i data-i18n="installations">Kurulumlar</i> <em id="navCount">8</em></button>
         <button class="nav-item" data-view="calendar"><span>â–¡</span> <i data-i18n="calendar">Takvim</i></button>
-        <p class="nav-label">YÃ–NETÄ°M</p>
         <button class="nav-item" data-view="customers"><span>â™™</span> <i data-i18n="customers">MÃ¼ÅŸteriler</i></button>
         <button class="nav-item" data-view="products"><span>â—‡</span> <i data-i18n="products">ÃœrÃ¼nler</i></button>
         <button class="nav-item" data-view="reports"><span>â–¥</span> <i data-i18n="reports">Raporlar</i></button>
         <button class="nav-item" data-view="users"><span>â™§</span> <i data-i18n="users">KullanÄ±cÄ±lar</i></button>
       </nav>
-      <div class="sidebar-foot"><div class="avatar">EA</div><div><b>Emre Aksoy</b><small>Servis Supervisor</small></div><button id="logoutButton" title="Ã‡Ä±kÄ±ÅŸ">â†ª</button></div>
-    </aside>
+    </header>
 
     <main class="main-content">
-      <header class="topbar">
-        <button id="menuButton" class="icon-button menu-button" aria-label="MenÃ¼yÃ¼ aÃ§">â˜°</button>
-        <div id="connectionState" class="connection online"><i></i><span>Ã‡evrimiÃ§i</span></div>
-        <div class="top-actions"><button id="languageButton" class="text-button">TR</button><button class="icon-button" aria-label="Bildirimler">â™¢<i class="notification-dot"></i></button></div>
-      </header>
-
       <section id="dashboardView" class="view active-view">
         <div class="page-heading"><div><p class="eyebrow">26 AÄUSTOS 2026, Ã‡ARÅAMBA</p><h1>GÃ¼naydÄ±n, Emre</h1><p>Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.</p></div><button id="newInstallationButton" class="primary-button">ï¼‹ Yeni kurulum</button></div>
         <div class="stat-grid">
