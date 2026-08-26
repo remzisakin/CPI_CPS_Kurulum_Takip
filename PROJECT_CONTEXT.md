@@ -147,10 +147,10 @@ Mevcut prototipte:
 
 Demo hesaplarÄ± yalnÄ±zca prototip iÃ§indir:
 
-- YÃ¶netici: `admin` / `Demo123!`
-- SatÄ±ÅŸ MÃ¼hendisi: `sales` / `Demo123!`
-- Servis Supervisor: `supervisor` / `Demo123!`
-- Servis Teknisyeni: `technician` / `Demo123!`
+- YÃ¶netici â€” Remzi Sakin: `admin` / `Demo123!`
+- SatÄ±ÅŸ MÃ¼hendisi â€” Ä°rem OÄŸuzkan: `sales` / `Demo123!`
+- Servis Supervisor â€” Tevfik ÅahinbaÅŸ: `supervisor` / `Demo123!`
+- Servis Teknisyeni â€” GÃ¼rcan Girgin: `technician` / `Demo123!`
 
 Her demo kullanÄ±cÄ±sÄ± giriÅŸ yaptÄ±ÄŸÄ±nda rolÃ¼ne uygun menÃ¼leri gÃ¶rÃ¼r. Yeni kurulum oluÅŸturma iÅŸlemi prototipte yalnÄ±zca YÃ¶netici ve SatÄ±ÅŸ MÃ¼hendisi rollerine gÃ¶sterilir.
 
