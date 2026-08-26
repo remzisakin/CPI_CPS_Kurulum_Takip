@@ -89,7 +89,7 @@
 
       <section id="installationsView" class="view">
         <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>TÃ¼m sevkiyat ve kurulum iÅŸlerini takip edin.</p></div><button class="primary-button open-new sales-action">ï¼‹ Yeni kurulum</button></div>
-        <section class="panel"><div class="toolbar"><input id="searchInput" type="search" placeholder="MÃ¼ÅŸteri, SO veya PTD ara..."><select id="statusFilter"><option value="">TÃ¼m durumlar</option><option>PlanlandÄ±</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>SÃ¼re aÅŸÄ±ldÄ±</option></select></div><div class="table-wrap"><table><thead><tr><th>MÃœÅTERÄ° / SÄ°PARÄ°Å</th><th>DURUM</th><th>PLANLANAN TARÄ°H</th><th>TEKNÄ°SYEN</th><th>Ä°LERLEME</th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div></section>
+        <section class="panel"><div class="toolbar"><input id="searchInput" type="search" placeholder="MÃ¼ÅŸteri, SO, PTD veya satÄ±ÅŸ mÃ¼hendisi ara..."><select id="statusFilter"><option value="">TÃ¼m durumlar</option><option>PlanlandÄ±</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>SÃ¼re aÅŸÄ±ldÄ±</option></select></div><div class="table-wrap"><table class="installations-table"><thead><tr><th>MÃœÅTERÄ°</th><th>SO NO<br><small>SALES ORDER NUMBER</small></th><th>TALEP TARÄ°HÄ°</th><th>SATIÅ MÃœHENDÄ°SÄ°</th><th>DURUM</th><th>PLANLANAN KURULUM</th><th>TEKNÄ°SYEN</th><th>Ä°LERLEME</th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div></section>
       </section>
 
       <section id="placeholderView" class="view"><div class="empty-state"><span>â—‡</span><h1 id="placeholderTitle">Bu bÃ¶lÃ¼m hazÄ±rlanÄ±yor</h1><p>Ä°lk prototipte ana takip ve yeni kurulum akÄ±ÅŸÄ±na odaklandÄ±k.</p></div></section>
@@ -106,6 +106,8 @@
         <label>Kurulum adresi<input name="address" required placeholder="Åehir / adres"></label>
         <label>SO No â€” Sales Order Number<input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
         <label>PTD No<input name="ptd" placeholder="Varsa girin"></label>
+        <label>Talep tarihi<input name="requestDate" type="date" required></label>
+        <label>SatÄ±ÅŸ mÃ¼hendisi<select name="salesEngineer" required><option>Ä°rem OÄŸuzkan</option><option>Remzi Sakin</option></select></label>
         <label>Planlanan tarih<input name="date" type="date" required></label>
         <label>Planlanan sÃ¼re<div class="inline-fields"><input name="duration" type="number" min="1" value="8" required><select name="unit"><option>Saat</option><option>GÃ¼n</option></select></div></label>
         <label>Servis teknisyeni<select name="technician"><option>Atama bekliyor</option><option>Ahmet Kaya</option><option>Selin Demir</option><option>Murat Ã‡elik</option></select></label>
