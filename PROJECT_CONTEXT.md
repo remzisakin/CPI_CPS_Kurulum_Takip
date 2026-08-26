@@ -145,10 +145,14 @@ Mevcut prototipte:
 - TÃ¼rkÃ§e/Ä°ngilizce geÃ§iÅŸinin yalnÄ±zca temel menÃ¼ bÃ¶lÃ¼mÃ¼ uygulanmÄ±ÅŸtÄ±r; tÃ¼m ekran Ã§evirisi henÃ¼z tamamlanmamÄ±ÅŸtÄ±r.
 - ArayÃ¼z Desoutter'Ä±n resmÃ® sitesindeki tasarÄ±m diline yaklaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. ResmÃ® Desoutter logo varlÄ±ÄŸÄ± kullanÄ±lÄ±r. ResmÃ® CSS'ten doÄŸrulanan ana renkler `#0D0D0E` siyah, `#252526` koyu gri, beyaz/gri metinler ve `#EC4936` kÄ±rmÄ±zÄ±-turuncu vurgudur; sarÄ± kullanÄ±lmaz. Ãœst baÅŸlÄ±kta logo ve kullanÄ±cÄ± araÃ§larÄ±, ayrÄ± koyu satÄ±rda navigasyon bulunur. Mobil gÃ¶rÃ¼nÃ¼mde navigasyon yatay kaydÄ±rÄ±labilir.
 
-Demo hesabÄ± yalnÄ±zca prototip iÃ§indir:
+Demo hesaplarÄ± yalnÄ±zca prototip iÃ§indir:
 
-- KullanÄ±cÄ± adÄ±: `supervisor`
-- Åifre: `Demo123!`
+- YÃ¶netici: `admin` / `Demo123!`
+- SatÄ±ÅŸ MÃ¼hendisi: `sales` / `Demo123!`
+- Servis Supervisor: `supervisor` / `Demo123!`
+- Servis Teknisyeni: `technician` / `Demo123!`
+
+Her demo kullanÄ±cÄ±sÄ± giriÅŸ yaptÄ±ÄŸÄ±nda rolÃ¼ne uygun menÃ¼leri gÃ¶rÃ¼r. Yeni kurulum oluÅŸturma iÅŸlemi prototipte yalnÄ±zca YÃ¶netici ve SatÄ±ÅŸ MÃ¼hendisi rollerine gÃ¶sterilir.
 
 Bu bilgiler Ã¼retim sÃ¼rÃ¼mÃ¼nde kullanÄ±lmamalÄ±dÄ±r.
 
