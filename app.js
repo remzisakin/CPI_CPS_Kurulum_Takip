@@ -38,7 +38,7 @@ function showView(name){
   $$('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
   const direct=$(`#${name}View`);
   if(direct) direct.classList.add('active-view'); else {$('#placeholderView').classList.add('active-view');$('#placeholderTitle').textContent=$(`.nav-item[data-view="${name}"]`)?.textContent.trim()||'Bu bÃ¶lÃ¼m hazÄ±rlanÄ±yor'}
-  $('.sidebar').classList.remove('open');
+  $('.sidebar')?.classList.remove('open');
 }
 function showToast(message){const toast=$('#toast');toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)}
 function openNew(){if(!navigator.onLine){showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}$('#installationDialog').showModal()}
@@ -54,7 +54,6 @@ $('#logoutButton').addEventListener('click',()=>{sessionStorage.removeItem('cps-
 $('#mainNav').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view)});
 $('#newInstallationButton').addEventListener('click',openNew);$$('.open-new').forEach(x=>x.addEventListener('click',openNew));
 $('#showAllButton').addEventListener('click',()=>showView('installations'));
-$('#menuButton').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));
 $('#languageButton').addEventListener('click',toggleLanguage);$('#loginLanguage').addEventListener('click',toggleLanguage);
 $('#searchInput').addEventListener('input',render);$('#statusFilter').addEventListener('change',render);
 $('#installationForm').addEventListener('submit',event=>{
