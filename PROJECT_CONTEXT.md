@@ -63,6 +63,8 @@ SatÄ±ÅŸ mÃ¼hendisi â€œYeni kurulumâ€ formunda doÄŸrudan son kul
 
 SatÄ±ÅŸ MÃ¼hendisi, mevcut bir kaydÄ±n sevkiyat bilgilerini Kurulumlar tablosundaki â€œSevkiyatâ€ dÃ¼ÄŸmesinden daha sonra gÃ¼ncelleyebilir. Bu iÅŸlem sevk tarihi zorunluluÄŸunu ve parÃ§alÄ± sevkiyat Ã¼rÃ¼n seÃ§imini yeniden uygular.
 
+SipariÅŸ iÃ§eriÄŸi serbest metin deÄŸildir. ÃœrÃ¼nler `Part No`, `Description`, `Qty` ve opsiyonel `Set Bilgisi` alanlarÄ±yla satÄ±r satÄ±r tutulur. SatÄ±ÅŸ mÃ¼hendisi â€œÃœrÃ¼n ekleâ€ ile manuel satÄ±r oluÅŸturup alanlarÄ± dÃ¼zenleyebilir veya `Order_Form_2026.xlsx` benzeri `.xlsx`, `.xls` ve `.csv` dosyalarÄ±nÄ±n ilk sayfasÄ±ndan Ã¼rÃ¼nleri aktarabilir. Excel baÅŸlÄ±klarÄ± Part No/Part Number, Description/AÃ§Ä±klama, Qty/Quantity/Adet ve opsiyonel Set Bilgisi/Set olarak eÅŸleÅŸtirilir. Set Bilgisi gÃ¶rÃ¼nÃ¼mÃ¼ aynÄ± set adÄ±na sahip Ã¼rÃ¼nleri gruplar. KaydedilmiÅŸ bir kurulumun Ã¼rÃ¼nleri Kurulumlar tablosundaki â€œÃœrÃ¼nlerâ€ iÅŸlemiyle daha sonra dÃ¼zenlenebilir, silinebilir veya yeni satÄ±r/Excel iÃ§eriÄŸi eklenebilir. Excel okuma cihaz iÃ§inde, projeye yerel eklenen SheetJS 0.20.3 ile yapÄ±lÄ±r.
+
 ## 4. ÃœrÃ¼n ve sevkiyat gereksinimleri
 
 - GeliÅŸtirme sÄ±rasÄ±nda Ã¶rnek Ã¼rÃ¼n veritabanÄ± kullanÄ±lacak.
