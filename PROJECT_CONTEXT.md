@@ -143,7 +143,7 @@ Mevcut prototipte:
 - Offline durumda yeni kayÄ±t engellenir.
 - Mobil uyumlu gÃ¶rÃ¼nÃ¼m vardÄ±r.
 - TÃ¼rkÃ§e/Ä°ngilizce geÃ§iÅŸinin yalnÄ±zca temel menÃ¼ bÃ¶lÃ¼mÃ¼ uygulanmÄ±ÅŸtÄ±r; tÃ¼m ekran Ã§evirisi henÃ¼z tamamlanmamÄ±ÅŸtÄ±r.
-- Ana navigasyon soldaki dikey menÃ¼den ekranÄ±n Ã¼stÃ¼nde yer alan yatay menÃ¼ye dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lmÃ¼ÅŸtÃ¼r. Marka ve kullanÄ±cÄ± bilgisi Ã¼st satÄ±rda, navigasyon baÄŸlantÄ±larÄ± ayrÄ± alt satÄ±rdadÄ±r. Mobil gÃ¶rÃ¼nÃ¼mde menÃ¼ yatay kaydÄ±rÄ±labilir.
+- ArayÃ¼z Desoutter'Ä±n resmÃ® sitesindeki tasarÄ±m diline yaklaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. ResmÃ® Desoutter logo varlÄ±ÄŸÄ± kullanÄ±lÄ±r; ana renkler kÄ±rmÄ±zÄ±, sarÄ±, siyah ve aÃ§Ä±k gridir. Ãœst baÅŸlÄ±kta logo ve kullanÄ±cÄ± araÃ§larÄ±, ayrÄ± koyu satÄ±rda navigasyon bulunur. Mobil gÃ¶rÃ¼nÃ¼mde navigasyon yatay kaydÄ±rÄ±labilir.
 
 Demo hesabÄ± yalnÄ±zca prototip iÃ§indir:
 
