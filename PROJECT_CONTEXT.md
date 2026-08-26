@@ -1,172 +1,182 @@
-# CPI / CPS Kurulum Takip â€” Proje BaÄŸlamÄ±
+# CPI / CPS Kurulum Takip — Proje Bağlamı
 
-> Bu dosya, proje Ã¼zerinde Ã§alÄ±ÅŸan asistanÄ±n baÄŸlamÄ± kaybetmeden devam edebilmesi iÃ§in tutulur. Her Ã¶nemli karar, kapsam deÄŸiÅŸikliÄŸi ve tamamlanan aÅŸamadan sonra gÃ¼ncellenmelidir.
+> Bu dosya, proje üzerinde çalışan asistanın bağlamı kaybetmeden devam edebilmesi için tutulur. Her önemli karar, kapsam değişikliği ve tamamlanan aşamadan sonra güncellenmelidir.
 
-## 1. Projenin amacÄ±
+## 1. Projenin amacı
 
-SatÄ±ÅŸ ekibinin kurulum iÃ§eren satÄ±ÅŸlarÄ± kaydettiÄŸi; sevkiyat, teknisyen atama, saha ziyareti, sÃ¼re ve kurulum raporu sÃ¼reÃ§lerinin ÅŸirket Ã§alÄ±ÅŸanlarÄ± tarafÄ±ndan takip edildiÄŸi online bir uygulama geliÅŸtirmek.
+Satış ekibinin kurulum içeren satışları kaydettiği; sevkiyat, teknisyen atama, saha ziyareti, süre ve kurulum raporu süreçlerinin şirket çalışanları tarafından takip edildiği online bir uygulama geliştirmek.
 
 Uygulama:
 
-- ÅÄ±k, sade ve kolay kullanÄ±labilir olmalÄ±.
-- Bilgisayar ve telefonda Ã§alÄ±ÅŸmalÄ±.
+- Şık, sade ve kolay kullanılabilir olmalı.
+- Bilgisayar ve telefonda çalışmalı.
 - Telefona uygulama gibi kurulabilmeli.
-- TÃ¼rkÃ§e ve Ä°ngilizce kullanÄ±labilmeli.
-- Ä°nternet yokken daha Ã¶nce aÃ§Ä±lan kayÄ±tlarÄ± yalnÄ±zca gÃ¶sterebilmeli.
-- Offline durumdayken kayÄ±t veya dosya eklenmek istenirse â€œÄ°ÅŸleme devam etmek iÃ§in online olunâ€ uyarÄ±sÄ± vermeli.
-- FotoÄŸraf, belge ve kurulum raporu yÃ¼klemeyi desteklemeli.
+- Türkçe ve İngilizce kullanılabilmeli.
+- İnternet yokken daha önce açılan kayıtları yalnızca gösterebilmeli.
+- Offline durumdayken kayıt veya dosya eklenmek istenirse “İşleme devam etmek için online olun” uyarısı vermeli.
+- Fotoğraf, belge ve kurulum raporu yüklemeyi desteklemeli.
 
-## 2. KullanÄ±cÄ±lar ve giriÅŸ
+## 2. Kullanıcılar ve giriş
 
-- Tahmini kullanÄ±cÄ± sayÄ±sÄ±: 20.
-- YalnÄ±zca ÅŸirket Ã§alÄ±ÅŸanlarÄ± giriÅŸ yapacak; mÃ¼ÅŸteriler giriÅŸ yapmayacak.
-- Microsoft 365 ile giriÅŸ kullanÄ±lmayacak.
-- KullanÄ±cÄ± adÄ± ve ÅŸifreyle giriÅŸ yapÄ±lacak.
-- GerÃ§ek sÃ¼rÃ¼mde ÅŸifreler sunucu tarafÄ±nda gÃ¼venli parola Ã¶zeti olarak saklanmalÄ±.
-- YÃ¶netici kullanÄ±cÄ± oluÅŸturabilmeli, hesabÄ± devre dÄ±ÅŸÄ± bÄ±rakabilmeli ve ÅŸifre sÄ±fÄ±rlayabilmeli.
-- Bir kullanÄ±cÄ± birden fazla role sahip olabilmeli.
+- Tahmini kullanıcı sayısı: 20.
+- Yalnızca şirket çalışanları giriş yapacak; müşteriler giriş yapmayacak.
+- Microsoft 365 ile giriş kullanılmayacak.
+- Kullanıcı adı ve şifreyle giriş yapılacak.
+- Gerçek sürümde şifreler sunucu tarafında güvenli parola özeti olarak saklanmalı.
+- Yönetici kullanıcı oluşturabilmeli, hesabı devre dışı bırakabilmeli ve şifre sıfırlayabilmeli.
+- Bir kullanıcı birden fazla role sahip olabilmeli.
 
 Roller:
 
-1. SatÄ±ÅŸ MÃ¼hendisi
+1. Satış Mühendisi
 2. Servis Supervisor
 3. Servis Teknisyeni
-4. YÃ¶netici
+4. Yönetici
 
-Servis Supervisor, kurulum iÅŸlerine bir veya birden fazla teknisyen atar. Bir kurulumda birden fazla satÄ±ÅŸ mÃ¼hendisi de bulunabilir.
+Servis Supervisor, kurulum işlerine bir veya birden fazla teknisyen atar. Bir kurulumda birden fazla satış mühendisi de bulunabilir.
 
-Planlanan kurulum tarihi, planlanan sÃ¼re/birim ve servis teknisyeni satÄ±ÅŸ mÃ¼hendisi tarafÄ±ndan girilmez. SatÄ±ÅŸ kaydÄ± â€œPlanlama bekliyorâ€ durumunda aÃ§Ä±lÄ±r; bu Ã¼Ã§ alan Kurulumlar ekranÄ±ndaki ayrÄ± â€œServis planlamasÄ±â€ iÅŸlemi Ã¼zerinden yalnÄ±zca Servis Supervisor tarafÄ±ndan kaydedilir.
+Planlanan kurulum tarihi, planlanan süre/birim ve servis teknisyeni satış mühendisi tarafından girilmez. Satış kaydı “Planlama bekliyor” durumunda açılır; bu üç alan Kurulumlar ekranındaki ayrı “Servis planlaması” işlemi üzerinden yalnızca Servis Supervisor tarafından kaydedilir.
 
-## 3. SatÄ±ÅŸ kaydÄ± gereksinimleri
+## 3. Satış kaydı gereksinimleri
 
-- MÃ¼ÅŸteri adÄ±
-- Varsa MTB ve son kullanÄ±cÄ± bilgilerinin ayrÄ± tutulmasÄ±
-- Sorumlu satÄ±ÅŸ mÃ¼hendisi veya mÃ¼hendisleri
-- SO No â€” Sales Order Number
-- Talep tarihi â€” kurulum talebinin sisteme girildiÄŸi tarih
-- SatÄ±ÅŸ mÃ¼hendisi
+- Müşteri adı
+- Varsa MTB ve son kullanıcı bilgilerinin ayrı tutulması
+- Sorumlu satış mühendisi veya mühendisleri
+- SO No — Sales Order Number
+- Talep tarihi — kurulum talebinin sisteme girildiği tarih
+- Satış mühendisi
 - PTD No (opsiyonel)
-- Kurulum tutarÄ± (â‚¬)
-- MTB ve son kullanÄ±cÄ± iÃ§in ayrÄ± kontaklar:
+- Kurulum tutarı (€)
+- MTB ve son kullanıcı için ayrı kontaklar:
   - Ad
   - Soyad
   - E-posta
   - Telefon
-- SipariÅŸ iÃ§eriÄŸi
+- Sipariş içeriği
 - Tahmini teslim tarihi
 - Tahmini kurulum tarihi
 - Notlar
 - Dosya ekleri
-- MÃ¼ÅŸteri merkezinden farklÄ± olabilen kurulum adresi
+- Müşteri merkezinden farklı olabilen kurulum adresi
 
-SatÄ±ÅŸ mÃ¼hendisi â€œYeni kurulumâ€ formunda doÄŸrudan son kullanÄ±cÄ± veya MTB + son kullanÄ±cÄ± yapÄ±sÄ±nÄ± seÃ§er. MTB seÃ§ilirse iki firmanÄ±n kontak bilgileri ayrÄ± ve zorunlu alanlar olarak aÃ§Ä±lÄ±r. Tahmini teslim/kurulum tarihleri opsiyoneldir. Sevk edildi iÅŸaretlenirse sevk tarihi zorunlu olur; parÃ§alÄ± sevkiyatta gÃ¶nderilen en az bir mock Ã¼rÃ¼n seÃ§ilir. Demo Ã¼rÃ¼n notu ve Ã§oklu dosya seÃ§imi desteklenir. Prototipte dosyanÄ±n yalnÄ±zca adÄ±, tÃ¼rÃ¼ ve boyutu tarayÄ±cÄ± kaydÄ±na yazÄ±lÄ±r; gerÃ§ek dosya iÃ§eriÄŸi Ã¼retim sÃ¼rÃ¼mÃ¼nde nesne depolamaya alÄ±nacaktÄ±r.
+Satış mühendisi “Yeni kurulum” formunda doğrudan son kullanıcı veya MTB + son kullanıcı yapısını seçer. MTB seçilirse iki firmanın kontak bilgileri ayrı ve zorunlu alanlar olarak açılır. Tahmini teslim/kurulum tarihleri opsiyoneldir. Sevk edildi işaretlenirse sevk tarihi zorunlu olur; parçalı sevkiyatta gönderilen en az bir mock ürün seçilir. Demo ürün notu ve çoklu dosya seçimi desteklenir. Prototipte dosyanın yalnızca adı, türü ve boyutu tarayıcı kaydına yazılır; gerçek dosya içeriği üretim sürümünde nesne depolamaya alınacaktır.
 
-SatÄ±ÅŸ MÃ¼hendisi, mevcut bir kaydÄ±n sevkiyat bilgilerini Kurulumlar tablosundaki â€œSevkiyatâ€ dÃ¼ÄŸmesinden daha sonra gÃ¼ncelleyebilir. Bu iÅŸlem sevk tarihi zorunluluÄŸunu ve parÃ§alÄ± sevkiyat Ã¼rÃ¼n seÃ§imini yeniden uygular.
+Satış Mühendisi, mevcut bir kaydın sevkiyat bilgilerini Kurulumlar tablosundaki “Sevkiyat” düğmesinden daha sonra güncelleyebilir. Bu işlem sevk tarihi zorunluluğunu ve parçalı sevkiyat ürün seçimini yeniden uygular.
 
-SipariÅŸ iÃ§eriÄŸi serbest metin deÄŸildir. ÃœrÃ¼nler `Part No`, `Description`, `Qty` ve opsiyonel `Set Bilgisi` alanlarÄ±yla satÄ±r satÄ±r tutulur. SatÄ±ÅŸ mÃ¼hendisi â€œÃœrÃ¼n ekleâ€ ile manuel satÄ±r oluÅŸturup alanlarÄ± dÃ¼zenleyebilir veya `Order_Form_2026.xlsx` benzeri `.xlsx`, `.xls` ve `.csv` dosyalarÄ±nÄ±n ilk sayfasÄ±ndan Ã¼rÃ¼nleri aktarabilir. Excel baÅŸlÄ±klarÄ± Part No/Part Number, Description/AÃ§Ä±klama, Qty/Quantity/Adet ve opsiyonel Set Bilgisi/Set olarak eÅŸleÅŸtirilir. Set Bilgisi gÃ¶rÃ¼nÃ¼mÃ¼ aynÄ± set adÄ±na sahip Ã¼rÃ¼nleri gruplar. KaydedilmiÅŸ bir kurulumun Ã¼rÃ¼nleri Kurulumlar tablosundaki â€œÃœrÃ¼nlerâ€ iÅŸlemiyle daha sonra dÃ¼zenlenebilir, silinebilir veya yeni satÄ±r/Excel iÃ§eriÄŸi eklenebilir. Excel okuma cihaz iÃ§inde, projeye yerel eklenen SheetJS 0.20.3 ile yapÄ±lÄ±r.
+Sipariş içeriği serbest metin değildir. Ürünler `Part No`, `Description`, `Qty` ve opsiyonel `Set Bilgisi` alanlarıyla satır satır tutulur. Satış mühendisi “Ürün ekle” ile manuel satır oluşturup alanları düzenleyebilir veya `Order_Form_2026.xlsx` benzeri `.xlsx`, `.xls` ve `.csv` dosyalarının ilk sayfasından ürünleri aktarabilir. Excel başlıkları Part No/Part Number, Description/Açıklama, Qty/Quantity/Adet ve opsiyonel Set Bilgisi/Set olarak eşleştirilir. Set Bilgisi görünümü aynı set adına sahip ürünleri gruplar. Kaydedilmiş bir kurulumun ürünleri Kurulumlar tablosundaki “Ürünler” işlemiyle daha sonra düzenlenebilir, silinebilir veya yeni satır/Excel içeriği eklenebilir. Excel okuma cihaz içinde, projeye yerel eklenen SheetJS 0.20.3 ile yapılır.
 
-## 4. ÃœrÃ¼n ve sevkiyat gereksinimleri
+## 4. Ürün ve sevkiyat gereksinimleri
 
-- GeliÅŸtirme sÄ±rasÄ±nda Ã¶rnek Ã¼rÃ¼n veritabanÄ± kullanÄ±lacak.
-- GerÃ§ek Ã¼rÃ¼n listesi kullanÄ±cÄ± tarafÄ±ndan daha sonra verilecek.
-- ÃœrÃ¼nler listeden seÃ§ilebilmeli, elle girilebilmeli veya dosyadan yÃ¼klenebilmeli.
-- â€œÃœrÃ¼nler mÃ¼ÅŸteriye sevk edildiâ€ sonradan iÅŸaretlenebilmeli.
-- Sevk edildiÄŸinde takvimden sevk tarihi seÃ§mek zorunlu olmalÄ±.
-- Tam ve parÃ§alÄ± sevkiyat desteklenmeli.
-- ParÃ§alÄ± sevkiyatta gÃ¶nderilen Ã¼rÃ¼nler ve miktarlar seÃ§ilebilmeli.
-- Bir sipariÅŸ iÃ§in birden fazla sevkiyat kaydÄ± tutulabilmeli.
-- Demo Ã¼rÃ¼n kullanÄ±mÄ± ve ilgili notlar kaydedilebilmeli.
+- Geliştirme sırasında örnek ürün veritabanı kullanılacak.
+- Gerçek ürün listesi kullanıcı tarafından daha sonra verilecek.
+- Ürünler listeden seçilebilmeli, elle girilebilmeli veya dosyadan yüklenebilmeli.
+- “Ürünler müşteriye sevk edildi” sonradan işaretlenebilmeli.
+- Sevk edildiğinde takvimden sevk tarihi seçmek zorunlu olmalı.
+- Tam ve parçalı sevkiyat desteklenmeli.
+- Parçalı sevkiyatta gönderilen ürünler ve miktarlar seçilebilmeli.
+- Bir sipariş için birden fazla sevkiyat kaydı tutulabilmeli.
+- Demo ürün kullanımı ve ilgili notlar kaydedilebilmeli.
 
 ## 5. Servis ve kurulum gereksinimleri
 
 - Planlanan kurulum tarihi
-- ÃœrÃ¼n durumu:
-  - ÃœrÃ¼nler tam
-  - ÃœrÃ¼n eksik; eksik Ã¼rÃ¼nler seÃ§ilir
-  - Demo Ã¼rÃ¼nle kurulum
-- MÃ¼ÅŸteriyle kurulum Ã¶ncesi kontrol listesi durumu
-- Planlanan kurulum sÃ¼resi
-- SÃ¼re saat veya gÃ¼n olarak girilebilir; varsayÄ±lan saat olmalÄ±.
-- GÃ¼n-saat dÃ¶nÃ¼ÅŸÃ¼mÃ¼ iÃ§in ÅŸimdilik Ã¶nerilen deÄŸer 1 gÃ¼n = 8 saattir; kesinleÅŸmedi.
+- Ürün durumu:
+  - Ürünler tam
+  - Ürün eksik; eksik ürünler seçilir
+  - Demo ürünle kurulum
+- Müşteriyle kurulum öncesi kontrol listesi durumu
+- Planlanan kurulum süresi
+- Süre saat veya gün olarak girilebilir; varsayılan saat olmalı.
+- Gün-saat dönüşümü için şimdilik önerilen değer 1 gün = 8 saattir; kesinleşmedi.
 
-Her kurulum ziyareti ayrÄ± kaydedilir:
+Her kurulum ziyareti ayrı kaydedilir:
 
-- 1. Kurulum, 2. Kurulum, 3. Kurulum ÅŸeklinde sÄ±nÄ±rsÄ±z devam edebilir.
-- KatÄ±lan bir veya birden fazla teknisyen
-- EÅŸlik eden bir veya birden fazla mÃ¼ÅŸteri Ã§alÄ±ÅŸanÄ±
-- Yol sÃ¼resi
-- Sahada geÃ§irilen sÃ¼re
-- FotoÄŸraf ve belgeler
-- Kurulum raporu; ilk kayÄ±ttan sonra da yÃ¼klenebilir
+- 1. Kurulum, 2. Kurulum, 3. Kurulum şeklinde sınırsız devam edebilir.
+- Katılan bir veya birden fazla teknisyen
+- Eşlik eden bir veya birden fazla müşteri çalışanı
+- Yol süresi
+- Sahada geçirilen süre
+- Fotoğraf ve belgeler
+- Kurulum raporu; ilk kayıttan sonra da yüklenebilir
 - Notlar
-- Kurulum tamamlandÄ± mÄ±?
-- TamamlanmadÄ±ysa planlanan sonraki kurulum tarihi
+- Kurulum tamamlandı mı?
+- Tamamlanmadıysa planlanan sonraki kurulum tarihi
 
-Toplam gerÃ§ekleÅŸen sÃ¼re hesabÄ±na hem yol hem saha sÃ¼resi dahildir. Planlanan sÃ¼re aÅŸÄ±lÄ±rsa teknisyene onay sorulmalÄ±. Onaydan sonra ek sÃ¼re kaydedilebilmeli ve sÃ¼re aÅŸÄ±mÄ± yÃ¶netici ekranÄ±nda belirgin biÃ§imde gÃ¶sterilmelidir.
+Toplam gerçekleşen süre hesabına hem yol hem saha süresi dahildir. Planlanan süre aşılırsa teknisyene onay sorulmalı. Onaydan sonra ek süre kaydedilebilmeli ve süre aşımı yönetici ekranında belirgin biçimde gösterilmelidir.
 
-Kurulum raporu iÃ§in:
+Kurulum raporu için:
 
-- MÃ¼ÅŸteriyle paylaÅŸÄ±ldÄ± mÄ±?
-- PaylaÅŸÄ±m tarihi ve alÄ±cÄ±larÄ±
-- PaylaÅŸÄ±lan e-postanÄ±n dosya olarak eklenmesi
+- Müşteriyle paylaşıldı mı?
+- Paylaşım tarihi ve alıcıları
+- Paylaşılan e-postanın dosya olarak eklenmesi
 
-## 6. YÃ¶netim ekranÄ±
+## 6. Yönetim ekranı
 
-YÃ¶netici ve Supervisor aÅŸaÄŸÄ±dakileri kolayca ayÄ±rt edebilmeli:
+Yönetici ve Supervisor aşağıdakileri kolayca ayırt edebilmeli:
 
-- AÃ§Ä±k kurulumlar
-- YaklaÅŸan ve geciken iÅŸler
-- Eksik Ã¼rÃ¼nlÃ¼ iÅŸler
-- ParÃ§alÄ± sevkiyatlar
-- SÃ¼re aÅŸÄ±mÄ± olan iÅŸler
-- Eksik kurulum raporlarÄ±
-- MÃ¼ÅŸteriyle paylaÅŸÄ±lmamÄ±ÅŸ raporlar
-- Planlanan ve gerÃ§ekleÅŸen sÃ¼reler
-- Kurulum tutarlarÄ±
+- Açık kurulumlar
+- Yaklaşan ve geciken işler
+- Eksik ürünlü işler
+- Parçalı sevkiyatlar
+- Süre aşımı olan işler
+- Eksik kurulum raporları
+- Müşteriyle paylaşılmamış raporlar
+- Planlanan ve gerçekleşen süreler
+- Kurulum tutarları
 
-Filtreler mÃ¼ÅŸteri, satÄ±ÅŸ mÃ¼hendisi, teknisyen, tarih, durum, Sales Order No ve PTD No alanlarÄ±nÄ± kapsamalÄ±. Ä°leride Excel ve PDF Ã§Ä±ktÄ±sÄ± eklenmelidir.
+Filtreler müşteri, satış mühendisi, teknisyen, tarih, durum, Sales Order No ve PTD No alanlarını kapsamalı. İleride Excel ve PDF çıktısı eklenmelidir.
 
 ## 7. Mevcut teknik durum
 
-Ã‡alÄ±ÅŸma klasÃ¶rÃ¼:
+Çalışma klasörü:
 
 `C:\AI Projeler\CPI_CPS_Kurulum_Takip`
 
-Ä°lk sÃ¼rÃ¼m baÄŸÄ±mlÄ±lÄ±ksÄ±z bir tarayÄ±cÄ± prototipidir:
+İlk sürüm bağımlılıksız bir tarayıcı prototipidir:
 
-- `index.html`: Uygulama ekranlarÄ±
-- `styles.css`: Responsive gÃ¶rsel tasarÄ±m
-- `app.js`: Ã–rnek veriler ve temel etkileÅŸimler
-- `manifest.webmanifest`: Telefona kurulabilir uygulama tanÄ±mÄ±
-- `service-worker.js`: Offline Ã¶nbellek baÅŸlangÄ±cÄ±
-- `README.md`: KullanÄ±m ve gÃ¼venlik notlarÄ±
+- `index.html`: Uygulama ekranları
+- `styles.css`: Responsive görsel tasarım
+- `app.js`: Örnek veriler ve temel etkileşimler
+- `manifest.webmanifest`: Telefona kurulabilir uygulama tanımı
+- `service-worker.js`: Offline önbellek başlangıcı
+- `README.md`: Kullanım ve güvenlik notları
 
 Mevcut prototipte:
 
-- Demo kullanÄ±cÄ± adÄ± ve ÅŸifre ekranÄ± Ã§alÄ±ÅŸÄ±r.
-- Supervisor kontrol paneli vardÄ±r.
-- Sekiz Ã¶rnek kurulum kaydÄ± bulunur.
-- Arama ve durum filtresi Ã§alÄ±ÅŸÄ±r.
-- Yeni kurulum formu Ã§alÄ±ÅŸÄ±r.
-- KayÄ±tlar geÃ§ici olarak tarayÄ±cÄ±nÄ±n `localStorage` alanÄ±nda tutulur.
-- Online/offline durum algÄ±lanÄ±r.
-- Offline durumda yeni kayÄ±t engellenir.
-- Mobil uyumlu gÃ¶rÃ¼nÃ¼m vardÄ±r.
-- TÃ¼rkÃ§e/Ä°ngilizce geÃ§iÅŸinin yalnÄ±zca temel menÃ¼ bÃ¶lÃ¼mÃ¼ uygulanmÄ±ÅŸtÄ±r; tÃ¼m ekran Ã§evirisi henÃ¼z tamamlanmamÄ±ÅŸtÄ±r.
-- ArayÃ¼z Desoutter'Ä±n resmÃ® sitesindeki tasarÄ±m diline yaklaÅŸtÄ±rÄ±lmÄ±ÅŸtÄ±r. ResmÃ® Desoutter logo varlÄ±ÄŸÄ± kullanÄ±lÄ±r. ResmÃ® CSS'ten doÄŸrulanan ana renkler `#0D0D0E` siyah, `#252526` koyu gri, beyaz/gri metinler ve `#EC4936` kÄ±rmÄ±zÄ±-turuncu vurgudur; sarÄ± kullanÄ±lmaz. Ãœst baÅŸlÄ±kta logo ve kullanÄ±cÄ± araÃ§larÄ±, ayrÄ± koyu satÄ±rda navigasyon bulunur. Mobil gÃ¶rÃ¼nÃ¼mde navigasyon yatay kaydÄ±rÄ±labilir.
+- Demo kullanıcı adı ve şifre ekranı çalışır.
+- Supervisor kontrol paneli vardır.
+- Sekiz örnek kurulum kaydı bulunur.
+- Arama ve durum filtresi çalışır.
+- Yeni kurulum formu çalışır.
+- Kayıtlar geçici olarak tarayıcının `localStorage` alanında tutulur.
+- Online/offline durum algılanır.
+- Offline durumda yeni kayıt engellenir.
+- Mobil uyumlu görünüm vardır.
+- Türkçe/İngilizce geçişinin yalnızca temel menü bölümü uygulanmıştır; tüm ekran çevirisi henüz tamamlanmamıştır.
+- Arayüz Desoutter'ın resmî sitesindeki tasarım diline yaklaştırılmıştır. Resmî Desoutter logo varlığı kullanılır. Resmî CSS'ten doğrulanan ana renkler `#0D0D0E` siyah, `#252526` koyu gri, beyaz/gri metinler ve `#EC4936` kırmızı-turuncu vurgudur; sarı kullanılmaz. Üst başlıkta logo ve kullanıcı araçları, ayrı koyu satırda navigasyon bulunur. Mobil görünümde navigasyon yatay kaydırılabilir.
 
-Demo hesaplarÄ± yalnÄ±zca prototip iÃ§indir:
+Demo hesapları yalnızca prototip içindir:
 
-- YÃ¶netici â€” Remzi Sakin: `admin` / `Demo123!`
-- SatÄ±ÅŸ MÃ¼hendisi â€” Ä°rem OÄŸuzkan: `sales` / `Demo123!`
-- Servis Supervisor â€” Tevfik ÅahinbaÅŸ: `supervisor` / `Demo123!`
-- Servis Teknisyeni â€” GÃ¼rcan Girgin: `technician` / `Demo123!`
+- Yönetici — Remzi Sakin: `admin` / `Demo123!`
+- Satış Mühendisi — İrem Oğuzkan: `sales` / `Demo123!`
+- Servis Supervisor — Tevfik Şahinbaş: `supervisor` / `Demo123!`
+- Servis Teknisyeni — Gürcan Girgin: `technician` / `Demo123!`
 
-Her demo kullanÄ±cÄ±sÄ± giriÅŸ yaptÄ±ÄŸÄ±nda rolÃ¼ne uygun menÃ¼leri gÃ¶rÃ¼r. Yeni kurulum oluÅŸturma iÅŸlemi prototipte yalnÄ±zca YÃ¶netici ve SatÄ±ÅŸ MÃ¼hendisi rollerine gÃ¶sterilir.
+Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Yeni kurulum oluşturma işlemi prototipte yalnızca Yönetici ve Satış Mühendisi rollerine gösterilir.
 
-Bu bilgiler Ã¼retim sÃ¼rÃ¼mÃ¼nde kullanÄ±lmamalÄ±dÄ±r.
+### Satıştan servis planlamasına geçiş
 
-## 8. GitHub Ã§alÄ±ÅŸma dÃ¼zeni
+- Satış Mühendisi tarafından oluşturulan yeni kurulum önce `Taslak` durumuyla kaydedilir.
+- Taslak kayıtlar Servis Supervisor ekranında ve bu role ait sayaçlarda görünmez.
+- Satış Mühendisi `Planlamaya gönder` düğmesine bastığında kayıt `Planlama bekliyor` durumuna geçer ve Servis Supervisor kuyruğunda görünür.
+- Satış Mühendisi listedeki `Düzenle` düğmesiyle müşteri, kontak, sipariş, ürün, tarih, not, ek ve sevkiyat alanlarının tamamını yeniden açıp düzenleyebilir.
+- Parçalı sevkiyat seçimi, ilgili kurulumun sipariş içeriğindeki gerçek ürünlerden oluşturulur.
+- Tahmini kurulum tarihi, tahmini sevkiyat/teslim tarihinden önce seçilemez.
+- Excel içe aktarma; `Part No`, `Description` ve `Qty` başlıklarını bularak ürün satırlarını okur; toplam/ara toplam satırlarında durur, yüzde içeren veya geçersiz adetli satırları atlar.
+
+Bu bilgiler üretim sürümünde kullanılmamalıdır.
+
+## 8. GitHub çalışma düzeni
 
 Depo:
 
@@ -176,55 +186,55 @@ Mevcut dal:
 
 `feat/initial-prototype`
 
-Ä°lk taslak PR:
+İlk taslak PR:
 
 `https://github.com/remzisakin/CPI_CPS_Kurulum_Takip/pull/1`
 
-GeliÅŸtirmeler kÃ¼Ã§Ã¼k ve anlamlÄ± commit'lere ayrÄ±lmalÄ±, dÃ¼zenli olarak aynÄ± depoya gÃ¶nderilmeli. KullanÄ±cÄ± istemedikÃ§e doÄŸrudan `main` Ã¼zerinde deÄŸiÅŸiklik yapÄ±lmamalÄ±dÄ±r.
+Geliştirmeler küçük ve anlamlı commit'lere ayrılmalı, düzenli olarak aynı depoya gönderilmeli. Kullanıcı istemedikçe doğrudan `main` üzerinde değişiklik yapılmamalıdır.
 
-## 9. Ã–nemli teknik sÄ±nÄ±r
+## 9. Önemli teknik sınır
 
-Mevcut prototip Ã¼retime hazÄ±r deÄŸildir. GerÃ§ek kullanÄ±mdan Ã¶nce aÅŸaÄŸÄ±dakiler gereklidir:
+Mevcut prototip üretime hazır değildir. Gerçek kullanımdan önce aşağıdakiler gereklidir:
 
-- Sunucu tarafÄ± uygulama
-- Merkezi veritabanÄ±
-- GÃ¼venli kimlik doÄŸrulama ve oturum yÃ¶netimi
-- Rol bazlÄ± yetkilendirme
-- GÃ¼venli dosya ve fotoÄŸraf depolama
-- KayÄ±t deÄŸiÅŸikliÄŸi geÃ§miÅŸi
+- Sunucu tarafı uygulama
+- Merkezi veritabanı
+- Güvenli kimlik doğrulama ve oturum yönetimi
+- Rol bazlı yetkilendirme
+- Güvenli dosya ve fotoğraf depolama
+- Kayıt değişikliği geçmişi
 - Yedekleme
-- Dosya tÃ¼rÃ¼ ve boyutu kontrolleri
-- GerÃ§ek offline veri gÃ¼venliÄŸi
-- Test ve yayÄ±n ortamlarÄ±
+- Dosya türü ve boyutu kontrolleri
+- Gerçek offline veri güvenliği
+- Test ve yayın ortamları
 
-TarayÄ±cÄ± koduna gerÃ§ek kullanÄ±cÄ± ÅŸifresi yazÄ±lmamalÄ± ve `localStorage` Ã¼retim veritabanÄ± olarak kullanÄ±lmamalÄ±dÄ±r.
+Tarayıcı koduna gerçek kullanıcı şifresi yazılmamalı ve `localStorage` üretim veritabanı olarak kullanılmamalıdır.
 
-## 10. SÄ±radaki Ã¶nerilen Ã§alÄ±ÅŸma
+## 10. Sıradaki önerilen çalışma
 
-1. Ãœretim teknolojisini ve yayÄ±n ortamÄ±nÄ± belirle.
-2. Merkezi veritabanÄ± ÅŸemasÄ±nÄ± oluÅŸtur.
-3. GÃ¼venli kullanÄ±cÄ± adÄ±/ÅŸifre sistemi ve rolleri geliÅŸtir.
-4. MÃ¼ÅŸteri, kontak, adres, Ã¼rÃ¼n ve satÄ±ÅŸ kaydÄ± ekranlarÄ±nÄ± tamamla.
-5. Sevkiyat ve parÃ§alÄ± sevkiyat akÄ±ÅŸÄ±nÄ± geliÅŸtir.
-6. Supervisor teknisyen atama ekranÄ±nÄ± geliÅŸtir.
-7. Tekrarlanan saha ziyareti ve sÃ¼re aÅŸÄ±mÄ± sistemini geliÅŸtir.
-8. Dosya/fotoÄŸraf yÃ¼kleme altyapÄ±sÄ±nÄ± ekle.
-9. TÃ¼rkÃ§e ve Ä°ngilizce Ã§evirileri tamamla.
-10. Offline salt-okunur davranÄ±ÅŸÄ± gerÃ§ek verilerle gÃ¼venli hÃ¢le getir.
+1. Üretim teknolojisini ve yayın ortamını belirle.
+2. Merkezi veritabanı şemasını oluştur.
+3. Güvenli kullanıcı adı/şifre sistemi ve rolleri geliştir.
+4. Müşteri, kontak, adres, ürün ve satış kaydı ekranlarını tamamla.
+5. Sevkiyat ve parçalı sevkiyat akışını geliştir.
+6. Supervisor teknisyen atama ekranını geliştir.
+7. Tekrarlanan saha ziyareti ve süre aşımı sistemini geliştir.
+8. Dosya/fotoğraf yükleme altyapısını ekle.
+9. Türkçe ve İngilizce çevirileri tamamla.
+10. Offline salt-okunur davranışı gerçek verilerle güvenli hâle getir.
 
-## 11. HenÃ¼z kesinleÅŸmeyen sorular
+## 11. Henüz kesinleşmeyen sorular
 
-- MTB'nin tam aÃ§Ä±lÄ±mÄ± nedir?
-- Bir iÅŸ gÃ¼nÃ¼ kesin olarak kaÃ§ saat kabul edilecek?
-- Kurulum Ã¶ncesi kontrol listesi maddeleri nelerdir?
-- SatÄ±ÅŸ kaydÄ± oluÅŸturulduktan sonra yÃ¶netici onayÄ± gerekecek mi?
-- Teknisyen atamasÄ± ve yaklaÅŸan tarihler iÃ§in e-posta bildirimi gÃ¶nderilecek mi?
-- Dosya baÅŸÄ±na boyut sÄ±nÄ±rÄ± ne olacak?
-- Kurulum tutarÄ±nÄ± hangi roller gÃ¶rebilecek?
-- Excel Ã§Ä±ktÄ±sÄ± genel listeyi, kurulum detayÄ±nÄ± veya ikisini birden mi iÃ§erecek?
-- Microsoft 365 giriÅŸ iÃ§in kullanÄ±lmayacak; yalnÄ±zca e-posta/bildirim entegrasyonunda kullanÄ±lÄ±p kullanÄ±lmayacaÄŸÄ± henÃ¼z belli deÄŸildir.
+- MTB'nin tam açılımı nedir?
+- Bir iş günü kesin olarak kaç saat kabul edilecek?
+- Kurulum öncesi kontrol listesi maddeleri nelerdir?
+- Satış kaydı oluşturulduktan sonra yönetici onayı gerekecek mi?
+- Teknisyen ataması ve yaklaşan tarihler için e-posta bildirimi gönderilecek mi?
+- Dosya başına boyut sınırı ne olacak?
+- Kurulum tutarını hangi roller görebilecek?
+- Excel çıktısı genel listeyi, kurulum detayını veya ikisini birden mi içerecek?
+- Microsoft 365 giriş için kullanılmayacak; yalnızca e-posta/bildirim entegrasyonunda kullanılıp kullanılmayacağı henüz belli değildir.
 
-## 12. Asistan iÃ§in devam kuralÄ±
+## 12. Asistan için devam kuralı
 
-Yeni bir Ã§alÄ±ÅŸma oturumunda Ã¶nce bu dosyayÄ± ve `README.md` dosyasÄ±nÄ± oku. ArdÄ±ndan mevcut dosyalarÄ± ve GitHub durumunu kontrol et. KullanÄ±cÄ±nÄ±n yeni kararÄ± bu dosyayla Ã§eliÅŸirse en gÃ¼ncel kullanÄ±cÄ± talebini uygula ve bu dosyayÄ± aynÄ± Ã§alÄ±ÅŸma iÃ§inde gÃ¼ncelle.
+Yeni bir çalışma oturumunda önce bu dosyayı ve `README.md` dosyasını oku. Ardından mevcut dosyaları ve GitHub durumunu kontrol et. Kullanıcının yeni kararı bu dosyayla çelişirse en güncel kullanıcı talebini uygula ve bu dosyayı aynı çalışma içinde güncelle.
 
