@@ -6,10 +6,10 @@ SatÄ±ÅŸ, sevkiyat ve saha kurulum sÃ¼reÃ§lerini izlemek iÃ§in hazÄ±r
 
 TÃ¼m demo hesaplarÄ±nÄ±n ÅŸifresi `Demo123!` ÅŸeklindedir.
 
-- YÃ¶netici: `admin`
-- SatÄ±ÅŸ MÃ¼hendisi: `sales`
-- Servis Supervisor: `supervisor`
-- Servis Teknisyeni: `technician`
+- YÃ¶netici â€” Remzi Sakin: `admin`
+- SatÄ±ÅŸ MÃ¼hendisi â€” Ä°rem OÄŸuzkan: `sales`
+- Servis Supervisor â€” Tevfik ÅahinbaÅŸ: `supervisor`
+- Servis Teknisyeni â€” GÃ¼rcan Girgin: `technician`
 
 `index.html` dosyasÄ± modern bir tarayÄ±cÄ±da doÄŸrudan aÃ§Ä±larak arayÃ¼z incelenebilir. Yeni kurulum kayÄ±tlarÄ± prototip aÅŸamasÄ±nda yalnÄ±zca o tarayÄ±cÄ±nÄ±n yerel hafÄ±zasÄ±nda saklanÄ±r.
 
