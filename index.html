@@ -101,16 +101,84 @@
       <div class="dialog-header"><div><p class="eyebrow">YENÄ° KAYIT</p><h2>Yeni kurulum oluÅŸtur</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">Ã—</button></div>
       <div class="steps"><span class="active">1 MÃ¼ÅŸteri</span><span>2 SipariÅŸ</span></div>
       <div class="form-grid">
-        <label class="wide">MÃ¼ÅŸteri adÄ±<input name="customer" required placeholder="Ã–rn. Atlas Otomasyon A.Å."></label>
-        <label>MÃ¼ÅŸteri yapÄ±sÄ±<select name="customerType"><option>DoÄŸrudan son kullanÄ±cÄ±</option><option>MTB ve son kullanÄ±cÄ± ayrÄ±</option></select></label>
-        <label>Kurulum adresi<input name="address" required placeholder="Åehir / adres"></label>
-        <label>SO No â€” Sales Order Number<input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
-        <label>PTD No<input name="ptd" placeholder="Varsa girin"></label>
-        <label>Talep tarihi<input name="requestDate" type="date" required></label>
-        <label>SatÄ±ÅŸ mÃ¼hendisi<select name="salesEngineer" required><option>Ä°rem OÄŸuzkan</option><option>Remzi Sakin</option></select></label>
-        <label>Kurulum tutarÄ± (â‚¬)<input name="amount" type="number" min="0" placeholder="0"></label>
-        <label class="wide">SipariÅŸ iÃ§eriÄŸi<textarea name="content" rows="3" required placeholder="ÃœrÃ¼n ve kurulum kapsamÄ±nÄ± yazÄ±n"></textarea></label>
-        <label class="wide">Notlar<textarea name="notes" rows="2" placeholder="Varsa Ã¶nemli notlar"></textarea></label>
+        <fieldset class="form-section wide">
+          <legend>MÃ¼ÅŸteri ve sipariÅŸ bilgileri</legend>
+          <div class="section-grid">
+            <label>MÃ¼ÅŸteri adÄ±<input name="customer" required placeholder="Ã–rn. Atlas Otomasyon A.Å."></label>
+            <label>MÃ¼ÅŸteri yapÄ±sÄ±<select id="customerType" name="customerType"><option value="direct">DoÄŸrudan son kullanÄ±cÄ±</option><option value="mtb">MTB ve son kullanÄ±cÄ± ayrÄ±</option></select></label>
+            <div id="mtbCompanyFields" class="conditional-fields wide role-hidden">
+              <label>MTB firma adÄ±<input name="mtbName" data-required placeholder="MTB firma adÄ±"></label>
+              <label>Son kullanÄ±cÄ± firma adÄ±<input name="endUserName" data-required placeholder="Son kullanÄ±cÄ± firma adÄ±"></label>
+            </div>
+            <label>MÃ¼ÅŸteriden sorumlu satÄ±ÅŸ mÃ¼hendisi<select name="salesEngineer" required><option>Ä°rem OÄŸuzkan</option><option>Remzi Sakin</option></select></label>
+            <label>SO No â€” Sales Order Number<input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
+            <label>PTD No <small>(varsa)</small><input name="ptd" placeholder="Varsa girin"></label>
+            <label>Kurulum tutarÄ± (â‚¬)<input name="amount" type="number" min="0" step="0.01" required placeholder="0"></label>
+            <label>Talep tarihi<input name="requestDate" type="date" required></label>
+            <label>Kurulum adresi<input name="address" required placeholder="Åehir / adres"></label>
+          </div>
+        </fieldset>
+
+        <fieldset id="directContactFields" class="form-section wide">
+          <legend>MÃ¼ÅŸteri kontak bilgileri</legend>
+          <div class="section-grid contact-grid">
+            <label>Ad<input name="contactFirstName" data-required required></label>
+            <label>Soyad<input name="contactLastName" data-required required></label>
+            <label>E-posta<input name="contactEmail" type="email" data-required required></label>
+            <label>Telefon<input name="contactPhone" type="tel" data-required required></label>
+          </div>
+        </fieldset>
+
+        <div id="splitContactFields" class="conditional-fields wide role-hidden">
+          <fieldset class="form-section">
+            <legend>MTB kontak bilgileri</legend>
+            <div class="section-grid contact-grid">
+              <label>Ad<input name="mtbContactFirstName" data-required></label>
+              <label>Soyad<input name="mtbContactLastName" data-required></label>
+              <label>E-posta<input name="mtbContactEmail" type="email" data-required></label>
+              <label>Telefon<input name="mtbContactPhone" type="tel" data-required></label>
+            </div>
+          </fieldset>
+          <fieldset class="form-section">
+            <legend>Son kullanÄ±cÄ± kontak bilgileri</legend>
+            <div class="section-grid contact-grid">
+              <label>Ad<input name="endUserContactFirstName" data-required></label>
+              <label>Soyad<input name="endUserContactLastName" data-required></label>
+              <label>E-posta<input name="endUserContactEmail" type="email" data-required></label>
+              <label>Telefon<input name="endUserContactPhone" type="tel" data-required></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <fieldset class="form-section wide">
+          <legend>SipariÅŸ iÃ§eriÄŸi ve tarihler</legend>
+          <div class="section-grid">
+            <label class="wide">SipariÅŸ iÃ§eriÄŸi<textarea name="content" rows="3" required placeholder="ÃœrÃ¼n ve kurulum kapsamÄ±nÄ± yazÄ±n"></textarea></label>
+            <label>Tahmini teslim tarihi <small>(varsa)</small><input name="estimatedDeliveryDate" type="date"></label>
+            <label>Tahmini kurulum tarihi <small>(varsa)</small><input name="estimatedInstallationDate" type="date"></label>
+            <label class="wide">Notlar<textarea name="notes" rows="2" placeholder="Varsa Ã¶nemli notlar"></textarea></label>
+            <label class="wide file-field">Dosya ekle<input name="attachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"><small>FotoÄŸraf, PDF, Word veya Excel dosyalarÄ± seÃ§ilebilir.</small></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section wide shipment-section">
+          <legend>Sevkiyat bilgileri</legend>
+          <label class="check-row"><input id="productsShipped" name="productsShipped" type="checkbox"> ÃœrÃ¼nler mÃ¼ÅŸteriye sevk edildi</label>
+          <div id="shipmentFields" class="conditional-fields role-hidden">
+            <div class="section-grid">
+              <label>Sevk tarihi<input name="shipmentDate" type="date" data-required></label>
+              <label class="check-row field-aligned"><input id="partialShipment" name="partialShipment" type="checkbox"> ParÃ§alÄ± sevkiyat</label>
+            </div>
+            <div id="partialProductFields" class="product-checklist role-hidden">
+              <p>Bu sevkiyatta gÃ¶nderilen Ã¼rÃ¼nler</p>
+              <label><input name="shippedProducts" type="checkbox" value="CVI3 Kontrol Ãœnitesi"> CVI3 Kontrol Ãœnitesi</label>
+              <label><input name="shippedProducts" type="checkbox" value="CONNECT AkÄ±llÄ± Hub"> CONNECT AkÄ±llÄ± Hub</label>
+              <label><input name="shippedProducts" type="checkbox" value="Q-SHIELD SÄ±kÄ±cÄ±"> Q-SHIELD SÄ±kÄ±cÄ±</label>
+              <label><input name="shippedProducts" type="checkbox" value="Kablo ve Aksesuar Seti"> Kablo ve Aksesuar Seti</label>
+            </div>
+            <label class="wide">Demo Ã¼rÃ¼n notu<textarea name="demoProductNote" rows="2" placeholder="Demo Ã¼rÃ¼n kullanÄ±lacaksa aÃ§Ä±klama ekleyin"></textarea></label>
+          </div>
+        </fieldset>
       </div>
       <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>VazgeÃ§</button><button id="saveInstallation" class="primary-button" value="default">KaydÄ± oluÅŸtur</button></div>
     </form>
@@ -127,6 +195,33 @@
         <label class="wide">Servis teknisyeni<select name="technician" required><option value="">Teknisyen seÃ§in</option><option>GÃ¼rcan Girgin</option><option>Ahmet Kaya</option><option>Selin Demir</option><option>Murat Ã‡elik</option></select></label>
       </div>
       <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>VazgeÃ§</button><button class="primary-button" value="default">PlanlamayÄ± kaydet</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="shipmentDialog">
+    <form id="shipmentForm" method="dialog">
+      <input id="shipmentInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SATIÅ MÃœHENDÄ°SÄ°</p><h2>Sevkiyat bilgilerini gÃ¼ncelle</h2><p id="shipmentRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">Ã—</button></div>
+      <div class="form-grid planning-grid">
+        <fieldset class="form-section wide shipment-section">
+          <label class="check-row"><input id="editProductsShipped" name="productsShipped" type="checkbox"> ÃœrÃ¼nler mÃ¼ÅŸteriye sevk edildi</label>
+          <div id="editShipmentFields" class="conditional-fields role-hidden">
+            <div class="section-grid">
+              <label>Sevk tarihi<input name="shipmentDate" type="date" data-required></label>
+              <label class="check-row field-aligned"><input id="editPartialShipment" name="partialShipment" type="checkbox"> ParÃ§alÄ± sevkiyat</label>
+            </div>
+            <div id="editPartialProductFields" class="product-checklist role-hidden">
+              <p>Bu sevkiyatta gÃ¶nderilen Ã¼rÃ¼nler</p>
+              <label><input name="shippedProducts" type="checkbox" value="CVI3 Kontrol Ãœnitesi"> CVI3 Kontrol Ãœnitesi</label>
+              <label><input name="shippedProducts" type="checkbox" value="CONNECT AkÄ±llÄ± Hub"> CONNECT AkÄ±llÄ± Hub</label>
+              <label><input name="shippedProducts" type="checkbox" value="Q-SHIELD SÄ±kÄ±cÄ±"> Q-SHIELD SÄ±kÄ±cÄ±</label>
+              <label><input name="shippedProducts" type="checkbox" value="Kablo ve Aksesuar Seti"> Kablo ve Aksesuar Seti</label>
+            </div>
+            <label>Demo Ã¼rÃ¼n notu<textarea name="demoProductNote" rows="2" placeholder="Demo Ã¼rÃ¼n kullanÄ±lacaksa aÃ§Ä±klama ekleyin"></textarea></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>VazgeÃ§</button><button class="primary-button" value="default">SevkiyatÄ± kaydet</button></div>
     </form>
   </dialog>
 
