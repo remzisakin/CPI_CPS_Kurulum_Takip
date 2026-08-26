@@ -1,15 +1,15 @@
 const seedInstallations = [
-  {id:1,customer:'Anka EndÃ¼stri',salesOrderNumber:'SO-2026-1842',ptd:'PTD-0831',status:'Devam ediyor',date:'27 AÄŸu 2026',tech:'Ahmet Kaya',initials:'AK',progress:65},
-  {id:2,customer:'Marmara Teknoloji',salesOrderNumber:'SO-2026-1798',ptd:'PTD-0814',status:'PlanlandÄ±',date:'28 AÄŸu 2026',tech:'Selin Demir',initials:'SD',progress:20},
-  {id:3,customer:'Nova Ambalaj',salesOrderNumber:'SO-2026-1765',ptd:'â€”',status:'Sevkiyat bekliyor',date:'02 Eyl 2026',tech:'Atama bekliyor',initials:'?',progress:10},
-  {id:4,customer:'Eksen Otomasyon',salesOrderNumber:'SO-2026-1699',ptd:'PTD-0779',status:'SÃ¼re aÅŸÄ±ldÄ±',date:'25 AÄŸu 2026',tech:'Murat Ã‡elik',initials:'MÃ‡',progress:82},
-  {id:5,customer:'Atlas Makina',salesOrderNumber:'SO-2026-1684',ptd:'PTD-0764',status:'PlanlandÄ±',date:'04 Eyl 2026',tech:'Ahmet Kaya',initials:'AK',progress:15},
-  {id:6,customer:'Pera Ãœretim',salesOrderNumber:'SO-2026-1651',ptd:'â€”',status:'Devam ediyor',date:'05 Eyl 2026',tech:'Selin Demir',initials:'SD',progress:48},
-  {id:7,customer:'Kuzey Robotik',salesOrderNumber:'SO-2026-1602',ptd:'PTD-0702',status:'PlanlandÄ±',date:'08 Eyl 2026',tech:'Murat Ã‡elik',initials:'MÃ‡',progress:25},
-  {id:8,customer:'Delta Sistem',salesOrderNumber:'SO-2026-1588',ptd:'PTD-0688',status:'SÃ¼re aÅŸÄ±ldÄ±',date:'24 AÄŸu 2026',tech:'Ahmet Kaya',initials:'AK',progress:92}
+  {id:1,customer:'Anka EndÃ¼stri',salesOrderNumber:'SO-2026-1842',requestDate:'12 AÄŸu 2026',salesEngineer:'Ä°rem OÄŸuzkan',ptd:'PTD-0831',status:'Devam ediyor',date:'27 AÄŸu 2026',tech:'Ahmet Kaya',initials:'AK',progress:65},
+  {id:2,customer:'Marmara Teknoloji',salesOrderNumber:'SO-2026-1798',requestDate:'14 AÄŸu 2026',salesEngineer:'Ä°rem OÄŸuzkan',ptd:'PTD-0814',status:'PlanlandÄ±',date:'28 AÄŸu 2026',tech:'Selin Demir',initials:'SD',progress:20},
+  {id:3,customer:'Nova Ambalaj',salesOrderNumber:'SO-2026-1765',requestDate:'15 AÄŸu 2026',salesEngineer:'Remzi Sakin',ptd:'â€”',status:'Sevkiyat bekliyor',date:'02 Eyl 2026',tech:'Atama bekliyor',initials:'?',progress:10},
+  {id:4,customer:'Eksen Otomasyon',salesOrderNumber:'SO-2026-1699',requestDate:'17 AÄŸu 2026',salesEngineer:'Ä°rem OÄŸuzkan',ptd:'PTD-0779',status:'SÃ¼re aÅŸÄ±ldÄ±',date:'25 AÄŸu 2026',tech:'Murat Ã‡elik',initials:'MÃ‡',progress:82},
+  {id:5,customer:'Atlas Makina',salesOrderNumber:'SO-2026-1684',requestDate:'18 AÄŸu 2026',salesEngineer:'Remzi Sakin',ptd:'PTD-0764',status:'PlanlandÄ±',date:'04 Eyl 2026',tech:'Ahmet Kaya',initials:'AK',progress:15},
+  {id:6,customer:'Pera Ãœretim',salesOrderNumber:'SO-2026-1651',requestDate:'19 AÄŸu 2026',salesEngineer:'Ä°rem OÄŸuzkan',ptd:'â€”',status:'Devam ediyor',date:'05 Eyl 2026',tech:'Selin Demir',initials:'SD',progress:48},
+  {id:7,customer:'Kuzey Robotik',salesOrderNumber:'SO-2026-1602',requestDate:'20 AÄŸu 2026',salesEngineer:'Remzi Sakin',ptd:'PTD-0702',status:'PlanlandÄ±',date:'08 Eyl 2026',tech:'Murat Ã‡elik',initials:'MÃ‡',progress:25},
+  {id:8,customer:'Delta Sistem',salesOrderNumber:'SO-2026-1588',requestDate:'21 AÄŸu 2026',salesEngineer:'Ä°rem OÄŸuzkan',ptd:'PTD-0688',status:'SÃ¼re aÅŸÄ±ldÄ±',date:'24 AÄŸu 2026',tech:'Ahmet Kaya',initials:'AK',progress:92}
 ];
 
-let installations = (JSON.parse(localStorage.getItem('cps-installations') || 'null') || seedInstallations).map(item=>({...item,salesOrderNumber:item.salesOrderNumber||item.so}));
+let installations = (JSON.parse(localStorage.getItem('cps-installations') || 'null') || seedInstallations).map(item=>{const sample=seedInstallations.find(seed=>seed.id===item.id);return {...item,salesOrderNumber:item.salesOrderNumber||item.so,requestDate:item.requestDate||sample?.requestDate||'â€”',salesEngineer:item.salesEngineer||sample?.salesEngineer||'Atama bekliyor'}});
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const demoUsers={
@@ -27,13 +27,14 @@ const translations={
 
 function statusClass(status){return {'Devam ediyor':'progress','PlanlandÄ±':'planned','Sevkiyat bekliyor':'waiting','SÃ¼re aÅŸÄ±ldÄ±':'overrun'}[status] || 'planned'}
 function rowTemplate(item){return `<tr><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.salesOrderNumber)} Â· ${escapeHtml(item.ptd)}</small></td><td><span class="status ${statusClass(item.status)}">${item.status}</span></td><td><strong>${item.date}</strong><small>09:00</small></td><td><div class="technician"><span class="mini-avatar">${item.initials}</span>${escapeHtml(item.tech)}</div></td><td><span class="progress-bar"><i style="width:${item.progress}%"></i></span><small>%${item.progress}</small></td><td><button class="row-action" aria-label="Detay">â€º</button></td></tr>`}
+function installationRowTemplate(item){return `<tr><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.ptd)}</small></td><td><strong>${escapeHtml(item.salesOrderNumber)}</strong></td><td>${escapeHtml(item.requestDate)}</td><td><strong>${escapeHtml(item.salesEngineer)}</strong></td><td><span class="status ${statusClass(item.status)}">${item.status}</span></td><td><strong>${item.date}</strong><small>09:00</small></td><td><div class="technician"><span class="mini-avatar">${item.initials}</span>${escapeHtml(item.tech)}</div></td><td><span class="progress-bar"><i style="width:${item.progress}%"></i></span><small>%${item.progress}</small></td><td><button class="row-action" aria-label="Detay">â€º</button></td></tr>`}
 function escapeHtml(value){return String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]))}
 function render(){
   const term=($('#searchInput')?.value||'').toLocaleLowerCase('tr');
   const filter=$('#statusFilter')?.value||'';
-  const filtered=installations.filter(x=>(!filter||x.status===filter)&&(`${x.customer} ${x.salesOrderNumber} ${x.ptd}`.toLocaleLowerCase('tr').includes(term)));
+  const filtered=installations.filter(x=>(!filter||x.status===filter)&&(`${x.customer} ${x.salesOrderNumber} ${x.ptd} ${x.salesEngineer}`.toLocaleLowerCase('tr').includes(term)));
   $('#installationRows').innerHTML=installations.slice(0,4).map(rowTemplate).join('');
-  $('#allInstallationRows').innerHTML=filtered.map(rowTemplate).join('') || '<tr><td colspan="6">AramanÄ±zla eÅŸleÅŸen kayÄ±t bulunamadÄ±.</td></tr>';
+  $('#allInstallationRows').innerHTML=filtered.map(installationRowTemplate).join('') || '<tr><td colspan="9">AramanÄ±zla eÅŸleÅŸen kayÄ±t bulunamadÄ±.</td></tr>';
   $('#activeCount').textContent=installations.length;
   $('#navCount').textContent=installations.length;
   $('#overrunCount').textContent=installations.filter(x=>x.status==='SÃ¼re aÅŸÄ±ldÄ±').length;
@@ -48,7 +49,7 @@ function showView(name){
   $('.sidebar')?.classList.remove('open');
 }
 function showToast(message){const toast=$('#toast');toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)}
-function openNew(){if(!navigator.onLine){showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}$('#installationDialog').showModal()}
+function openNew(){if(!navigator.onLine){showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}const requestDate=$('[name="requestDate"]');if(requestDate&&!requestDate.value)requestDate.value=new Date().toISOString().slice(0,10);$('#installationDialog').showModal()}
 function toggleLanguage(){language=language==='tr'?'en':'tr';document.documentElement.lang=language;$$('[data-i18n]').forEach(node=>node.textContent=translations[language][node.dataset.i18n]);$('#languageButton').textContent=language.toUpperCase();$('#loginLanguage').textContent=language==='tr'?'EN':'TR';showToast(language==='tr'?'Dil TÃ¼rkÃ§e olarak deÄŸiÅŸtirildi.':'Language changed to English.')}
 function applyUser(user){
   currentUser=user;
@@ -82,7 +83,8 @@ $('#installationForm').addEventListener('submit',event=>{
   if(!navigator.onLine){$('#installationDialog').close();showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}
   const data=new FormData(event.currentTarget);const date=new Date(`${data.get('date')}T12:00:00`);
   const tech=data.get('technician');
-  installations.unshift({id:Date.now(),customer:data.get('customer'),salesOrderNumber:data.get('salesOrderNumber'),ptd:data.get('ptd')||'â€”',status:tech==='Atama bekliyor'?'Sevkiyat bekliyor':'PlanlandÄ±',date:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(date),tech,initials:tech==='Atama bekliyor'?'?':tech.split(' ').map(x=>x[0]).join(''),progress:10});
+  const requestDate=new Date(`${data.get('requestDate')}T12:00:00`);
+  installations.unshift({id:Date.now(),customer:data.get('customer'),salesOrderNumber:data.get('salesOrderNumber'),requestDate:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(requestDate),salesEngineer:data.get('salesEngineer'),ptd:data.get('ptd')||'â€”',status:tech==='Atama bekliyor'?'Sevkiyat bekliyor':'PlanlandÄ±',date:new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'short',year:'numeric'}).format(date),tech,initials:tech==='Atama bekliyor'?'?':tech.split(' ').map(x=>x[0]).join(''),progress:10});
   localStorage.setItem('cps-installations',JSON.stringify(installations));render();event.currentTarget.reset();$('#installationDialog').close();showToast('Yeni kurulum kaydÄ± oluÅŸturuldu.');
 });
 
