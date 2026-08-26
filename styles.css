@@ -8,3 +8,42 @@ dialog{border:0;border-radius:10px;padding:0;width:min(760px,calc(100% - 30px));
 @media(max-width:440px){.stat-grid{grid-template-columns:1fr}.page-heading{flex-direction:column}.page-heading .primary-button{font-size:12px}.form-grid{padding:18px}.dialog-header,.dialog-actions{padding-left:18px;padding-right:18px}}
 .nav-item i{font-style:normal}
 
+/* Ãœst navigasyon dÃ¼zeni */
+.app-shell{display:block;padding-top:78px}
+.sidebar{inset:0 0 auto 0;width:100%;height:78px;padding:0 28px;flex-direction:row;align-items:center;gap:24px;box-shadow:0 5px 18px rgba(8,29,43,.12)}
+.app-brand{padding:0;min-width:max-content}
+.app-brand .brand-mark.small{width:38px;height:38px}
+.sidebar nav{display:flex;align-items:stretch;height:100%;gap:3px;min-width:0}
+.nav-item{width:auto;margin:0;padding:0 12px;border-radius:0;white-space:nowrap;position:relative}
+.nav-item span{width:auto;font-size:15px}
+.nav-item em{margin-left:2px}
+.nav-item.active,.nav-item:hover{background:transparent;color:white}
+.nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;background:#63c7c0;border-radius:3px 3px 0 0}
+.nav-label{display:none}
+.sidebar-foot{margin:0 0 0 auto;padding:0 0 0 20px;border:0;border-left:1px solid rgba(255,255,255,.12);min-width:205px}
+.main-content{margin:0;min-width:0}
+.topbar{top:78px}
+
+@media(max-width:1120px){
+  .sidebar{gap:12px;padding:0 18px}
+  .app-brand>div:last-child{display:none}
+  .sidebar-foot{min-width:auto}
+  .sidebar-foot>div:nth-child(2){display:none}
+  .sidebar-foot{grid-template-columns:35px 25px;padding-left:12px}
+}
+
+@media(max-width:760px){
+  .app-shell{padding-top:64px}
+  .sidebar{height:64px;padding:0 12px;transform:none;transition:none;gap:9px}
+  .sidebar.open{transform:none}
+  .app-brand .brand-mark.small{width:34px;height:34px}
+  .sidebar nav{overflow-x:auto;scrollbar-width:none;flex:1}
+  .sidebar nav::-webkit-scrollbar{display:none}
+  .nav-item{padding:0 10px}
+  .nav-item span{display:none}
+  .nav-item.active::after{left:10px;right:10px}
+  .sidebar-foot{display:none}
+  .topbar{top:64px}
+  .menu-button{display:none}
+}
+
