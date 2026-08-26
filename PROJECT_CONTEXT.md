@@ -143,6 +143,7 @@ Mevcut prototipte:
 - Offline durumda yeni kayÄ±t engellenir.
 - Mobil uyumlu gÃ¶rÃ¼nÃ¼m vardÄ±r.
 - TÃ¼rkÃ§e/Ä°ngilizce geÃ§iÅŸinin yalnÄ±zca temel menÃ¼ bÃ¶lÃ¼mÃ¼ uygulanmÄ±ÅŸtÄ±r; tÃ¼m ekran Ã§evirisi henÃ¼z tamamlanmamÄ±ÅŸtÄ±r.
+- Ana navigasyon soldaki dikey menÃ¼den ekranÄ±n Ã¼stÃ¼nde yer alan yatay menÃ¼ye dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lmÃ¼ÅŸtÃ¼r. Mobil gÃ¶rÃ¼nÃ¼mde menÃ¼ yatay kaydÄ±rÄ±labilir.
 
 Demo hesabÄ± yalnÄ±zca prototip iÃ§indir:
 
