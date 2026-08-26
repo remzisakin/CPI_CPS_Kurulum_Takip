@@ -78,3 +78,81 @@ dialog{border:0;border-radius:10px;padding:0;width:min(760px,calc(100% - 30px));
   .topbar{top:106px}
 }
 
+/* Desoutter kurumsal arayÃ¼z */
+:root{--navy:#171717;--navy-2:#242424;--ink:#181818;--muted:#666;--line:#dedede;--bg:#f4f4f2;--white:#fff;--teal:#e30613;--amber:#f4c400;--coral:#e30613;--blue:#343434;--shadow:0 8px 22px rgba(0,0,0,.08)}
+body{background:var(--bg);font-family:Arial,"Segoe UI",sans-serif}
+.app-shell{display:block;padding:0;min-height:100vh}
+.site-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #d8d8d8;box-shadow:0 3px 12px rgba(0,0,0,.08)}
+.header-main{height:78px;padding:0 38px;display:flex;align-items:center;justify-content:space-between;gap:28px}
+.app-brand{display:flex;align-items:center;gap:22px;padding:0;min-width:0}
+.official-logo{display:block;width:190px;height:auto;object-fit:contain}
+.login-logo{width:min(340px,80%);margin:0 0 46px}
+.app-title{padding-left:22px;border-left:1px solid #d2d2d2;display:flex;flex-direction:column;gap:4px;white-space:nowrap}
+.app-title b{font-size:19px;color:#1c1c1c}
+.app-title small{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#777}
+.header-tools{display:flex;align-items:center;gap:10px;min-width:0}
+.connection{margin:0 10px 0 0;padding-right:18px;border-right:1px solid #ddd;color:#555;white-space:nowrap}
+.connection i{background:#36a269}
+.connection.offline i{background:#e30613}
+.header-button,.logout-button{height:38px;padding:0 13px;border:1px solid #d9d9d9;background:white;color:#242424;font-size:12px;font-weight:700;position:relative}
+.header-button:hover,.logout-button:hover{border-color:#1d1d1d}
+.notification-button{font-weight:500}
+.user-summary{height:45px;margin-left:8px;padding-left:16px;border-left:1px solid #ddd;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.user-summary>div:last-child{display:flex;flex-direction:column;gap:2px}
+.user-summary b{font-size:12px}.user-summary small{font-size:10px;color:#777}
+.avatar{background:#f4c400;color:#1b1b1b}
+.logout-button{background:#1e1e1e;color:#fff;border-color:#1e1e1e}
+.header-nav{height:54px;padding:0 38px;background:#1c1c1c;display:flex;align-items:stretch;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.header-nav::-webkit-scrollbar{display:none}
+.header-nav .nav-item{height:54px;width:auto;flex:0 0 auto;margin:0;padding:0 20px;border:0;border-right:1px solid #353535;border-radius:0;background:transparent;color:#e4e4e4;font-size:13px;gap:9px;white-space:nowrap;position:relative}
+.header-nav .nav-item:first-child{border-left:1px solid #353535}
+.header-nav .nav-item span{display:inline;width:auto;font-size:14px;color:#aaa}
+.header-nav .nav-item em{margin-left:2px;background:#444;color:#fff}
+.header-nav .nav-item:hover{background:#292929;color:#fff}
+.header-nav .nav-item.active{background:#f4c400;color:#181818}
+.header-nav .nav-item.active span{color:#181818}
+.header-nav .nav-item.active em{background:#1e1e1e;color:#fff}
+.header-nav .nav-item.active::after{display:none}
+.main-content{margin:0;min-width:0}
+.view{padding:38px clamp(20px,3vw,52px)}
+.eyebrow{color:#e30613}
+.page-heading h1,.panel-header h2,.login-card h2{font-family:Arial,"Segoe UI",sans-serif;font-weight:800}
+.primary-button{background:#f4c400;color:#181818;border-radius:0;text-transform:none}
+.primary-button:hover{background:#ffd817}
+.secondary-button,.login-card input,.form-grid input,.form-grid select,.form-grid textarea,.toolbar input,.toolbar select,.panel,.stat-card,dialog{border-radius:0}
+.stat-card.dark{background:#242424;border-top:4px solid #f4c400}
+.stat-card:not(.dark){border-top:4px solid #dedede}
+.stat-card:nth-child(3){border-top-color:#f4c400}.stat-card:nth-child(4){border-top-color:#e30613}
+.stat-icon.blue{color:#222;background:#eee}.stat-icon.amber{background:#fff5bd;color:#695500}.stat-icon.coral{background:#fee9ea;color:#e30613}
+.status.progress{background:#e8f4ed;color:#247348}.status.planned{background:#eee;color:#333}.status.waiting{background:#fff4c2;color:#6b5700}.status.overrun{background:#fee8e9;color:#b0000b}
+.progress-bar i{background:#e30613}
+.text-link{color:#d0000c}
+.login-brand{background:#181818}
+.login-brand:after{border-color:rgba(244,196,0,.15);box-shadow:0 0 0 80px rgba(244,196,0,.035),0 0 0 160px rgba(244,196,0,.02)}
+.login-brand .eyebrow{color:#f4c400}
+.brand-feature>span{color:#f4c400;border-color:#f4c400}
+.demo-box{background:#fff6c8;color:#4c410b}
+.login-card input:focus,.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.09)}
+.toast{background:#202020;border-left:5px solid #f4c400;border-radius:0}
+
+@media(max-width:1100px){
+  .header-main{padding:0 22px}
+  .official-logo{width:155px}
+  .app-title{display:none}
+  .connection{display:none}
+  .header-nav{padding:0 22px}
+}
+
+@media(max-width:760px){
+  .site-header{position:sticky;height:auto;display:block;padding:0;transform:none}
+  .header-main{height:66px;padding:0 14px;gap:12px}
+  .official-logo{width:132px}
+  .header-tools{margin-left:auto}
+  .notification-button,.user-summary{display:none}
+  .header-button,.logout-button{height:34px;padding:0 10px}
+  .header-nav{height:50px;padding:0 14px}
+  .header-nav .nav-item{height:50px;padding:0 15px}
+  .header-nav .nav-item span{display:none}
+  .view{padding:25px 16px}
+}
+
