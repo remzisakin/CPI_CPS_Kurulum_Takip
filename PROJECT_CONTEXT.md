@@ -59,6 +59,10 @@ Planlanan kurulum tarihi, planlanan sÃ¼re/birim ve servis teknisyeni satÄ±Å
 - Dosya ekleri
 - MÃ¼ÅŸteri merkezinden farklÄ± olabilen kurulum adresi
 
+SatÄ±ÅŸ mÃ¼hendisi â€œYeni kurulumâ€ formunda doÄŸrudan son kullanÄ±cÄ± veya MTB + son kullanÄ±cÄ± yapÄ±sÄ±nÄ± seÃ§er. MTB seÃ§ilirse iki firmanÄ±n kontak bilgileri ayrÄ± ve zorunlu alanlar olarak aÃ§Ä±lÄ±r. Tahmini teslim/kurulum tarihleri opsiyoneldir. Sevk edildi iÅŸaretlenirse sevk tarihi zorunlu olur; parÃ§alÄ± sevkiyatta gÃ¶nderilen en az bir mock Ã¼rÃ¼n seÃ§ilir. Demo Ã¼rÃ¼n notu ve Ã§oklu dosya seÃ§imi desteklenir. Prototipte dosyanÄ±n yalnÄ±zca adÄ±, tÃ¼rÃ¼ ve boyutu tarayÄ±cÄ± kaydÄ±na yazÄ±lÄ±r; gerÃ§ek dosya iÃ§eriÄŸi Ã¼retim sÃ¼rÃ¼mÃ¼nde nesne depolamaya alÄ±nacaktÄ±r.
+
+SatÄ±ÅŸ MÃ¼hendisi, mevcut bir kaydÄ±n sevkiyat bilgilerini Kurulumlar tablosundaki â€œSevkiyatâ€ dÃ¼ÄŸmesinden daha sonra gÃ¼ncelleyebilir. Bu iÅŸlem sevk tarihi zorunluluÄŸunu ve parÃ§alÄ± sevkiyat Ã¼rÃ¼n seÃ§imini yeniden uygular.
+
 ## 4. ÃœrÃ¼n ve sevkiyat gereksinimleri
 
 - GeliÅŸtirme sÄ±rasÄ±nda Ã¶rnek Ã¼rÃ¼n veritabanÄ± kullanÄ±lacak.
