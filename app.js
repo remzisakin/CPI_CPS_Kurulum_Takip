@@ -12,6 +12,13 @@ const seedInstallations = [
 let installations = JSON.parse(localStorage.getItem('cps-installations') || 'null') || seedInstallations;
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
+const demoUsers={
+  admin:{username:'admin',password:'Demo123!',name:'AyÅŸe YÄ±lmaz',firstName:'AyÅŸe',initials:'AY',role:'admin',roleLabel:'YÃ¶netici',description:'TÃ¼m kurulum operasyonlarÄ±nÄ±n genel gÃ¶rÃ¼nÃ¼mÃ¼.'},
+  sales:{username:'sales',password:'Demo123!',name:'Zeynep Erdem',firstName:'Zeynep',initials:'ZE',role:'sales',roleLabel:'SatÄ±ÅŸ MÃ¼hendisi',description:'SatÄ±ÅŸ ve sevkiyat kayÄ±tlarÄ±nÄ±zÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'},
+  supervisor:{username:'supervisor',password:'Demo123!',name:'Emre Aksoy',firstName:'Emre',initials:'EA',role:'supervisor',roleLabel:'Servis Supervisor',description:'Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'},
+  technician:{username:'technician',password:'Demo123!',name:'Ahmet Kaya',firstName:'Ahmet',initials:'AK',role:'technician',roleLabel:'Servis Teknisyeni',description:'Size atanan kurulumlarÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'}
+};
+let currentUser=null;
 let language='tr';
 const translations={
   tr:{overview:'Genel BakÄ±ÅŸ',installations:'Kurulumlar',calendar:'Takvim',customers:'MÃ¼ÅŸteriler',products:'ÃœrÃ¼nler',reports:'Raporlar',users:'KullanÄ±cÄ±lar'},
@@ -43,14 +50,27 @@ function showView(name){
 function showToast(message){const toast=$('#toast');toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)}
 function openNew(){if(!navigator.onLine){showToast('Ä°ÅŸleme devam etmek iÃ§in online olun.');return}$('#installationDialog').showModal()}
 function toggleLanguage(){language=language==='tr'?'en':'tr';document.documentElement.lang=language;$$('[data-i18n]').forEach(node=>node.textContent=translations[language][node.dataset.i18n]);$('#languageButton').textContent=language.toUpperCase();$('#loginLanguage').textContent=language==='tr'?'EN':'TR';showToast(language==='tr'?'Dil TÃ¼rkÃ§e olarak deÄŸiÅŸtirildi.':'Language changed to English.')}
+function applyUser(user){
+  currentUser=user;
+  $('#currentUserInitials').textContent=user.initials;
+  $('#currentUserName').textContent=user.name;
+  $('#currentUserRole').textContent=user.roleLabel;
+  $('#welcomeHeading').textContent=`GÃ¼naydÄ±n, ${user.firstName}`;
+  $('#welcomeDescription').textContent=user.description;
+  $$('[data-roles]').forEach(item=>item.classList.toggle('role-hidden',!item.dataset.roles.split(',').includes(user.role)));
+  $$('.sales-action').forEach(item=>item.classList.toggle('role-hidden',!['admin','sales'].includes(user.role)));
+  showView('dashboard');render();
+}
 
 $('#loginForm').addEventListener('submit',event=>{
   event.preventDefault();
-  if($('#username').value==='supervisor'&&$('#password').value==='Demo123!'){
-    sessionStorage.setItem('cps-session','active');$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');render();
+  const user=Object.values(demoUsers).find(item=>item.username===$('#username').value.trim()&&item.password===$('#password').value);
+  if(user){
+    sessionStorage.setItem('cps-session',user.username);$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');applyUser(user);
   }else $('#loginError').textContent='KullanÄ±cÄ± adÄ± veya ÅŸifre hatalÄ±.';
 });
-$('#logoutButton').addEventListener('click',()=>{sessionStorage.removeItem('cps-session');$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#password').value=''});
+$$('[data-demo-user]').forEach(button=>button.addEventListener('click',()=>{const user=demoUsers[button.dataset.demoUser];$('#username').value=user.username;$('#password').value=user.password;$('#loginError').textContent='';$('#loginForm').requestSubmit()}));
+$('#logoutButton').addEventListener('click',()=>{sessionStorage.removeItem('cps-session');currentUser=null;$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#password').value=''});
 $('#mainNav').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view)});
 $('#newInstallationButton').addEventListener('click',openNew);$$('.open-new').forEach(x=>x.addEventListener('click',openNew));
 $('#showAllButton').addEventListener('click',()=>showView('installations'));
@@ -73,6 +93,6 @@ $('#alertsList').innerHTML=alerts.map(x=>`<div class="alert-item"><span class="a
 
 function updateConnection(){const online=navigator.onLine;$('#connectionState').className=`connection ${online?'online':'offline'}`;$('#connectionState span').textContent=online?'Ã‡evrimiÃ§i':'Offline Â· Sadece gÃ¶rÃ¼ntÃ¼leme';if(!online)showToast('Offline mod: KayÄ±tlar yalnÄ±zca gÃ¶rÃ¼ntÃ¼lenebilir.')}
 window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);updateConnection();
-if(sessionStorage.getItem('cps-session')==='active'){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');render()}
+const savedUser=demoUsers[sessionStorage.getItem('cps-session')];if(savedUser){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');applyUser(savedUser)}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('service-worker.js');
 
