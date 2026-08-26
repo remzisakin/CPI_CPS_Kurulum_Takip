@@ -35,6 +35,8 @@ Roller:
 
 Servis Supervisor, kurulum iÅŸlerine bir veya birden fazla teknisyen atar. Bir kurulumda birden fazla satÄ±ÅŸ mÃ¼hendisi de bulunabilir.
 
+Planlanan kurulum tarihi, planlanan sÃ¼re/birim ve servis teknisyeni satÄ±ÅŸ mÃ¼hendisi tarafÄ±ndan girilmez. SatÄ±ÅŸ kaydÄ± â€œPlanlama bekliyorâ€ durumunda aÃ§Ä±lÄ±r; bu Ã¼Ã§ alan Kurulumlar ekranÄ±ndaki ayrÄ± â€œServis planlamasÄ±â€ iÅŸlemi Ã¼zerinden yalnÄ±zca Servis Supervisor tarafÄ±ndan kaydedilir.
+
 ## 3. SatÄ±ÅŸ kaydÄ± gereksinimleri
 
 - MÃ¼ÅŸteri adÄ±
