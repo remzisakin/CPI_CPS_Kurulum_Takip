@@ -47,3 +47,34 @@ dialog{border:0;border-radius:10px;padding:0;width:min(760px,calc(100% - 30px));
   .menu-button{display:none}
 }
 
+/* Ãœst menÃ¼ yerleÅŸim dÃ¼zeltmesi: marka/kullanÄ±cÄ± ve navigasyon ayrÄ± satÄ±rlar */
+.app-shell{padding-top:122px}
+.sidebar{height:122px;padding:0 34px;display:grid;grid-template-columns:1fr auto;grid-template-rows:66px 56px;column-gap:24px;align-items:center}
+.app-brand{grid-column:1;grid-row:1;align-self:center}
+.sidebar nav{grid-column:1/-1;grid-row:2;width:100%;height:56px;border-top:1px solid rgba(255,255,255,.1);overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.sidebar nav::-webkit-scrollbar{display:none}
+.nav-item{height:56px;padding:0 17px;flex:0 0 auto}
+.nav-item:first-child{padding-left:8px}
+.nav-item.active::after{left:17px;right:17px}
+.nav-item:first-child.active::after{left:8px}
+.sidebar-foot{grid-column:2;grid-row:1;margin:0;padding-left:22px;min-width:230px}
+.topbar{top:122px}
+
+@media(max-width:1120px){
+  .sidebar{padding:0 22px}
+  .app-brand>div:last-child{display:flex}
+  .sidebar-foot{grid-template-columns:35px 1fr 25px;min-width:205px}
+  .sidebar-foot>div:nth-child(2){display:flex}
+}
+
+@media(max-width:760px){
+  .app-shell{padding-top:106px}
+  .sidebar{height:106px;padding:0 14px;display:grid;grid-template-columns:1fr;grid-template-rows:50px 56px}
+  .app-brand{grid-column:1;grid-row:1}
+  .app-brand>div:last-child{display:flex}
+  .app-brand>div:last-child small{display:none}
+  .sidebar nav{grid-column:1;grid-row:2}
+  .sidebar-foot{display:none}
+  .topbar{top:106px}
+}
+
