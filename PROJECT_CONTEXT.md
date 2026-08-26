@@ -40,7 +40,7 @@ Servis Supervisor, kurulum iÅŸlerine bir veya birden fazla teknisyen atar. Bir
 - MÃ¼ÅŸteri adÄ±
 - Varsa MTB ve son kullanÄ±cÄ± bilgilerinin ayrÄ± tutulmasÄ±
 - Sorumlu satÄ±ÅŸ mÃ¼hendisi veya mÃ¼hendisleri
-- Sales Order No
+- SO No â€” Sales Order Number
 - PTD No (opsiyonel)
 - Kurulum tutarÄ± (â‚¬)
 - MTB ve son kullanÄ±cÄ± iÃ§in ayrÄ± kontaklar:
