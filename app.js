@@ -13,10 +13,10 @@ let installations = JSON.parse(localStorage.getItem('cps-installations') || 'nul
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const demoUsers={
-  admin:{username:'admin',password:'Demo123!',name:'AyÅŸe YÄ±lmaz',firstName:'AyÅŸe',initials:'AY',role:'admin',roleLabel:'YÃ¶netici',description:'TÃ¼m kurulum operasyonlarÄ±nÄ±n genel gÃ¶rÃ¼nÃ¼mÃ¼.'},
-  sales:{username:'sales',password:'Demo123!',name:'Zeynep Erdem',firstName:'Zeynep',initials:'ZE',role:'sales',roleLabel:'SatÄ±ÅŸ MÃ¼hendisi',description:'SatÄ±ÅŸ ve sevkiyat kayÄ±tlarÄ±nÄ±zÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'},
-  supervisor:{username:'supervisor',password:'Demo123!',name:'Emre Aksoy',firstName:'Emre',initials:'EA',role:'supervisor',roleLabel:'Servis Supervisor',description:'Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'},
-  technician:{username:'technician',password:'Demo123!',name:'Ahmet Kaya',firstName:'Ahmet',initials:'AK',role:'technician',roleLabel:'Servis Teknisyeni',description:'Size atanan kurulumlarÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'}
+  admin:{username:'admin',password:'Demo123!',name:'Remzi Sakin',firstName:'Remzi',initials:'RS',role:'admin',roleLabel:'YÃ¶netici',description:'TÃ¼m kurulum operasyonlarÄ±nÄ±n genel gÃ¶rÃ¼nÃ¼mÃ¼.'},
+  sales:{username:'sales',password:'Demo123!',name:'Ä°rem OÄŸuzkan',firstName:'Ä°rem',initials:'Ä°O',role:'sales',roleLabel:'SatÄ±ÅŸ MÃ¼hendisi',description:'SatÄ±ÅŸ ve sevkiyat kayÄ±tlarÄ±nÄ±zÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'},
+  supervisor:{username:'supervisor',password:'Demo123!',name:'Tevfik ÅahinbaÅŸ',firstName:'Tevfik',initials:'TÅ',role:'supervisor',roleLabel:'Servis Supervisor',description:'Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'},
+  technician:{username:'technician',password:'Demo123!',name:'GÃ¼rcan Girgin',firstName:'GÃ¼rcan',initials:'GG',role:'technician',roleLabel:'Servis Teknisyeni',description:'Size atanan kurulumlarÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.'}
 };
 let currentUser=null;
 let language='tr';
