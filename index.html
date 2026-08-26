@@ -30,7 +30,14 @@
         <label>Åifre<input id="password" type="password" autocomplete="current-password" value="Demo123!" required></label>
         <div id="loginError" class="form-error" role="alert"></div>
         <button class="primary-button" type="submit">GiriÅŸ yap <span>â†’</span></button>
-        <div class="demo-box"><b>Demo hesabÄ±</b><span>supervisor / Demo123!</span></div>
+        <div class="demo-accounts">
+          <p>Demo hesaplarÄ±</p>
+          <button type="button" data-demo-user="admin"><span class="demo-avatar">AY</span><span><b>YÃ¶netici</b><small>admin</small></span></button>
+          <button type="button" data-demo-user="sales"><span class="demo-avatar">ZE</span><span><b>SatÄ±ÅŸ MÃ¼hendisi</b><small>sales</small></span></button>
+          <button type="button" data-demo-user="supervisor"><span class="demo-avatar">EA</span><span><b>Servis Supervisor</b><small>supervisor</small></span></button>
+          <button type="button" data-demo-user="technician"><span class="demo-avatar">AK</span><span><b>Servis Teknisyeni</b><small>technician</small></span></button>
+          <small>TÃ¼m hesaplarÄ±n ÅŸifresi: <b>Demo123!</b></small>
+        </div>
       </form>
     </div>
   </section>
@@ -43,24 +50,24 @@
           <div id="connectionState" class="connection online"><i></i><span>Ã‡evrimiÃ§i</span></div>
           <button id="languageButton" class="header-button">TR</button>
           <button class="header-button notification-button" aria-label="Bildirimler">Bildirimler<i class="notification-dot"></i></button>
-          <div class="user-summary"><div class="avatar">EA</div><div><b>Emre Aksoy</b><small>Servis Supervisor</small></div></div>
+          <div class="user-summary"><div id="currentUserInitials" class="avatar">EA</div><div><b id="currentUserName">Emre Aksoy</b><small id="currentUserRole">Servis Supervisor</small></div></div>
           <button id="logoutButton" class="logout-button" title="Ã‡Ä±kÄ±ÅŸ">Ã‡Ä±kÄ±ÅŸ</button>
         </div>
       </div>
       <nav id="mainNav" class="header-nav" aria-label="Ana menÃ¼">
-        <button class="nav-item active" data-view="dashboard"><span>âŒ‚</span> <i data-i18n="overview">Genel BakÄ±ÅŸ</i></button>
-        <button class="nav-item" data-view="installations"><span>â–¦</span> <i data-i18n="installations">Kurulumlar</i> <em id="navCount">8</em></button>
-        <button class="nav-item" data-view="calendar"><span>â–¡</span> <i data-i18n="calendar">Takvim</i></button>
-        <button class="nav-item" data-view="customers"><span>â™™</span> <i data-i18n="customers">MÃ¼ÅŸteriler</i></button>
-        <button class="nav-item" data-view="products"><span>â—‡</span> <i data-i18n="products">ÃœrÃ¼nler</i></button>
-        <button class="nav-item" data-view="reports"><span>â–¥</span> <i data-i18n="reports">Raporlar</i></button>
-        <button class="nav-item" data-view="users"><span>â™§</span> <i data-i18n="users">KullanÄ±cÄ±lar</i></button>
+        <button class="nav-item active" data-view="dashboard" data-roles="admin,sales,supervisor,technician"><span>âŒ‚</span> <i data-i18n="overview">Genel BakÄ±ÅŸ</i></button>
+        <button class="nav-item" data-view="installations" data-roles="admin,sales,supervisor,technician"><span>â–¦</span> <i data-i18n="installations">Kurulumlar</i> <em id="navCount">8</em></button>
+        <button class="nav-item" data-view="calendar" data-roles="admin,supervisor,technician"><span>â–¡</span> <i data-i18n="calendar">Takvim</i></button>
+        <button class="nav-item" data-view="customers" data-roles="admin,sales,supervisor"><span>â™™</span> <i data-i18n="customers">MÃ¼ÅŸteriler</i></button>
+        <button class="nav-item" data-view="products" data-roles="admin,sales,supervisor"><span>â—‡</span> <i data-i18n="products">ÃœrÃ¼nler</i></button>
+        <button class="nav-item" data-view="reports" data-roles="admin,supervisor,technician"><span>â–¥</span> <i data-i18n="reports">Raporlar</i></button>
+        <button class="nav-item" data-view="users" data-roles="admin"><span>â™§</span> <i data-i18n="users">KullanÄ±cÄ±lar</i></button>
       </nav>
     </header>
 
     <main class="main-content">
       <section id="dashboardView" class="view active-view">
-        <div class="page-heading"><div><p class="eyebrow">26 AÄUSTOS 2026, Ã‡ARÅAMBA</p><h1>GÃ¼naydÄ±n, Emre</h1><p>Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.</p></div><button id="newInstallationButton" class="primary-button">ï¼‹ Yeni kurulum</button></div>
+        <div class="page-heading"><div><p class="eyebrow">26 AÄUSTOS 2026, Ã‡ARÅAMBA</p><h1 id="welcomeHeading">GÃ¼naydÄ±n, Emre</h1><p id="welcomeDescription">Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.</p></div><button id="newInstallationButton" class="primary-button sales-action">ï¼‹ Yeni kurulum</button></div>
         <div class="stat-grid">
           <article class="stat-card dark"><div class="stat-icon">â–¦</div><span>AKTÄ°F KURULUM</span><strong id="activeCount">8</strong><small><b>â†‘ 2</b> bu hafta eklendi</small></article>
           <article class="stat-card"><div class="stat-icon blue">â–¡</div><span>BU HAFTA</span><strong>5</strong><small>3 kurulum bugÃ¼n</small></article>
@@ -81,7 +88,7 @@
       </section>
 
       <section id="installationsView" class="view">
-        <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>TÃ¼m sevkiyat ve kurulum iÅŸlerini takip edin.</p></div><button class="primary-button open-new">ï¼‹ Yeni kurulum</button></div>
+        <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>TÃ¼m sevkiyat ve kurulum iÅŸlerini takip edin.</p></div><button class="primary-button open-new sales-action">ï¼‹ Yeni kurulum</button></div>
         <section class="panel"><div class="toolbar"><input id="searchInput" type="search" placeholder="MÃ¼ÅŸteri, SO veya PTD ara..."><select id="statusFilter"><option value="">TÃ¼m durumlar</option><option>PlanlandÄ±</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>SÃ¼re aÅŸÄ±ldÄ±</option></select></div><div class="table-wrap"><table><thead><tr><th>MÃœÅTERÄ° / SÄ°PARÄ°Å</th><th>DURUM</th><th>PLANLANAN TARÄ°H</th><th>TEKNÄ°SYEN</th><th>Ä°LERLEME</th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div></section>
       </section>
 
