@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173f5f">
+  <meta name="description" content="CPI/CPS kurulum ve sevkiyat takip uygulamasÄ±">
+  <title>CPS Kurulum Takip</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="loginView" class="login-page">
+    <div class="login-brand">
+      <div class="brand-mark">CPS</div>
+      <p class="eyebrow">CPI / CPS OPERATIONS</p>
+      <h1>KurulumlarÄ± tek bir yerden yÃ¶netin.</h1>
+      <p>SatÄ±ÅŸtan sevkiyata, saha ziyaretinden mÃ¼ÅŸteri raporuna kadar tÃ¼m sÃ¼reÃ§ gÃ¶rÃ¼nÃ¼r ve dÃ¼zenli.</p>
+      <div class="brand-feature"><span>01</span><div><b>CanlÄ± takip</b><small>Kurulum durumlarÄ± ve kritik uyarÄ±lar</small></div></div>
+      <div class="brand-feature"><span>02</span><div><b>Saha odaklÄ±</b><small>Telefon ve bilgisayarda kolay kullanÄ±m</small></div></div>
+      <div class="brand-feature"><span>03</span><div><b>Offline gÃ¶rÃ¼nÃ¼m</b><small>Son gÃ¶rÃ¼ntÃ¼lenen kayÄ±tlara eriÅŸim</small></div></div>
+    </div>
+    <div class="login-panel">
+      <button id="loginLanguage" class="language-button" type="button">EN</button>
+      <form id="loginForm" class="login-card">
+        <p class="eyebrow">HOÅ GELDÄ°NÄ°Z</p>
+        <h2>HesabÄ±nÄ±za giriÅŸ yapÄ±n</h2>
+        <p class="muted">Devam etmek iÃ§in kullanÄ±cÄ± bilgilerinizi girin.</p>
+        <label>KullanÄ±cÄ± adÄ±<input id="username" autocomplete="username" value="supervisor" required></label>
+        <label>Åifre<input id="password" type="password" autocomplete="current-password" value="Demo123!" required></label>
+        <div id="loginError" class="form-error" role="alert"></div>
+        <button class="primary-button" type="submit">GiriÅŸ yap <span>â†’</span></button>
+        <div class="demo-box"><b>Demo hesabÄ±</b><span>supervisor / Demo123!</span></div>
+      </form>
+    </div>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="app-brand"><div class="brand-mark small">CPS</div><div><b>Kurulum Takip</b><small>Operations Hub</small></div></div>
+      <nav id="mainNav" aria-label="Ana menÃ¼">
+        <button class="nav-item active" data-view="dashboard"><span>âŒ‚</span> <i data-i18n="overview">Genel BakÄ±ÅŸ</i></button>
+        <button class="nav-item" data-view="installations"><span>â–¦</span> <i data-i18n="installations">Kurulumlar</i> <em id="navCount">8</em></button>
+        <button class="nav-item" data-view="calendar"><span>â–¡</span> <i data-i18n="calendar">Takvim</i></button>
+        <p class="nav-label">YÃ–NETÄ°M</p>
+        <button class="nav-item" data-view="customers"><span>â™™</span> <i data-i18n="customers">MÃ¼ÅŸteriler</i></button>
+        <button class="nav-item" data-view="products"><span>â—‡</span> <i data-i18n="products">ÃœrÃ¼nler</i></button>
+        <button class="nav-item" data-view="reports"><span>â–¥</span> <i data-i18n="reports">Raporlar</i></button>
+        <button class="nav-item" data-view="users"><span>â™§</span> <i data-i18n="users">KullanÄ±cÄ±lar</i></button>
+      </nav>
+      <div class="sidebar-foot"><div class="avatar">EA</div><div><b>Emre Aksoy</b><small>Servis Supervisor</small></div><button id="logoutButton" title="Ã‡Ä±kÄ±ÅŸ">â†ª</button></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button id="menuButton" class="icon-button menu-button" aria-label="MenÃ¼yÃ¼ aÃ§">â˜°</button>
+        <div id="connectionState" class="connection online"><i></i><span>Ã‡evrimiÃ§i</span></div>
+        <div class="top-actions"><button id="languageButton" class="text-button">TR</button><button class="icon-button" aria-label="Bildirimler">â™¢<i class="notification-dot"></i></button></div>
+      </header>
+
+      <section id="dashboardView" class="view active-view">
+        <div class="page-heading"><div><p class="eyebrow">26 AÄUSTOS 2026, Ã‡ARÅAMBA</p><h1>GÃ¼naydÄ±n, Emre</h1><p>Kurulum operasyonlarÄ±nÄ±n bugÃ¼nkÃ¼ gÃ¶rÃ¼nÃ¼mÃ¼.</p></div><button id="newInstallationButton" class="primary-button">ï¼‹ Yeni kurulum</button></div>
+        <div class="stat-grid">
+          <article class="stat-card dark"><div class="stat-icon">â–¦</div><span>AKTÄ°F KURULUM</span><strong id="activeCount">8</strong><small><b>â†‘ 2</b> bu hafta eklendi</small></article>
+          <article class="stat-card"><div class="stat-icon blue">â–¡</div><span>BU HAFTA</span><strong>5</strong><small>3 kurulum bugÃ¼n</small></article>
+          <article class="stat-card"><div class="stat-icon amber">!</div><span>DÄ°KKAT GEREKTÄ°REN</span><strong id="attentionCount">3</strong><small>Eksik Ã¼rÃ¼n veya gecikme</small></article>
+          <article class="stat-card"><div class="stat-icon coral">â†—</div><span>SÃœRE AÅIMI</span><strong id="overrunCount">2</strong><small>Planlanan sÃ¼re aÅŸÄ±ldÄ±</small></article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel installations-panel">
+            <div class="panel-header"><div><h2>Aktif kurulumlar</h2><p>Ã–ncelik ve planlanan tarihe gÃ¶re</p></div><button id="showAllButton" class="text-link">TÃ¼mÃ¼nÃ¼ gÃ¶r â†’</button></div>
+            <div class="table-wrap"><table><thead><tr><th>MÃœÅTERÄ° / SÄ°PARÄ°Å</th><th>DURUM</th><th>PLANLANAN TARÄ°H</th><th>TEKNÄ°SYEN</th><th>Ä°LERLEME</th><th></th></tr></thead><tbody id="installationRows"></tbody></table></div>
+          </section>
+          <aside class="right-column">
+            <section class="panel agenda-panel"><div class="panel-header"><div><h2>BugÃ¼nÃ¼n programÄ±</h2><p>3 planlÄ± aktivite</p></div><button class="icon-button">â€¢â€¢â€¢</button></div><div id="agendaList"></div></section>
+            <section class="panel alerts-panel"><div class="panel-header"><div><h2>Kritik uyarÄ±lar</h2><p>Ä°ÅŸlem bekleyen konular</p></div><span class="alert-count">3</span></div><div id="alertsList"></div></section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="installationsView" class="view">
+        <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>TÃ¼m sevkiyat ve kurulum iÅŸlerini takip edin.</p></div><button class="primary-button open-new">ï¼‹ Yeni kurulum</button></div>
+        <section class="panel"><div class="toolbar"><input id="searchInput" type="search" placeholder="MÃ¼ÅŸteri, SO veya PTD ara..."><select id="statusFilter"><option value="">TÃ¼m durumlar</option><option>PlanlandÄ±</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>SÃ¼re aÅŸÄ±ldÄ±</option></select></div><div class="table-wrap"><table><thead><tr><th>MÃœÅTERÄ° / SÄ°PARÄ°Å</th><th>DURUM</th><th>PLANLANAN TARÄ°H</th><th>TEKNÄ°SYEN</th><th>Ä°LERLEME</th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div></section>
+      </section>
+
+      <section id="placeholderView" class="view"><div class="empty-state"><span>â—‡</span><h1 id="placeholderTitle">Bu bÃ¶lÃ¼m hazÄ±rlanÄ±yor</h1><p>Ä°lk prototipte ana takip ve yeni kurulum akÄ±ÅŸÄ±na odaklandÄ±k.</p></div></section>
+    </main>
+  </div>
+
+  <dialog id="installationDialog">
+    <form id="installationForm" method="dialog">
+      <div class="dialog-header"><div><p class="eyebrow">YENÄ° KAYIT</p><h2>Yeni kurulum oluÅŸtur</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">Ã—</button></div>
+      <div class="steps"><span class="active">1 MÃ¼ÅŸteri</span><span>2 SipariÅŸ</span><span>3 Planlama</span></div>
+      <div class="form-grid">
+        <label class="wide">MÃ¼ÅŸteri adÄ±<input name="customer" required placeholder="Ã–rn. Atlas Otomasyon A.Å."></label>
+        <label>MÃ¼ÅŸteri yapÄ±sÄ±<select name="customerType"><option>DoÄŸrudan son kullanÄ±cÄ±</option><option>MTB ve son kullanÄ±cÄ± ayrÄ±</option></select></label>
+        <label>Kurulum adresi<input name="address" required placeholder="Åehir / adres"></label>
+        <label>Sales Order No<input name="so" required placeholder="SO-2026-000"></label>
+        <label>PTD No<input name="ptd" placeholder="Varsa girin"></label>
+        <label>Planlanan tarih<input name="date" type="date" required></label>
+        <label>Planlanan sÃ¼re<div class="inline-fields"><input name="duration" type="number" min="1" value="8" required><select name="unit"><option>Saat</option><option>GÃ¼n</option></select></div></label>
+        <label>Servis teknisyeni<select name="technician"><option>Atama bekliyor</option><option>Ahmet Kaya</option><option>Selin Demir</option><option>Murat Ã‡elik</option></select></label>
+        <label>Kurulum tutarÄ± (â‚¬)<input name="amount" type="number" min="0" placeholder="0"></label>
+        <label class="wide">SipariÅŸ iÃ§eriÄŸi<textarea name="content" rows="3" required placeholder="ÃœrÃ¼n ve kurulum kapsamÄ±nÄ± yazÄ±n"></textarea></label>
+        <label class="wide">Notlar<textarea name="notes" rows="2" placeholder="Varsa Ã¶nemli notlar"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>VazgeÃ§</button><button id="saveInstallation" class="primary-button" value="default">KaydÄ± oluÅŸtur</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
+
