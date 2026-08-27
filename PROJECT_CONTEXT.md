@@ -177,6 +177,7 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - PTD No, kurulum adresi, telefon numaraları, tahmini sevkiyat/teslim tarihi, tahmini kurulum tarihi ve notlar opsiyoneldir. Zorunlu form başlıkları kırmızı `*` ile belirtilir.
 - Yeni kurulum penceresi başlıktaki kontrol ile tam ekrana alınabilir ve tekrar normal boyuta döndürülebilir.
 - Ürün tablosunun son satırında Enter tuşuna basılması yeni bir ürün satırı açar ve odağı yeni satırın Part No alanına taşır.
+- Zorunluluk yıldızları alan adlarıyla aynı satırda gösterilir. Tam ekran yeni kurulum penceresi, normal pencerenin tüm bölümlerini korur; form gövdesi kaydırılırken sipariş ürün tablosu görünür ve kullanılabilir kalır.
 
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
