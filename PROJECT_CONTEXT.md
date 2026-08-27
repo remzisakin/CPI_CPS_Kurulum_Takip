@@ -28,8 +28,9 @@ Uygulama:
 - Prototipte aktif kullanıcılar `demodata/Kullanıcı bilgileri ve yetkileri.xlsx` dosyasından üretilen yerel kullanıcı dizininden alınır. Excel'deki `Ad Soyad`, `Görevi` ve `Yetkisi` alanları esas alınır; eski sabit demo hesapları kaldırılmıştır.
 - Kullanıcı adı `ad.soyad` biçiminde otomatik üretilir. Excel'de parola sütunu olmadığı için prototipte ortak geçici parola kullanılır; gerçek sürümde ilk girişte parola değiştirme ve sunucu tarafında güvenli parola özeti zorunludur.
 - Demo aşamasında giriş ekranı, Excel'deki aktif kullanıcılardan Yönetici, Servis Süpervisörü, Satış Mühendisi ve Servis Teknisyeni rollerinin birer temsilcisi için hızlı giriş kartları gösterir.
-- Kurulumlar listesinde temel arama/durum seçimine ek olarak yıl, çeyrek, satış mühendisi, müşteri ve durum ölçütlerini birlikte uygulayan gelişmiş filtre paneli bulunur. Tamamlanan kayıtlar ayrıca `Tamamlandı` durumuyla filtrelenebilir.
+- Kurulumlar listesindeki bağımsız gelişmiş filtre paneli kaldırılmıştır; filtreleme tablo başlıklarındaki sütun filtreleriyle yapılır.
 - Kurulum tablosundaki müşteri, SO No, talep tarihi, satış mühendisi, durum, planlanan kurulum, teknisyen ve ilerleme başlıklarının her birinde Excel benzeri çoktan seçmeli sütun filtresi bulunur. Bir sütunda birden fazla değer ve birden fazla sütun filtresi aynı anda seçilebilir.
+- Talep tarihi ve planlanan kurulum filtreleri yalnızca yıl ve her yılın altında ay bazında çoklu seçim sunar.
 - Kurulum detayı ve servis saha kaydı pencereleri tam ekran açılabilir; pencere kapatıldığında tam ekran sınıfı mutlaka temizlenir.
 
 Roller:
