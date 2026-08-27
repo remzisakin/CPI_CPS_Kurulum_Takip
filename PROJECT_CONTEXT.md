@@ -31,6 +31,7 @@ Uygulama:
 - Kurulumlar listesindeki bağımsız gelişmiş filtre paneli kaldırılmıştır; filtreleme tablo başlıklarındaki sütun filtreleriyle yapılır.
 - Kurulum tablosundaki müşteri, SO No, talep tarihi, satış mühendisi, durum, planlanan kurulum, teknisyen ve ilerleme başlıklarının her birinde Excel benzeri çoktan seçmeli sütun filtresi bulunur. Bir sütunda birden fazla değer ve birden fazla sütun filtresi aynı anda seçilebilir.
 - Talep tarihi ve planlanan kurulum filtreleri yalnızca yıl ve her yılın altında ay bazında çoklu seçim sunar.
+- Ana arama satırının sağında hızlı tekli durum filtresi bulunur; bu filtre sütun başlıklarındaki çoklu filtrelerle birlikte çalışır. Tablo başlık satırı gri zemin, yüksek kontrastlı yazılar ve ince kırmızı çerçeveyle veri satırlarından ayrılır.
 - Kurulum detayı ve servis saha kaydı pencereleri tam ekran açılabilir; pencere kapatıldığında tam ekran sınıfı mutlaka temizlenir.
 
 Roller:
