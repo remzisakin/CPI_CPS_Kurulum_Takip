@@ -173,6 +173,10 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - Parçalı sevkiyat seçimi, ilgili kurulumun sipariş içeriğindeki gerçek ürünlerden oluşturulur.
 - Tahmini kurulum tarihi, tahmini sevkiyat/teslim tarihinden önce seçilemez.
 - Excel içe aktarma; `Part No`, `Description` ve `Qty` başlıklarını bularak ürün satırlarını okur; toplam/ara toplam satırlarında durur, yüzde içeren veya geçersiz adetli satırları atlar.
+- Talep tarihi satış taslağı oluşturulurken girilmez. Satış Mühendisi taslağı `Planlamaya gönder` ile servise ilettiği anda sistem tarafından otomatik atanır.
+- PTD No, kurulum adresi, telefon numaraları, tahmini sevkiyat/teslim tarihi, tahmini kurulum tarihi ve notlar opsiyoneldir. Zorunlu form başlıkları kırmızı `*` ile belirtilir.
+- Yeni kurulum penceresi başlıktaki kontrol ile tam ekrana alınabilir ve tekrar normal boyuta döndürülebilir.
+- Ürün tablosunun son satırında Enter tuşuna basılması yeni bir ürün satırı açar ve odağı yeni satırın Part No alanına taşır.
 
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
