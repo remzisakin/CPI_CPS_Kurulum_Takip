@@ -187,6 +187,7 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - `demodata/Desoutter_Product.xlsm` iki ürün kaynağı içerir: `TP List` sekmesinde `Reference` Part No ve `Ref. Description` açıklamadır; `PRICE LIST 2026` sekmesinde Part No olarak yalnızca `615 Part number`, açıklama olarak `Item Description` kullanılır. `Item No.` Part No değildir ve sonuçlarda yalnızca ek referans olarak gösterilir.
 - `scripts/build-product-data.ps1` iki sekmeyi yerel `demodata/product-data.js` dizininde birleştirir. Kaynak ve üretilen ürün verisi `.gitignore` kapsamındadır. Part No alanında en az iki karakter yazıldığında en fazla sekiz eşleşme gösterilir; seçim Part No ve Description alanlarını doldurur, seçim yapılmazsa manuel Part No/Description girişi korunur.
 - Part No öneri katmanı sayfa gövdesinde değil, kullanıldığı modal pencerenin içinde tutulur. Böylece normal ve tam ekran yeni kurulum görünümünde modalın arkasında kalmaz; fare ve klavyeyle seçilebilir. Ayrı ürün düzenleme modalı kendi öneri katmanını kullanır.
+- Salt-okunur kurulum detay penceresi başlıktaki kontrol ile tam ekrana alınabilir ve normal boyuta döndürülebilir. Detaydaki `Sipariş içeriği` bölümü `Ürün Listesi` ve `Set Bilgisi` sekmelerine sahiptir; Set Bilgisi görünümü aynı set adına sahip ürünleri Part No, Description ve Qty ile gruplar, set atanmayanları ayrı bir grup olarak gösterir.
 
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
