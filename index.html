@@ -26,18 +26,11 @@
         <p class="eyebrow">HOŞ GELDİNİZ</p>
         <h2>Hesabınıza giriş yapın</h2>
         <p class="muted">Devam etmek için kullanıcı bilgilerinizi girin.</p>
-        <label>Kullanıcı adı<input id="username" autocomplete="username" value="supervisor" required></label>
-        <label>Şifre<input id="password" type="password" autocomplete="current-password" value="Demo123!" required></label>
+        <label>Kullanıcı adı<input id="username" autocomplete="username" placeholder="ad.soyad" required></label>
+        <label>Şifre<input id="password" type="password" autocomplete="current-password" required></label>
         <div id="loginError" class="form-error" role="alert"></div>
         <button class="primary-button" type="submit">Giriş yap <span>→</span></button>
-        <div class="demo-accounts">
-          <p>Demo hesapları</p>
-          <button type="button" data-demo-user="admin"><span class="demo-avatar">RS</span><span><b>Yönetici</b><small>Remzi Sakin · admin</small></span></button>
-          <button type="button" data-demo-user="sales"><span class="demo-avatar">İO</span><span><b>Satış Mühendisi</b><small>İrem Oğuzkan · sales</small></span></button>
-          <button type="button" data-demo-user="supervisor"><span class="demo-avatar">TŞ</span><span><b>Servis Supervisor</b><small>Tevfik Şahinbaş · supervisor</small></span></button>
-          <button type="button" data-demo-user="technician"><span class="demo-avatar">GG</span><span><b>Servis Teknisyeni</b><small>Gürcan Girgin · technician</small></span></button>
-          <small>Tüm hesapların şifresi: <b>Demo123!</b></small>
-        </div>
+        <div class="login-source-note">Kullanıcılar ve yetkiler şirket kullanıcı listesinden alınır.</div>
       </form>
     </div>
   </section>
@@ -92,6 +85,7 @@
         <section class="panel"><div class="toolbar"><input id="searchInput" type="search" placeholder="Müşteri, SO, PTD veya satış mühendisi ara..."><select id="statusFilter"><option value="">Tüm durumlar</option><option>Taslak</option><option>Planlama bekliyor</option><option>Planlandı</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>Süre aşıldı</option></select></div><div class="table-wrap"><table class="installations-table"><thead><tr><th>MÜŞTERİ</th><th>SO NO<br><small>SALES ORDER NUMBER</small></th><th>TALEP TARİHİ</th><th>SATIŞ MÜHENDİSİ</th><th>DURUM</th><th>PLANLANAN KURULUM</th><th>TEKNİSYEN</th><th>İLERLEME</th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div></section>
       </section>
 
+      <section id="usersView" class="view"><div class="page-heading"><div><p class="eyebrow">YÖNETİM</p><h1>Kullanıcılar</h1><p>Excel kullanıcı listesine göre aktif hesaplar ve yetkileri.</p></div></div><section class="panel"><div class="table-wrap"><table class="users-table"><thead><tr><th>AD SOYAD</th><th>GÖREVİ</th><th>YETKİSİ</th><th>KULLANICI ADI</th><th>DURUM</th></tr></thead><tbody id="userRows"></tbody></table></div></section></section>
       <section id="placeholderView" class="view"><div class="empty-state"><span>◇</span><h1 id="placeholderTitle">Bu bölüm hazırlanıyor</h1><p>İlk prototipte ana takip ve yeni kurulum akışına odaklandık.</p></div></section>
     </main>
   </div>
@@ -300,6 +294,7 @@
   <script src="vendor/xlsx.full.min.js"></script>
   <script src="demodata/accounts-data.js"></script>
   <script src="demodata/product-data.js"></script>
+  <script src="demodata/user-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
