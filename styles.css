@@ -224,6 +224,8 @@ dialog{background:#252526;color:#fff}
 .demo-accounts>button>span:last-child{display:flex;flex-direction:column;gap:2px}
 .demo-accounts>button b{font-size:11px}.demo-accounts>button small{font-size:10px;color:#aaa}
 .demo-accounts>small{grid-column:1/-1;color:#888;margin-top:4px}.demo-accounts>small b{color:#ddd}
+.login-source-note{margin-top:18px;padding:12px 14px;border-left:3px solid #e30613;background:#202021;color:#aaa;font-size:12px;line-height:1.5}
+.users-table code{color:#eee;background:#242425;padding:5px 8px}.user-active{display:inline-flex;align-items:center;gap:7px;color:#8fd0aa;font-weight:700}.user-active i{width:8px;height:8px;border-radius:50%;background:#55a875}
 .demo-avatar{width:28px;height:28px;flex:0 0 28px;background:#ec4936;color:#fff;display:grid;place-items:center;font-size:9px;font-weight:800}
 @media(max-width:760px){.demo-accounts{grid-template-columns:1fr}.demo-accounts>p,.demo-accounts>small{grid-column:1}}
 
