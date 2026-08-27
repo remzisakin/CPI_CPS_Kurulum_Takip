@@ -192,6 +192,7 @@
         </fieldset>
       </div>
       <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button id="saveInstallation" class="primary-button" value="default">Taslağı kaydet</button></div>
+      <div id="productSuggestions" class="product-suggestions role-hidden" role="listbox"></div>
     </form>
   </dialog>
 
@@ -256,11 +257,11 @@
       <div id="editProductsTabPanel" class="order-tab-panel"><div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO</th><th>DESCRIPTION</th><th>QTY</th><th>SET BİLGİSİ <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="editOrderProductRows"></tbody></table></div></div>
       <div id="editSetsTabPanel" class="order-tab-panel role-hidden"><div id="editSetGroups" class="set-groups"></div></div>
       <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Ürünleri kaydet</button></div>
+      <div id="editProductSuggestions" class="product-suggestions role-hidden" role="listbox"></div>
     </form>
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <div id="productSuggestions" class="product-suggestions role-hidden" role="listbox"></div>
   <script src="vendor/xlsx.full.min.js"></script>
   <script src="demodata/accounts-data.js"></script>
   <script src="demodata/product-data.js"></script>
