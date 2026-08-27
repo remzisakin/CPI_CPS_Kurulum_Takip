@@ -1,0 +1,4 @@
+# Gerçek müşteri verileri yerel geliştirme ortamında kalır.
+demodata/Accounts Report-*.xlsx
+demodata/accounts-data.js
+
