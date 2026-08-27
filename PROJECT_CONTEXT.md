@@ -33,6 +33,7 @@ Uygulama:
 - Talep tarihi ve planlanan kurulum filtreleri yalnızca yıl ve her yılın altında ay bazında çoklu seçim sunar.
 - Ana arama satırının sağında hızlı tekli durum filtresi bulunur; bu filtre sütun başlıklarındaki çoklu filtrelerle birlikte çalışır. Tablo başlık satırı gri zemin, yüksek kontrastlı yazılar ve nötr sütun ayırıcılarıyla veri satırlarından ayrılır.
 - Kurulum detayı ve servis saha kaydı pencereleri tam ekran açılabilir; pencere kapatıldığında tam ekran sınıfı mutlaka temizlenir.
+- Dialog formlarındaki tek satırlı alanlarda Enter tuşu formu gönderip pencereyi kapatmaz; bir sonraki düzenlenebilir alana odaklanır. Metin alanlarında satır ekleme ve sipariş ürünlerindeki Enter ile yeni satır oluşturma davranışları korunur.
 
 Roller:
 
