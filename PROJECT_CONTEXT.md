@@ -29,6 +29,7 @@ Uygulama:
 - Kullanıcı adı `ad.soyad` biçiminde otomatik üretilir. Excel'de parola sütunu olmadığı için prototipte ortak geçici parola kullanılır; gerçek sürümde ilk girişte parola değiştirme ve sunucu tarafında güvenli parola özeti zorunludur.
 - Demo aşamasında giriş ekranı, Excel'deki aktif kullanıcılardan Yönetici, Servis Süpervisörü, Satış Mühendisi ve Servis Teknisyeni rollerinin birer temsilcisi için hızlı giriş kartları gösterir.
 - Kurulumlar listesinde temel arama/durum seçimine ek olarak yıl, çeyrek, satış mühendisi, müşteri ve durum ölçütlerini birlikte uygulayan gelişmiş filtre paneli bulunur. Tamamlanan kayıtlar ayrıca `Tamamlandı` durumuyla filtrelenebilir.
+- Kurulum tablosundaki müşteri, SO No, talep tarihi, satış mühendisi, durum, planlanan kurulum, teknisyen ve ilerleme başlıklarının her birinde Excel benzeri çoktan seçmeli sütun filtresi bulunur. Bir sütunda birden fazla değer ve birden fazla sütun filtresi aynı anda seçilebilir.
 - Kurulum detayı ve servis saha kaydı pencereleri tam ekran açılabilir; pencere kapatıldığında tam ekran sınıfı mutlaka temizlenir.
 
 Roller:
