@@ -23,6 +23,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-account-data
 
 Bu işlem, uygulamanın müşteri adı otomatik tamamlama alanında kullandığı yerel `demodata/accounts-data.js` dosyasını üretir. Bu dosya da GitHub'a gönderilmez.
 
+Ürün Part No otomatik tamamlama dizini için `demodata/Desoutter_Product.xlsm` dosyası kullanılır:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-product-data.ps1
+```
+
+Komut, `TP List` sekmesindeki `Reference` ile `Ref. Description` alanlarını ve `PRICE LIST 2026` sekmesindeki `615 Part number` ile `Item Description` alanlarını birleştirerek yerel `demodata/product-data.js` dosyasını üretir. Kaynak Excel ve üretilen ürün dizini GitHub'a gönderilmez.
+
 ## Bu sürümde çalışan bölümler
 
 - Kullanıcı adı ve şifre ekranı (demo)
@@ -31,6 +39,7 @@ Bu işlem, uygulamanın müşteri adı otomatik tamamlama alanında kullandığ�
 - Kurulum listesinde arama ve filtreleme
 - Yeni kurulum oluşturma
 - Excel kaynaklı müşteri adı otomatik tamamlama ve adres önerisi
+- Excel kaynaklı Part No otomatik tamamlama ve Description doldurma
 - Mobil uyumlu arayüz
 - Offline durum algılama ve salt-okunur uyarısı
 - Uygulama manifesti ve çevrimdışı önbellek altyapısı
