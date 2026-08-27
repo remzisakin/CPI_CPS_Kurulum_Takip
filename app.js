@@ -153,6 +153,7 @@ function showView(name){
   $('.sidebar')?.classList.remove('open');
 }
 function showToast(message){const toast=$('#toast');toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)}
+function moveToNextFormField(event){if(event.key!=='Enter'||event.defaultPrevented||event.shiftKey||event.target.matches('textarea,button,[type="submit"],[type="button"],[type="file"],[type="checkbox"],[type="radio"]'))return;event.preventDefault();const form=event.currentTarget,fields=$$('input:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]),select,textarea').filter(field=>field.form===form&&!field.disabled&&!field.readOnly&&field.offsetParent!==null),index=fields.indexOf(event.target),next=fields[index+1];if(next){next.focus();if(next.matches('input:not([type="date"]):not([type="number"]),textarea'))next.select?.()}}
 function setConditionalSection(selector,active){const section=$(selector);if(!section)return;section.classList.toggle('role-hidden',!active);section.querySelectorAll('input,select,textarea').forEach(field=>{field.disabled=!active;if(field.dataset.required!==undefined)field.required=active})}
 function updateCustomerFields(){const isMtb=$('#customerType').value==='mtb';setConditionalSection('#mtbCompanyFields',isMtb);setConditionalSection('#splitContactFields',isMtb);setConditionalSection('#splitAddressFields',isMtb);setConditionalSection('#directContactFields',!isMtb);setConditionalSection('#directAddressField',!isMtb);hideAccountSuggestions()}
 function updateShipmentFields(){const shipped=$('#productsShipped').checked;setConditionalSection('#shipmentFields',shipped);if(!shipped)$('#partialShipment').checked=false;updatePartialShipmentFields()}
@@ -218,6 +219,7 @@ $('#loginForm').addEventListener('submit',event=>{
     sessionStorage.setItem('cps-session',user.username);$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');applyUser(user);
   }else $('#loginError').textContent='Kullanıcı adı veya şifre hatalı.';
 });
+$$('dialog form').forEach(form=>form.addEventListener('keydown',moveToNextFormField));
 $('#quickLoginAccounts').addEventListener('click',event=>{const button=event.target.closest('[data-quick-login]');if(!button)return;const user=userDirectory.find(item=>item.username===button.dataset.quickLogin);if(!user)return;$('#username').value=user.username;$('#password').value=user.password;$('#loginError').textContent='';$('#loginForm').requestSubmit()});
 $('#logoutButton').addEventListener('click',()=>{sessionStorage.removeItem('cps-session');currentUser=null;$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#password').value=''});
 $('#mainNav').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view)});
