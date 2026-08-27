@@ -1,23 +1,21 @@
 const seedInstallations = [
-  {id:1,customer:'Anka Endüstri',salesOrderNumber:'SO-2026-1842',requestDate:'12 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0831',status:'Devam ediyor',date:'27 Ağu 2026',tech:'Ahmet Kaya',initials:'AK',progress:65},
-  {id:2,customer:'Marmara Teknoloji',salesOrderNumber:'SO-2026-1798',requestDate:'14 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0814',status:'Planlandı',date:'28 Ağu 2026',tech:'Selin Demir',initials:'SD',progress:20},
+  {id:1,customer:'Anka Endüstri',salesOrderNumber:'SO-2026-1842',requestDate:'12 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0831',status:'Devam ediyor',date:'27 Ağu 2026',tech:'Gürcan Girgin',initials:'GG',progress:65},
+  {id:2,customer:'Marmara Teknoloji',salesOrderNumber:'SO-2026-1798',requestDate:'14 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0814',status:'Planlandı',date:'28 Ağu 2026',tech:'Cihan Eraslan',initials:'CE',progress:20},
   {id:3,customer:'Nova Ambalaj',salesOrderNumber:'SO-2026-1765',requestDate:'15 Ağu 2026',salesEngineer:'Remzi Sakin',ptd:'—',status:'Sevkiyat bekliyor',date:'02 Eyl 2026',tech:'Atama bekliyor',initials:'?',progress:10},
-  {id:4,customer:'Eksen Otomasyon',salesOrderNumber:'SO-2026-1699',requestDate:'17 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0779',status:'Süre aşıldı',date:'25 Ağu 2026',tech:'Murat Çelik',initials:'MÇ',progress:82},
-  {id:5,customer:'Atlas Makina',salesOrderNumber:'SO-2026-1684',requestDate:'18 Ağu 2026',salesEngineer:'Remzi Sakin',ptd:'PTD-0764',status:'Planlandı',date:'04 Eyl 2026',tech:'Ahmet Kaya',initials:'AK',progress:15},
-  {id:6,customer:'Pera Üretim',salesOrderNumber:'SO-2026-1651',requestDate:'19 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'—',status:'Devam ediyor',date:'05 Eyl 2026',tech:'Selin Demir',initials:'SD',progress:48},
-  {id:7,customer:'Kuzey Robotik',salesOrderNumber:'SO-2026-1602',requestDate:'20 Ağu 2026',salesEngineer:'Remzi Sakin',ptd:'PTD-0702',status:'Planlandı',date:'08 Eyl 2026',tech:'Murat Çelik',initials:'MÇ',progress:25},
-  {id:8,customer:'Delta Sistem',salesOrderNumber:'SO-2026-1588',requestDate:'21 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0688',status:'Süre aşıldı',date:'24 Ağu 2026',tech:'Ahmet Kaya',initials:'AK',progress:92}
+  {id:4,customer:'Eksen Otomasyon',salesOrderNumber:'SO-2026-1699',requestDate:'17 Ağu 2026',salesEngineer:'İrem Oğuzkan',ptd:'PTD-0779',status:'Süre aşıldı',date:'25 Ağu 2026',tech:'Zemzem Daşdemir',initials:'ZD',progress:82},
+  {id:5,customer:'Atlas Makina',salesOrderNumber:'SO-2026-1684',requestDate:'18 Ağu 2026',salesEngineer:'Bora Erdem',ptd:'PTD-0764',status:'Planlandı',date:'04 Eyl 2026',tech:'Raşit Abbasoğlu',initials:'RA',progress:15},
+  {id:6,customer:'Pera Üretim',salesOrderNumber:'SO-2026-1651',requestDate:'19 Ağu 2026',salesEngineer:'Oğulcan Çoban',ptd:'—',status:'Devam ediyor',date:'05 Eyl 2026',tech:'Cihan Eraslan',initials:'CE',progress:48},
+  {id:7,customer:'Kuzey Robotik',salesOrderNumber:'SO-2026-1602',requestDate:'20 Ağu 2026',salesEngineer:'Bora Erdem',ptd:'PTD-0702',status:'Planlandı',date:'08 Eyl 2026',tech:'Zemzem Daşdemir',initials:'ZD',progress:25},
+  {id:8,customer:'Delta Sistem',salesOrderNumber:'SO-2026-1588',requestDate:'21 Ağu 2026',salesEngineer:'Oğulcan Çoban',ptd:'PTD-0688',status:'Süre aşıldı',date:'24 Ağu 2026',tech:'Gürcan Girgin',initials:'GG',progress:92}
 ];
 
 let installations = (JSON.parse(localStorage.getItem('cps-installations') || 'null') || seedInstallations).map(item=>{const sample=seedInstallations.find(seed=>seed.id===item.id);const workflowStage=item.workflowStage||(item.status==='Taslak'?'draft':item.status==='Planlama bekliyor'?'awaitingPlanning':'planned');return {...item,workflowStage,salesOrderNumber:item.salesOrderNumber||item.so,requestDate:workflowStage==='draft'?'—':item.requestDate||sample?.requestDate||'—',salesEngineer:item.salesEngineer||sample?.salesEngineer||'Atama bekliyor'}});
+const retiredDemoAssignees={'Ahmet Kaya':['Gürcan Girgin','GG'],'Selin Demir':['Cihan Eraslan','CE'],'Murat Çelik':['Zemzem Daşdemir','ZD']};
+installations=installations.map(item=>retiredDemoAssignees[item.tech]?{...item,tech:retiredDemoAssignees[item.tech][0],initials:retiredDemoAssignees[item.tech][1]}:item);
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
-const demoUsers={
-  admin:{username:'admin',password:'Demo123!',name:'Remzi Sakin',firstName:'Remzi',initials:'RS',role:'admin',roleLabel:'Yönetici',description:'Tüm kurulum operasyonlarının genel görünümü.'},
-  sales:{username:'sales',password:'Demo123!',name:'İrem Oğuzkan',firstName:'İrem',initials:'İO',role:'sales',roleLabel:'Satış Mühendisi',description:'Satış ve sevkiyat kayıtlarınızın bugünkü görünümü.'},
-  supervisor:{username:'supervisor',password:'Demo123!',name:'Tevfik Şahinbaş',firstName:'Tevfik',initials:'TŞ',role:'supervisor',roleLabel:'Servis Supervisor',description:'Kurulum operasyonlarının bugünkü görünümü.'},
-  technician:{username:'technician',password:'Demo123!',name:'Gürcan Girgin',firstName:'Gürcan',initials:'GG',role:'technician',roleLabel:'Servis Teknisyeni',description:'Size atanan kurulumların bugünkü görünümü.'}
-};
+const roleDescriptions={admin:'Tüm kurulum operasyonlarının ve kullanıcıların genel görünümü.',sales:'Satış ve sevkiyat kayıtlarınızın bugünkü görünümü.',supervisor:'Kurulum operasyonlarının bugünkü görünümü.',technician:'Size atanan kurulumların bugünkü görünümü.'};
+const userDirectory=(Array.isArray(window.CPS_USER_DATA)?window.CPS_USER_DATA:[]).filter(user=>user.active!==false).map(user=>{const parts=String(user.name||'').trim().split(/\s+/);return {...user,firstName:parts[0]||'',initials:parts.map(part=>part[0]).join('').toLocaleUpperCase('tr-TR'),description:roleDescriptions[user.role]||'Kurulum operasyonlarının bugünkü görünümü.'}});
 let currentUser=null;
 let draftOrderProducts=[];
 let editOrderProducts=[];
@@ -42,6 +40,10 @@ const translations={
   tr:{overview:'Genel Bakış',installations:'Kurulumlar',calendar:'Takvim',customers:'Müşteriler',products:'Ürünler',reports:'Raporlar',users:'Kullanıcılar'},
   en:{overview:'Overview',installations:'Installations',calendar:'Calendar',customers:'Customers',products:'Products',reports:'Reports',users:'Users'}
 };
+
+function hasRole(...roles){return Boolean(currentUser&&(currentUser.role==='admin'||roles.includes(currentUser.role)))}
+function populateUserSelectors(){const salesUsers=userDirectory.filter(user=>['admin','sales'].includes(user.role)),technicians=userDirectory.filter(user=>user.role==='technician');$$('select[name="salesEngineer"]').forEach(select=>{const selected=select.value;select.innerHTML=salesUsers.map(user=>`<option>${escapeHtml(user.name)}</option>`).join('');if([...select.options].some(option=>option.value===selected))select.value=selected});$$('select[name="technician"]').forEach(select=>{const selected=select.value;select.innerHTML=`<option value="">Teknisyen seçin</option>${technicians.map(user=>`<option>${escapeHtml(user.name)}</option>`).join('')}`;if([...select.options].some(option=>option.value===selected))select.value=selected})}
+function renderUsers(){const rows=$('#userRows');if(!rows)return;rows.innerHTML=userDirectory.map(user=>`<tr><td><div class="technician"><span class="mini-avatar">${escapeHtml(user.initials)}</span><strong>${escapeHtml(user.name)}</strong></div></td><td>${escapeHtml(user.title)}</td><td><span class="status planned">${escapeHtml(user.roleLabel)}</span></td><td><code>${escapeHtml(user.username)}</code></td><td><span class="user-active"><i></i>Aktif</span></td></tr>`).join('')}
 
 function statusClass(status){return {'Taslak':'draft','Devam ediyor':'progress','Planlandı':'planned','Tamamlandı':'completed','Planlama bekliyor':'waiting','Sevkiyat bekliyor':'waiting','Süre aşıldı':'overrun'}[status] || 'planned'}
 function rowTemplate(item){return `<tr><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.salesOrderNumber)} · ${escapeHtml(item.ptd)}</small></td><td><span class="status ${statusClass(item.status)}">${item.status}</span></td><td><strong>${item.date}</strong><small>09:00</small></td><td><div class="technician"><span class="mini-avatar">${item.initials}</span>${escapeHtml(item.tech)}</div></td><td><span class="progress-bar"><i style="width:${item.progress}%"></i></span><small>%${item.progress}</small></td><td><button class="row-action" aria-label="Detay">›</button></td></tr>`}
@@ -183,12 +185,11 @@ function applyUser(user){
 
 $('#loginForm').addEventListener('submit',event=>{
   event.preventDefault();
-  const user=Object.values(demoUsers).find(item=>item.username===$('#username').value.trim()&&item.password===$('#password').value);
+  const user=userDirectory.find(item=>item.username===$('#username').value.trim().toLocaleLowerCase('tr-TR')&&item.password===$('#password').value);
   if(user){
     sessionStorage.setItem('cps-session',user.username);$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');applyUser(user);
   }else $('#loginError').textContent='Kullanıcı adı veya şifre hatalı.';
 });
-$$('[data-demo-user]').forEach(button=>button.addEventListener('click',()=>{const user=demoUsers[button.dataset.demoUser];$('#username').value=user.username;$('#password').value=user.password;$('#loginError').textContent='';$('#loginForm').requestSubmit()}));
 $('#logoutButton').addEventListener('click',()=>{sessionStorage.removeItem('cps-session');currentUser=null;$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#password').value=''});
 $('#mainNav').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view)});
 $('#newInstallationButton').addEventListener('click',openNew);$$('.open-new').forEach(x=>x.addEventListener('click',openNew));
@@ -259,14 +260,14 @@ $('#shipmentForm').addEventListener('submit',event=>{
 });
 $('#orderEditForm').addEventListener('submit',event=>{if(event.submitter?.value==='cancel')return;event.preventDefault();if(currentUser?.role!=='sales'){showToast('Bu işlem için Satış Mühendisi yetkisi gerekir.');return}if(!editOrderProducts.length||editOrderProducts.some(product=>!product.partNo.trim()||!product.description.trim()||!Number(product.qty))){showToast('Her ürün için Part No, Description ve Qty bilgileri zorunludur.');return}const item=installations.find(record=>record.id===Number(new FormData(event.currentTarget).get('installationId')));if(!item)return;item.orderProducts=editOrderProducts.map(product=>({...product}));localStorage.setItem('cps-installations',JSON.stringify(installations));$('#orderEditDialog').close();showToast('Sipariş ürünleri güncellendi.')});
 
-const agenda=[['09:00','Anka Endüstri','1. Kurulum · Ahmet Kaya'],['13:30','Marmara Teknoloji','Ön kontrol · Selin Demir'],['16:00','Eksen Otomasyon','Devam ziyareti · Murat Çelik']];
+const agenda=[['09:00','Anka Endüstri','1. Kurulum · Gürcan Girgin'],['13:30','Marmara Teknoloji','Ön kontrol · Cihan Eraslan'],['16:00','Eksen Otomasyon','Devam ziyareti · Zemzem Daşdemir']];
 $('#agendaList').innerHTML=agenda.map(x=>`<div class="agenda-item"><time>${x[0]}</time><div class="line"></div><div><b>${x[1]}</b><small>${x[2]}</small></div></div>`).join('');
 const alerts=[['Süre aşımı','Eksen Otomasyon planlanan süreyi 4 saat aştı.'],['Eksik ürün','Nova Ambalaj için 2 ürün sevk edilmedi.'],['Geciken rapor','Delta Sistem kurulum raporu bekleniyor.']];
 $('#alertsList').innerHTML=alerts.map(x=>`<div class="alert-item"><span class="alert-icon">!</span><div><b>${x[0]}</b><p>${x[1]}</p></div></div>`).join('');
 
 function updateConnection(){const online=navigator.onLine;$('#connectionState').className=`connection ${online?'online':'offline'}`;$('#connectionState span').textContent=online?'Çevrimiçi':'Offline · Sadece görüntüleme';if(!online)showToast('Offline mod: Kayıtlar yalnızca görüntülenebilir.')}
 window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);updateConnection();
-const savedUser=demoUsers[sessionStorage.getItem('cps-session')];if(savedUser){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');applyUser(savedUser)}
-updateCustomerFields();updateShipmentFields();updateEditShipmentFields();renderOrderProducts();
+const savedUser=userDirectory.find(user=>user.username===sessionStorage.getItem('cps-session'));if(savedUser){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');applyUser(savedUser)}
+populateUserSelectors();renderUsers();updateCustomerFields();updateShipmentFields();updateEditShipmentFields();renderOrderProducts();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('service-worker.js');
 
