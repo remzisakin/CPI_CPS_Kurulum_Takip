@@ -181,6 +181,9 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - `demodata/Accounts Report-2026-08-27-11-21-15.xlsx` içindeki `Account Name` ve `Full Address` alanları müşteri otomatik tamamlama kaynağıdır. Kullanıcı en az iki karakter yazdığında eşleşmeler görünür; seçim yapılmazsa yazılan değer aynen kullanılır. Bir kayıt seçildiğinde adres onayı açılır: onay adresi forma aktarır, `Yeni adres` seçimi adres alanını boş bırakır.
 - Gerçek müşteri verisi herkese açık GitHub deposuna gönderilmez. `scripts/build-account-data.ps1` Excel'den yerel `demodata/accounts-data.js` üretir; kaynak rapor ve üretilen veri `.gitignore` kapsamındadır.
 - Müşteri otomatik tamamlama aynı veri kaynağıyla `MTB firma adı` ve `Son kullanıcı firma adı` alanlarında da çalışır. MTB yapısı seçildiğinde tek kurulum adresi yerine opsiyonel `Kurulum Adresi MTB` ve `Kurulum Adresi Son Kullanıcı` alanları açılır. Firma seçiminin adres onayı yalnızca ilgili adres alanını doldurur; `Yeni adres` seçimi yalnızca ilgili alanı boş bırakır.
+- Yeni kurulumdaki sipariş ürün tablosu kaydırma başlamadan önce en az sekiz ürün satırını gösterecek yüksekliğe sahiptir; tam ekran görünümünde de aynı kapasite korunur.
+- Kurulumlar tablosunda işlem düğmeleri dışındaki bir alana tıklamak salt-okunur kurulum özeti açar. Özet müşteri, firma/adres/kontak, sipariş, tarihler, servis planı, ürünler, sevkiyat, notlar ve dosya bilgilerini bölümler hâlinde gösterir.
+- Satış Mühendisi yalnızca `Taslak` veya `Planlama bekliyor` aşamasındaki talepleri, onay sorusundan sonra silebilir. Silme işlemi liste ve detay özetinden erişilebilir; diğer roller ve daha ileri aşamalar silme yetkisine sahip değildir.
 
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
