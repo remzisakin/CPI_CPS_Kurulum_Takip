@@ -178,6 +178,8 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - Yeni kurulum penceresi başlıktaki kontrol ile tam ekrana alınabilir ve tekrar normal boyuta döndürülebilir.
 - Ürün tablosunun son satırında Enter tuşuna basılması yeni bir ürün satırı açar ve odağı yeni satırın Part No alanına taşır.
 - Zorunluluk yıldızları alan adlarıyla aynı satırda gösterilir. Tam ekran yeni kurulum penceresi, normal pencerenin tüm bölümlerini korur; form gövdesi kaydırılırken sipariş ürün tablosu görünür ve kullanılabilir kalır.
+- `demodata/Accounts Report-2026-08-27-11-21-15.xlsx` içindeki `Account Name` ve `Full Address` alanları müşteri otomatik tamamlama kaynağıdır. Kullanıcı en az iki karakter yazdığında eşleşmeler görünür; seçim yapılmazsa yazılan değer aynen kullanılır. Bir kayıt seçildiğinde adres onayı açılır: onay adresi forma aktarır, `Yeni adres` seçimi adres alanını boş bırakır.
+- Gerçek müşteri verisi herkese açık GitHub deposuna gönderilmez. `scripts/build-account-data.ps1` Excel'den yerel `demodata/accounts-data.js` üretir; kaynak rapor ve üretilen veri `.gitignore` kapsamındadır.
 
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
