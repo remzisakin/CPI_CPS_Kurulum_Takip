@@ -184,6 +184,8 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - Yeni kurulumdaki sipariş ürün tablosu kaydırma başlamadan önce en az sekiz ürün satırını gösterecek yüksekliğe sahiptir; tam ekran görünümünde de aynı kapasite korunur.
 - Kurulumlar tablosunda işlem düğmeleri dışındaki bir alana tıklamak salt-okunur kurulum özeti açar. Özet müşteri, firma/adres/kontak, sipariş, tarihler, servis planı, ürünler, sevkiyat, notlar ve dosya bilgilerini bölümler hâlinde gösterir.
 - Satış Mühendisi yalnızca `Taslak` veya `Planlama bekliyor` aşamasındaki talepleri, onay sorusundan sonra silebilir. Silme işlemi liste ve detay özetinden erişilebilir; diğer roller ve daha ileri aşamalar silme yetkisine sahip değildir.
+- `demodata/Desoutter_Product.xlsm` iki ürün kaynağı içerir: `TP List` sekmesinde `Reference` Part No ve `Ref. Description` açıklamadır; `PRICE LIST 2026` sekmesinde Part No olarak yalnızca `615 Part number`, açıklama olarak `Item Description` kullanılır. `Item No.` Part No değildir ve sonuçlarda yalnızca ek referans olarak gösterilir.
+- `scripts/build-product-data.ps1` iki sekmeyi yerel `demodata/product-data.js` dizininde birleştirir. Kaynak ve üretilen ürün verisi `.gitignore` kapsamındadır. Part No alanında en az iki karakter yazıldığında en fazla sekiz eşleşme gösterilir; seçim Part No ve Description alanlarını doldurur, seçim yapılmazsa manuel Part No/Description girişi korunur.
 
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
