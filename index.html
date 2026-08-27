@@ -98,34 +98,33 @@
 
   <dialog id="installationDialog">
     <form id="installationForm" method="dialog">
-      <div class="dialog-header"><div><p id="installationDialogEyebrow" class="eyebrow">YENİ KAYIT</p><h2 id="installationDialogTitle">Yeni kurulum oluştur</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="dialog-header"><div><p id="installationDialogEyebrow" class="eyebrow">YENİ KAYIT</p><h2 id="installationDialogTitle">Yeni kurulum oluştur</h2></div><div class="dialog-header-actions"><button id="toggleInstallationFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div></div>
       <div class="steps"><span class="active">1 Müşteri</span><span>2 Sipariş</span></div>
       <div class="form-grid">
         <fieldset class="form-section wide">
           <legend>Müşteri ve sipariş bilgileri</legend>
           <div class="section-grid">
-            <label>Müşteri adı<input name="customer" required placeholder="Örn. Atlas Otomasyon A.Ş."></label>
+            <label>Müşteri adı <span class="required-mark">*</span><input name="customer" required placeholder="Örn. Atlas Otomasyon A.Ş."></label>
             <label>Müşteri yapısı<select id="customerType" name="customerType"><option value="direct">Doğrudan son kullanıcı</option><option value="mtb">MTB ve son kullanıcı ayrı</option></select></label>
             <div id="mtbCompanyFields" class="conditional-fields wide role-hidden">
-              <label>MTB firma adı<input name="mtbName" data-required placeholder="MTB firma adı"></label>
-              <label>Son kullanıcı firma adı<input name="endUserName" data-required placeholder="Son kullanıcı firma adı"></label>
+              <label>MTB firma adı <span class="required-mark">*</span><input name="mtbName" data-required placeholder="MTB firma adı"></label>
+              <label>Son kullanıcı firma adı <span class="required-mark">*</span><input name="endUserName" data-required placeholder="Son kullanıcı firma adı"></label>
             </div>
-            <label>Müşteriden sorumlu satış mühendisi<select name="salesEngineer" required><option>İrem Oğuzkan</option><option>Remzi Sakin</option></select></label>
-            <label>SO No — Sales Order Number<input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
-            <label>PTD No <small>(varsa)</small><input name="ptd" placeholder="Varsa girin"></label>
-            <label>Kurulum tutarı (€)<input name="amount" type="number" min="0" step="0.01" required placeholder="0"></label>
-            <label>Talep tarihi<input name="requestDate" type="date" required></label>
-            <label>Kurulum adresi<input name="address" required placeholder="Şehir / adres"></label>
+            <label>Müşteriden sorumlu satış mühendisi <span class="required-mark">*</span><select name="salesEngineer" required><option>İrem Oğuzkan</option><option>Remzi Sakin</option></select></label>
+            <label>SO No — Sales Order Number <span class="required-mark">*</span><input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
+            <label>PTD No <small>(opsiyonel)</small><input name="ptd" placeholder="Varsa girin"></label>
+            <label>Kurulum tutarı (€) <span class="required-mark">*</span><input name="amount" type="number" min="0" step="0.01" required placeholder="0"></label>
+            <label>Kurulum adresi <small>(opsiyonel)</small><input name="address" placeholder="Şehir / adres"></label>
           </div>
         </fieldset>
 
         <fieldset id="directContactFields" class="form-section wide">
           <legend>Müşteri kontak bilgileri</legend>
           <div class="section-grid contact-grid">
-            <label>Ad<input name="contactFirstName" data-required required></label>
-            <label>Soyad<input name="contactLastName" data-required required></label>
-            <label>E-posta<input name="contactEmail" type="email" data-required required></label>
-            <label>Telefon<input name="contactPhone" type="tel" data-required required></label>
+            <label>Ad <span class="required-mark">*</span><input name="contactFirstName" data-required required></label>
+            <label>Soyad <span class="required-mark">*</span><input name="contactLastName" data-required required></label>
+            <label>E-posta <span class="required-mark">*</span><input name="contactEmail" type="email" data-required required></label>
+            <label>Telefon <small>(opsiyonel)</small><input name="contactPhone" type="tel"></label>
           </div>
         </fieldset>
 
@@ -133,32 +132,32 @@
           <fieldset class="form-section">
             <legend>MTB kontak bilgileri</legend>
             <div class="section-grid contact-grid">
-              <label>Ad<input name="mtbContactFirstName" data-required></label>
-              <label>Soyad<input name="mtbContactLastName" data-required></label>
-              <label>E-posta<input name="mtbContactEmail" type="email" data-required></label>
-              <label>Telefon<input name="mtbContactPhone" type="tel" data-required></label>
+              <label>Ad <span class="required-mark">*</span><input name="mtbContactFirstName" data-required></label>
+              <label>Soyad <span class="required-mark">*</span><input name="mtbContactLastName" data-required></label>
+              <label>E-posta <span class="required-mark">*</span><input name="mtbContactEmail" type="email" data-required></label>
+              <label>Telefon <small>(opsiyonel)</small><input name="mtbContactPhone" type="tel"></label>
             </div>
           </fieldset>
           <fieldset class="form-section">
             <legend>Son kullanıcı kontak bilgileri</legend>
             <div class="section-grid contact-grid">
-              <label>Ad<input name="endUserContactFirstName" data-required></label>
-              <label>Soyad<input name="endUserContactLastName" data-required></label>
-              <label>E-posta<input name="endUserContactEmail" type="email" data-required></label>
-              <label>Telefon<input name="endUserContactPhone" type="tel" data-required></label>
+              <label>Ad <span class="required-mark">*</span><input name="endUserContactFirstName" data-required></label>
+              <label>Soyad <span class="required-mark">*</span><input name="endUserContactLastName" data-required></label>
+              <label>E-posta <span class="required-mark">*</span><input name="endUserContactEmail" type="email" data-required></label>
+              <label>Telefon <small>(opsiyonel)</small><input name="endUserContactPhone" type="tel"></label>
             </div>
           </fieldset>
         </div>
 
         <fieldset class="form-section wide order-content-section">
-          <legend>Sipariş içeriği</legend>
+          <legend>Sipariş içeriği <span class="required-mark">*</span></legend>
           <div class="order-toolbar">
             <div class="order-tabs"><button class="order-tab active" type="button" data-order-tab="products">Ürün Listesi</button><button class="order-tab" type="button" data-order-tab="sets">Set Bilgisi</button></div>
             <div class="order-actions"><input id="orderFileInput" type="file" accept=".xlsx,.xls,.csv" hidden><button id="importOrderButton" class="secondary-button" type="button">Dosya ekle</button><button id="addOrderProductButton" class="primary-button" type="button">＋ Ürün ekle</button></div>
           </div>
           <div id="orderFileStatus" class="order-file-status">Excel sütunları: Part No, Description, Qty; opsiyonel: Set Bilgisi</div>
           <div id="productsTabPanel" class="order-tab-panel">
-            <div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO</th><th>DESCRIPTION</th><th>QTY</th><th>SET BİLGİSİ <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="orderProductRows"></tbody></table></div>
+            <div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO <span class="required-mark">*</span></th><th>DESCRIPTION <span class="required-mark">*</span></th><th>QTY <span class="required-mark">*</span></th><th>SET BİLGİSİ <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="orderProductRows"></tbody></table></div>
           </div>
           <div id="setsTabPanel" class="order-tab-panel role-hidden"><div id="setGroups" class="set-groups"></div></div>
         </fieldset>
@@ -166,9 +165,9 @@
         <fieldset class="form-section wide">
           <legend>Tarihler, notlar ve ekler</legend>
           <div class="section-grid">
-            <label>Tahmini sevkiyat / teslim tarihi <small>(varsa)</small><input id="estimatedDeliveryDate" name="estimatedDeliveryDate" type="date"></label>
-            <label>Tahmini kurulum tarihi <small>(varsa)</small><input id="estimatedInstallationDate" name="estimatedInstallationDate" type="date"></label>
-            <label class="wide">Notlar<textarea name="notes" rows="2" placeholder="Varsa önemli notlar"></textarea></label>
+            <label>Tahmini sevkiyat / teslim tarihi <small>(opsiyonel)</small><input id="estimatedDeliveryDate" name="estimatedDeliveryDate" type="date"></label>
+            <label>Tahmini kurulum tarihi <small>(opsiyonel)</small><input id="estimatedInstallationDate" name="estimatedInstallationDate" type="date"></label>
+            <label class="wide">Notlar <small>(opsiyonel)</small><textarea name="notes" rows="2" placeholder="Varsa önemli notlar"></textarea></label>
             <label class="wide file-field">Dosya ekle<input name="attachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"><small>Fotoğraf, PDF, Word veya Excel dosyaları seçilebilir.</small></label>
           </div>
         </fieldset>
@@ -178,7 +177,7 @@
           <label class="check-row"><input id="productsShipped" name="productsShipped" type="checkbox"> Ürünler müşteriye sevk edildi</label>
           <div id="shipmentFields" class="conditional-fields role-hidden">
             <div class="section-grid">
-              <label>Sevk tarihi<input name="shipmentDate" type="date" data-required></label>
+              <label>Sevk tarihi <span class="required-mark">*</span><input name="shipmentDate" type="date" data-required></label>
               <label class="check-row field-aligned"><input id="partialShipment" name="partialShipment" type="checkbox"> Parçalı sevkiyat</label>
             </div>
             <div id="partialProductFields" class="product-checklist role-hidden">
