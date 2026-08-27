@@ -2,14 +2,17 @@
 
 Satış, sevkiyat ve saha kurulum süreçlerini izlemek için hazırlanmış ilk çalışan prototip.
 
-## Demo girişleri
+## Kullanıcı girişleri
 
-Tüm demo hesaplarının şifresi `Demo123!` şeklindedir.
+Aktif kullanıcılar `demodata/Kullanıcı bilgileri ve yetkileri.xlsx` dosyasından alınır. Kullanıcı adları `ad.soyad` biçiminde üretilir; prototipin ortak geçici parolası `Cps2026!` değeridir. Excel ve üretilen kullanıcı verisi güvenlik nedeniyle GitHub'a gönderilmez.
 
-- Yönetici — Remzi Sakin: `admin`
-- Satış Mühendisi — İrem Oğuzkan: `sales`
-- Servis Supervisor — Tevfik Şahinbaş: `supervisor`
-- Servis Teknisyeni — Gürcan Girgin: `technician`
+Excel güncellendiğinde kullanıcı dizinini yenilemek için:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-user-data.ps1
+```
+
+Yönetici, Satış Mühendisi, Servis Süpervisor ve Servis Teknisyeni yetkileri Excel'deki `Yetkisi` sütunundan atanır. Eski sabit demo hesapları artık kullanılmaz.
 
 `index.html` dosyası modern bir tarayıcıda doğrudan açılarak arayüz incelenebilir. Yeni kurulum kayıtları prototip aşamasında yalnızca o tarayıcının yerel hafızasında saklanır.
 
