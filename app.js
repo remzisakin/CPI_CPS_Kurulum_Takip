@@ -124,8 +124,9 @@ async function importOrderFile(file){
 async function importEditOrderFile(file){if(!file)return;if(typeof XLSX==='undefined'){showToast('Excel okuma bileşeni yüklenemedi.');return}try{const workbook=XLSX.read(await file.arrayBuffer(),{type:'array'});const result=parseOrderWorksheet(workbook.Sheets[workbook.SheetNames[0]]);editOrderProducts.push(...result.products);renderEditOrderProducts();$('#editOrderFileStatus').textContent=`${file.name} · ${result.products.length} ürün eklendi${result.ignored?` · ${result.ignored} satır atlandı`:''}`}catch(error){showToast(`Excel okunamadı: ${error.message}`)}}
 function render(){
   const term=($('#searchInput')?.value||'').toLocaleLowerCase('tr');
+  const statusFilter=$('#statusFilter')?.value||'';
   const visibleInstallations=currentUser?.role==='supervisor'?installations.filter(item=>item.workflowStage!=='draft'):installations;
-  const filtered=visibleInstallations.filter(x=>{const columnMatch=Object.entries(columnFilters).every(([key,values])=>!values.size||values.has(String(columnValue(x,key))));return columnMatch&&(`${x.customer} ${x.salesOrderNumber} ${x.ptd} ${x.salesEngineer}`.toLocaleLowerCase('tr').includes(term))});
+  const filtered=visibleInstallations.filter(x=>{const columnMatch=Object.entries(columnFilters).every(([key,values])=>!values.size||values.has(String(columnValue(x,key))));return columnMatch&&(!statusFilter||x.status===statusFilter)&&(`${x.customer} ${x.salesOrderNumber} ${x.ptd} ${x.salesEngineer}`.toLocaleLowerCase('tr').includes(term))});
   $('#installationRows').innerHTML=visibleInstallations.slice(0,4).map(rowTemplate).join('');
   $('#allInstallationRows').innerHTML=filtered.map(installationRowTemplate).join('') || '<tr><td colspan="9">Aramanızla eşleşen kayıt bulunamadı.</td></tr>';
   $('#activeCount').textContent=visibleInstallations.length;
@@ -213,7 +214,7 @@ $('#mainNav').addEventListener('click',event=>{const button=event.target.closest
 $('#newInstallationButton').addEventListener('click',openNew);$$('.open-new').forEach(x=>x.addEventListener('click',openNew));
 $('#showAllButton').addEventListener('click',()=>showView('installations'));
 $('#languageButton').addEventListener('click',toggleLanguage);$('#loginLanguage').addEventListener('click',toggleLanguage);
-$('#searchInput').addEventListener('input',render);
+$('#searchInput').addEventListener('input',render);$('#statusFilter').addEventListener('change',render);
 $('.installations-table thead').addEventListener('click',event=>{const button=event.target.closest('[data-column-filter]');if(button)openColumnFilter(button.dataset.columnFilter,button)});
 $('#columnFilterSearch').addEventListener('input',event=>renderColumnFilterOptions(event.target.value));
 $('#columnFilterOptions').addEventListener('change',event=>{const input=event.target.closest('input[type="checkbox"]');if(!input)return;if(input.dataset.filterYear){columnFilterValues(activeColumnFilter).filter(value=>value.startsWith(`${input.dataset.filterYear}-`)).forEach(value=>input.checked?pendingColumnSelection.add(value):pendingColumnSelection.delete(value));renderColumnFilterOptions($('#columnFilterSearch').value);return}if(input.checked)pendingColumnSelection.add(input.value);else pendingColumnSelection.delete(input.value)});
