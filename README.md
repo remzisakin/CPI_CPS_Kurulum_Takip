@@ -1,30 +1,41 @@
 # CPS Kurulum Takip
 
-SatÄ±ÅŸ, sevkiyat ve saha kurulum sÃ¼reÃ§lerini izlemek iÃ§in hazÄ±rlanmÄ±ÅŸ ilk Ã§alÄ±ÅŸan prototip.
+Satış, sevkiyat ve saha kurulum süreçlerini izlemek için hazırlanmış ilk çalışan prototip.
 
-## Demo giriÅŸleri
+## Demo girişleri
 
-TÃ¼m demo hesaplarÄ±nÄ±n ÅŸifresi `Demo123!` ÅŸeklindedir.
+Tüm demo hesaplarının şifresi `Demo123!` şeklindedir.
 
-- YÃ¶netici â€” Remzi Sakin: `admin`
-- SatÄ±ÅŸ MÃ¼hendisi â€” Ä°rem OÄŸuzkan: `sales`
-- Servis Supervisor â€” Tevfik ÅahinbaÅŸ: `supervisor`
-- Servis Teknisyeni â€” GÃ¼rcan Girgin: `technician`
+- Yönetici — Remzi Sakin: `admin`
+- Satış Mühendisi — İrem Oğuzkan: `sales`
+- Servis Supervisor — Tevfik Şahinbaş: `supervisor`
+- Servis Teknisyeni — Gürcan Girgin: `technician`
 
-`index.html` dosyasÄ± modern bir tarayÄ±cÄ±da doÄŸrudan aÃ§Ä±larak arayÃ¼z incelenebilir. Yeni kurulum kayÄ±tlarÄ± prototip aÅŸamasÄ±nda yalnÄ±zca o tarayÄ±cÄ±nÄ±n yerel hafÄ±zasÄ±nda saklanÄ±r.
+`index.html` dosyası modern bir tarayıcıda doğrudan açılarak arayüz incelenebilir. Yeni kurulum kayıtları prototip aşamasında yalnızca o tarayıcının yerel hafızasında saklanır.
 
-## Bu sÃ¼rÃ¼mde Ã§alÄ±ÅŸan bÃ¶lÃ¼mler
+### Yerel müşteri arama verisini hazırlama
 
-- KullanÄ±cÄ± adÄ± ve ÅŸifre ekranÄ± (demo)
-- YÃ¶netici/Supervisor genel bakÄ±ÅŸ paneli
-- Ã–rnek kurulum verileri ve durum uyarÄ±larÄ±
+Gerçek müşteri Excel'i güvenlik nedeniyle GitHub'a gönderilmez. `Accounts Report-*.xlsx` dosyasını `demodata` klasörüne koyduktan sonra aşağıdaki komut çalıştırılır:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-account-data.ps1
+```
+
+Bu işlem, uygulamanın müşteri adı otomatik tamamlama alanında kullandığı yerel `demodata/accounts-data.js` dosyasını üretir. Bu dosya da GitHub'a gönderilmez.
+
+## Bu sürümde çalışan bölümler
+
+- Kullanıcı adı ve şifre ekranı (demo)
+- Yönetici/Supervisor genel bakış paneli
+- Örnek kurulum verileri ve durum uyarıları
 - Kurulum listesinde arama ve filtreleme
-- Yeni kurulum oluÅŸturma
-- Mobil uyumlu arayÃ¼z
-- Offline durum algÄ±lama ve salt-okunur uyarÄ±sÄ±
-- Uygulama manifesti ve Ã§evrimdÄ±ÅŸÄ± Ã¶nbellek altyapÄ±sÄ±
+- Yeni kurulum oluşturma
+- Excel kaynaklı müşteri adı otomatik tamamlama ve adres önerisi
+- Mobil uyumlu arayüz
+- Offline durum algılama ve salt-okunur uyarısı
+- Uygulama manifesti ve çevrimdışı önbellek altyapısı
 
-## GÃ¼venlik notu
+## Güvenlik notu
 
-Bu sÃ¼rÃ¼m bir arayÃ¼z prototipidir. GerÃ§ek kullanÄ±cÄ± ÅŸifreleri tarayÄ±cÄ± kodunda tutulmamalÄ±dÄ±r. Ãœretim sÃ¼rÃ¼mÃ¼nde sunucu, veritabanÄ±, gÃ¼venli parola Ã¶zeti, oturum yÃ¶netimi, kullanÄ±cÄ± rolleri ve dosya depolama altyapÄ±sÄ± kurulacaktÄ±r.
+Bu sürüm bir arayüz prototipidir. Gerçek kullanıcı şifreleri tarayıcı kodunda tutulmamalıdır. Üretim sürümünde sunucu, veritabanı, güvenli parola özeti, oturum yönetimi, kullanıcı rolleri ve dosya depolama altyapısı kurulacaktır.
 
