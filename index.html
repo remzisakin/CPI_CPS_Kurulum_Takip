@@ -245,6 +245,41 @@
     </form>
   </dialog>
 
+  <dialog id="serviceEntryDialog" class="wide-dialog service-entry-dialog">
+    <form id="serviceEntryForm" method="dialog">
+      <input id="serviceInstallationId" name="installationId" type="hidden">
+      <input id="serviceVisitIndex" name="visitIndex" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SERVİS SAHA KAYDI</p><h2>Kurulum raporu</h2><p id="serviceRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div id="serviceVisitTabs" class="service-visit-tabs"></div>
+      <div class="form-grid service-entry-grid">
+        <fieldset class="form-section wide"><legend>Plan ve ürün durumu</legend><div class="section-grid">
+          <label>Planlanan kurulum tarihi<input id="servicePlannedDate" readonly></label>
+          <label>Planlanan süre<input id="servicePlannedDuration" readonly></label>
+          <label class="wide">Sevk edilen ürünlerin durumu <span class="required-mark">*</span><select id="serviceProductStatus" name="productStatus" required><option value="complete">Ürünler tam</option><option value="missing">Ürün eksik</option><option value="demo">Demo ürün ile kurulum yapılacak</option></select></label>
+          <div id="missingProductFields" class="wide role-hidden"><div id="missingProductChecklist" class="product-checklist"></div></div>
+          <label class="wide">Demo ürün açıklaması <small>(opsiyonel)</small><textarea name="demoProductNote" rows="2"></textarea></label>
+          <label class="wide">Müşteri ile kurulum öncesi check-list durumu <span class="required-mark">*</span><select name="checklistStatus" required><option value="">Durum seçin</option><option>Tamamlandı</option><option>Eksikler var</option><option>Müşteri onayı bekleniyor</option><option>Uygulanamadı</option></select></label>
+        </div></fieldset>
+        <fieldset class="form-section wide"><legend>Kurulum katılımcıları ve süre</legend><div class="section-grid">
+          <label>Kuruluma giden teknisyenler <span class="required-mark">*</span><textarea name="technicians" rows="3" required placeholder="Her satıra bir teknisyen adı yazın"></textarea><small>Çoklu giriş için her adı ayrı satıra yazın.</small></label>
+          <label>Eşlik eden müşteri çalışanları <span class="required-mark">*</span><textarea name="customerParticipants" rows="3" required placeholder="Her satıra bir kişi adı yazın"></textarea><small>Çoklu giriş için her adı ayrı satıra yazın.</small></label>
+          <label>Yol için harcanan süre <span class="required-mark">*</span><div class="inline-fields"><input name="travelDuration" type="number" min="0" step="0.25" required><select name="travelUnit"><option>Saat</option><option>Gün</option></select></div></label>
+          <label>Sahada harcanan süre <span class="required-mark">*</span><div class="inline-fields"><input name="siteDuration" type="number" min="0" step="0.25" required><select name="siteUnit"><option>Saat</option><option>Gün</option></select></div></label>
+        </div></fieldset>
+        <fieldset class="form-section wide"><legend>Rapor ve tamamlama</legend><div class="section-grid">
+          <label class="wide file-field">Kurulum raporu / fotoğraf / belge <small>(sonradan da eklenebilir)</small><input name="serviceAttachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"></label>
+          <label class="wide">Notlar <small>(opsiyonel)</small><textarea name="serviceNotes" rows="3"></textarea></label>
+          <label class="check-row wide"><input id="installationCompleted" name="completed" type="checkbox"> Kurulum tamamlandı</label>
+          <div id="nextInstallationDateField" class="wide"><label>Planlanan sonraki kurulum tarihi <span class="required-mark">*</span><input name="nextInstallationDate" type="date" data-required></label></div>
+          <label class="check-row wide"><input id="reportShared" name="reportShared" type="checkbox"> Kurulum raporu müşteri ile paylaşıldı</label>
+          <div id="sharedEmailField" class="wide role-hidden"><label>Paylaşılan e-maili ekle <span class="required-mark">*</span><input name="sharedEmailAttachment" type="file" accept=".msg,.eml,.pdf"></label></div>
+        </div></fieldset>
+        <div id="serviceOverrunNotice" class="service-overrun-notice wide role-hidden">Planlanan kurulum süresi aşılmıştır.</div>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Kurulum kaydını kaydet</button></div>
+    </form>
+  </dialog>
+
   <dialog id="orderEditDialog" class="wide-dialog">
     <form id="orderEditForm" method="dialog">
       <input id="orderEditInstallationId" name="installationId" type="hidden">
