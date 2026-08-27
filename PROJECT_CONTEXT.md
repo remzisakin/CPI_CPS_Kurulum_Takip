@@ -189,6 +189,17 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - Part No öneri katmanı sayfa gövdesinde değil, kullanıldığı modal pencerenin içinde tutulur. Böylece normal ve tam ekran yeni kurulum görünümünde modalın arkasında kalmaz; fare ve klavyeyle seçilebilir. Ayrı ürün düzenleme modalı kendi öneri katmanını kullanır.
 - Salt-okunur kurulum detay penceresi başlıktaki kontrol ile tam ekrana alınabilir ve normal boyuta döndürülebilir. Detaydaki `Sipariş içeriği` bölümü `Ürün Listesi` ve `Set Bilgisi` sekmelerine sahiptir; Set Bilgisi görünümü aynı set adına sahip ürünleri Part No, Description ve Qty ile gruplar, set atanmayanları ayrı bir grup olarak gösterir.
 
+### Servis teknisyeni saha kaydı
+
+- `Servis Teknisyeni` ve `Servis Supervisor` planlanmış kurulumlarda aynı `Servis kaydı` ekranını kullanır; Supervisor teknisyenin yapabildiği bütün kayıt işlemlerini yapabilir.
+- Ekranda planlanan tarih ve süre salt-okunur gösterilir. Ürün durumu `Ürünler tam`, `Ürün eksik` veya `Demo ürün` olarak seçilir; eksik ürünler kurulumun gerçek sipariş ürünlerinden işaretlenir.
+- Kurulum öncesi müşteri check-list durumu zorunludur. Teknisyenler ve eşlik eden müşteri çalışanları her satırda bir kişi olacak şekilde çoklu girilir.
+- Yol ve saha süreleri ayrı kaydedilir; her biri saat veya gün olabilir ve varsayılan birim saattir. Süre hesabında 1 gün = 8 saat kabul edilir.
+- Rapor/fotoğraf/belge ekleri ve notlar her kurulum ziyaretine kaydedilir; kayıtlı ziyaret yeniden açıldığında yeni dosya metadatası eklenebilir.
+- Kurulum tamamlanmadığında sonraki kurulum tarihi zorunlu olur ve kayıttan sonra `2. Kurulum`, `3. Kurulum` şeklinde yeni sekme açılır. Tamamlandı işaretlenene kadar ziyaret sayısı sınırsız ilerler.
+- Yol + saha sürelerinin tüm ziyaretlerdeki toplamı planlanan süreyi aşarsa kullanıcıdan onay alınır. Onaylanan aşım `Süre aşıldı` durumu, kırmızı tablo satırı ve detay uyarısı olarak yöneticilerce görülebilir.
+- Raporun müşteriyle paylaşıldığı işaretlenirse `.msg`, `.eml` veya `.pdf` e-mail eki zorunlu olur. Servis ziyaretlerinin tamamı salt-okunur kurulum detayında özetlenir.
+
 Bu bilgiler üretim sürümünde kullanılmamalıdır.
 
 ## 8. GitHub çalışma düzeni
