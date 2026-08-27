@@ -41,6 +41,8 @@ Roller:
 3. Servis Teknisyeni
 4. Yönetici
 
+Yönetici rolü diğer bütün rollerin izinlerini kapsar: satış kaydı oluşturma ve düzenleme, planlamaya gönderme, sevkiyat güncelleme, servis planlama, servis saha kaydı ve rapor işlemlerini yapabilir. Ayrıca kayıt durumundan bağımsız olarak bütün kurulum kayıtlarını silebilir. Satış Mühendisinin silme yetkisi yalnızca `Taslak` ve `Planlama bekliyor` kayıtlarla sınırlı kalır.
+
 Servis Supervisor, kurulum işlerine bir veya birden fazla teknisyen atar. Bir kurulumda birden fazla satış mühendisi de bulunabilir.
 
 Planlanan kurulum tarihi, planlanan süre/birim ve servis teknisyeni satış mühendisi tarafından girilmez. Satış kaydı “Planlama bekliyor” durumunda açılır; bu üç alan Kurulumlar ekranındaki ayrı “Servis planlaması” işlemi üzerinden yalnızca Servis Supervisor tarafından kaydedilir.
