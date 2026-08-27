@@ -107,14 +107,18 @@
             <div class="customer-search-field"><label>Müşteri adı <span class="required-mark">*</span><input id="customerNameInput" name="customer" required autocomplete="off" aria-autocomplete="list" aria-controls="customerSuggestions" placeholder="Müşteri adını yazmaya başlayın"></label><div id="customerSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
             <label>Müşteri yapısı<select id="customerType" name="customerType"><option value="direct">Doğrudan son kullanıcı</option><option value="mtb">MTB ve son kullanıcı ayrı</option></select></label>
             <div id="mtbCompanyFields" class="conditional-fields wide role-hidden">
-              <label>MTB firma adı <span class="required-mark">*</span><input name="mtbName" data-required placeholder="MTB firma adı"></label>
-              <label>Son kullanıcı firma adı <span class="required-mark">*</span><input name="endUserName" data-required placeholder="Son kullanıcı firma adı"></label>
+              <div class="customer-search-field"><label>MTB firma adı <span class="required-mark">*</span><input id="mtbNameInput" name="mtbName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="mtbSuggestions" placeholder="MTB firma adını yazmaya başlayın"></label><div id="mtbSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
+              <div class="customer-search-field"><label>Son kullanıcı firma adı <span class="required-mark">*</span><input id="endUserNameInput" name="endUserName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="endUserSuggestions" placeholder="Son kullanıcı firma adını yazmaya başlayın"></label><div id="endUserSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
             </div>
             <label>Müşteriden sorumlu satış mühendisi <span class="required-mark">*</span><select name="salesEngineer" required><option>İrem Oğuzkan</option><option>Remzi Sakin</option></select></label>
             <label>SO No — Sales Order Number <span class="required-mark">*</span><input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
             <label>PTD No <small>(opsiyonel)</small><input name="ptd" placeholder="Varsa girin"></label>
             <label>Kurulum tutarı (€) <span class="required-mark">*</span><input name="amount" type="number" min="0" step="0.01" required placeholder="0"></label>
-            <label>Kurulum adresi <small>(opsiyonel)</small><input name="address" placeholder="Şehir / adres"></label>
+            <label id="directAddressField">Kurulum adresi <small>(opsiyonel)</small><input name="address" placeholder="Şehir / adres"></label>
+            <div id="splitAddressFields" class="conditional-fields wide role-hidden">
+              <label>Kurulum Adresi MTB <small>(opsiyonel)</small><input name="mtbAddress" placeholder="MTB kurulum adresi"></label>
+              <label>Kurulum Adresi Son Kullanıcı <small>(opsiyonel)</small><input name="endUserAddress" placeholder="Son kullanıcı kurulum adresi"></label>
+            </div>
           </div>
         </fieldset>
 
@@ -193,7 +197,7 @@
 
   <dialog id="addressSuggestionDialog" class="address-suggestion-dialog">
     <div class="dialog-header"><div><p class="eyebrow">MÜŞTERİ ADRESİ BULUNDU</p><h2>Kurulum adresi</h2></div><button id="closeAddressSuggestion" class="icon-button" type="button" aria-label="Kapat">×</button></div>
-    <div class="address-suggestion-body"><strong id="selectedAccountName"></strong><p id="selectedAccountAddress"></p><span>Kurulum adresi olarak bu adres kullanılsın mı?</span></div>
+    <div class="address-suggestion-body"><strong id="selectedAccountName"></strong><p id="selectedAccountAddress"></p><span id="selectedAddressQuestion">Kurulum adresi olarak bu adres kullanılsın mı?</span></div>
     <div class="dialog-actions"><button id="useNewAddress" class="secondary-button" type="button">Yeni adres</button><button id="useSuggestedAddress" class="primary-button" type="button">Evet, bu adresi kullan</button></div>
   </dialog>
 
