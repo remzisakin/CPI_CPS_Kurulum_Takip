@@ -201,6 +201,12 @@
     <div class="dialog-actions"><button id="useNewAddress" class="secondary-button" type="button">Yeni adres</button><button id="useSuggestedAddress" class="primary-button" type="button">Evet, bu adresi kullan</button></div>
   </dialog>
 
+  <dialog id="installationDetailDialog" class="installation-detail-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">KURULUM TALEBİ</p><h2 id="detailDialogTitle">Kurulum detayı</h2><p id="detailDialogSubtitle" class="muted"></p></div><button id="closeInstallationDetail" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div id="installationDetailBody" class="installation-detail-body"></div>
+    <div class="dialog-actions"><button id="detailDeleteButton" class="danger-button role-hidden" type="button">Sil</button><button id="detailCloseButton" class="secondary-button" type="button">Kapat</button></div>
+  </dialog>
+
   <dialog id="planningDialog">
     <form id="planningForm" method="dialog">
       <input id="planningInstallationId" name="installationId" type="hidden">
