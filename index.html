@@ -104,7 +104,7 @@
         <fieldset class="form-section wide">
           <legend>Müşteri ve sipariş bilgileri</legend>
           <div class="section-grid">
-            <label>Müşteri adı <span class="required-mark">*</span><input name="customer" required placeholder="Örn. Atlas Otomasyon A.Ş."></label>
+            <div class="customer-search-field"><label>Müşteri adı <span class="required-mark">*</span><input id="customerNameInput" name="customer" required autocomplete="off" aria-autocomplete="list" aria-controls="customerSuggestions" placeholder="Müşteri adını yazmaya başlayın"></label><div id="customerSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
             <label>Müşteri yapısı<select id="customerType" name="customerType"><option value="direct">Doğrudan son kullanıcı</option><option value="mtb">MTB ve son kullanıcı ayrı</option></select></label>
             <div id="mtbCompanyFields" class="conditional-fields wide role-hidden">
               <label>MTB firma adı <span class="required-mark">*</span><input name="mtbName" data-required placeholder="MTB firma adı"></label>
@@ -191,6 +191,12 @@
     </form>
   </dialog>
 
+  <dialog id="addressSuggestionDialog" class="address-suggestion-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">MÜŞTERİ ADRESİ BULUNDU</p><h2>Kurulum adresi</h2></div><button id="closeAddressSuggestion" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="address-suggestion-body"><strong id="selectedAccountName"></strong><p id="selectedAccountAddress"></p><span>Kurulum adresi olarak bu adres kullanılsın mı?</span></div>
+    <div class="dialog-actions"><button id="useNewAddress" class="secondary-button" type="button">Yeni adres</button><button id="useSuggestedAddress" class="primary-button" type="button">Evet, bu adresi kullan</button></div>
+  </dialog>
+
   <dialog id="planningDialog">
     <form id="planningForm" method="dialog">
       <input id="planningInstallationId" name="installationId" type="hidden">
@@ -245,6 +251,7 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="vendor/xlsx.full.min.js"></script>
+  <script src="demodata/accounts-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
