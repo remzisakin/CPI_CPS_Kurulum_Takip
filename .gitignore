@@ -1,4 +1,6 @@
 # Gerçek müşteri verileri yerel geliştirme ortamında kalır.
 demodata/Accounts Report-*.xlsx
 demodata/accounts-data.js
+demodata/Desoutter_Product.xlsm
+demodata/product-data.js
 
