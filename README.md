@@ -34,6 +34,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-product-data
 
 Komut, `TP List` sekmesindeki `Reference` ile `Ref. Description` alanlarını ve `PRICE LIST 2026` sekmesindeki `615 Part number` ile `Item Description` alanlarını birleştirerek yerel `demodata/product-data.js` dosyasını üretir. Kaynak Excel ve üretilen ürün dizini GitHub'a gönderilmez.
 
+Müşteri kontak otomatik tamamlama dizini için `Contacts w Accounts Report-*.xlsx` dosyası kullanılır:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-contact-data.ps1
+```
+
+Komut `Account Name`, `First Name`, `Last Name`, `Email`, `Mobile` ve `Phone` alanlarını okur; geçersiz e-posta ve Türkiye telefon formatına uymayan numaraları ayıklar. Üretilen yerel `demodata/contact-data.js` ile kaynak Excel kişisel veri içerdiğinden GitHub'a gönderilmez.
+
 ## Bu sürümde çalışan bölümler
 
 - Kullanıcı adı ve şifre ekranı (demo)
