@@ -112,6 +112,8 @@ Her kurulum ziyareti ayrı kaydedilir:
 - Sahada geçirilen süre
 - Fotoğraf ve belgeler
 - Kurulum raporu; ilk kayıttan sonra da yüklenebilir
+- `Rapor ve tamamlama` bölümündeki dosya yükleme akışı korunur. `Yeni Rapor Oluştur` işlemi ayrıca rapor tipi seçtirerek aynı servis ziyaretine birden fazla sistem içi rapor taslağı ekler. İlk katalog: Sıkıcı Sistemleri / Tightening System Start-Up, Vida Besleme Sistemleri / Screw-feeding Units Start-Up, Demeter, Nexonar ve Diğer. Eklenen raporlar listede görünür ve `Düzenle` ile kendi içerik ekranı iskeletinde açılır.
+- Sistem içi rapor içerikleri henüz tanımlanmamıştır. Referans Word dosyaları alındıktan sonra mobil kullanım için klavye girişini azaltan seçim, işaretleme ve standart ifade bileşenleriyle rapor tipine özel hazırlanacaktır. Rapor tipi kataloğu ileride merkezi yapıdan artırılıp azaltılabilir.
 - Notlar
 - Kurulum tamamlandı mı?
 - Tamamlanmadıysa planlanan sonraki kurulum tarihi
