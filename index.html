@@ -84,7 +84,7 @@
       <section id="installationsView" class="view">
         <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>Tüm sevkiyat ve kurulum işlerini takip edin.</p></div><button class="primary-button open-new sales-action">＋ Yeni kurulum</button></div>
         <section class="panel installation-list-panel">
-          <div class="toolbar installation-toolbar"><input id="searchInput" type="search" placeholder="Müşteri, SO, PTD veya satış mühendisi ara..."><select id="statusFilter" aria-label="Duruma göre filtrele"><option value="">Tüm durumlar</option><option>Taslak</option><option>Planlama bekliyor</option><option>Planlandı</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>Süre aşıldı</option><option>Tamamlandı</option></select></div>
+          <div class="toolbar installation-toolbar"><input id="searchInput" type="search" placeholder="Müşteri, SO, PTD veya satış mühendisi ara..."><select id="statusFilter" aria-label="Duruma göre filtrele"><option value="">Tüm durumlar</option><option>Taslak</option><option>İnceleme bekliyor</option><option>Satış düzeltmesi bekliyor</option><option>Planlama bekliyor</option><option>Planlandı</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>Süre aşıldı</option><option>Tamamlandı</option></select></div>
           <div class="table-wrap"><table class="installations-table"><thead><tr><th><span class="filterable-heading">MÜŞTERİ<button type="button" data-column-filter="customer" aria-label="Müşteri filtresi">⌄</button></span></th><th><span class="filterable-heading">SO NO<button type="button" data-column-filter="salesOrderNumber" aria-label="SO No filtresi">⌄</button></span><small>SALES ORDER NUMBER</small></th><th><span class="filterable-heading">TALEP TARİHİ<button type="button" data-column-filter="requestDate" aria-label="Talep tarihi filtresi">⌄</button></span></th><th><span class="filterable-heading">SATIŞ MÜHENDİSİ<button type="button" data-column-filter="salesEngineer" aria-label="Satış mühendisi filtresi">⌄</button></span></th><th><span class="filterable-heading">DURUM<button type="button" data-column-filter="status" aria-label="Durum filtresi">⌄</button></span></th><th><span class="filterable-heading">PLANLANAN KURULUM<button type="button" data-column-filter="plannedDate" aria-label="Planlanan kurulum filtresi">⌄</button></span></th><th><span class="filterable-heading">TEKNİSYEN<button type="button" data-column-filter="technician" aria-label="Teknisyen filtresi">⌄</button></span></th><th><span class="filterable-heading">İLERLEME<button type="button" data-column-filter="progress" aria-label="İlerleme filtresi">⌄</button></span></th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div>
           <div id="columnFilterPopover" class="column-filter-popover role-hidden" role="dialog" aria-label="Sütun filtresi"><div class="column-filter-header"><strong id="columnFilterTitle">Filtrele</strong><button id="closeColumnFilter" class="icon-button" type="button" aria-label="Kapat">×</button></div><input id="columnFilterSearch" type="search" placeholder="Listede ara..."><div id="columnFilterOptions" class="column-filter-options"></div><div class="column-filter-actions"><button id="clearColumnFilter" class="secondary-button" type="button">Temizle</button><button id="applyColumnFilter" class="primary-button" type="button">Uygula</button></div></div>
         </section>
@@ -224,6 +224,24 @@
     <div class="dialog-header"><div><p class="eyebrow">KURULUM TALEBİ</p><h2 id="detailDialogTitle">Kurulum detayı</h2><p id="detailDialogSubtitle" class="muted"></p></div><div class="dialog-header-actions"><button id="toggleDetailFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button id="closeInstallationDetail" class="icon-button" type="button" aria-label="Kapat">×</button></div></div>
     <div id="installationDetailBody" class="installation-detail-body"></div>
     <div class="dialog-actions"><button id="detailDeleteButton" class="danger-button role-hidden" type="button">Sil</button><button id="detailCloseButton" class="secondary-button" type="button">Kapat</button></div>
+  </dialog>
+
+  <dialog id="requestReviewDialog" class="request-review-dialog">
+    <form id="requestReviewForm" method="dialog">
+      <input id="reviewInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SERVİS SUPERVISOR</p><h2>Kurulum talebini incele</h2><p id="reviewRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="request-review-body">
+        <p>Talepte sorun varsa ilgili başlıkları işaretleyin. Hiçbir sorun işaretlenmezse talep kabul edilebilir.</p>
+        <div class="review-checklist">
+          <label><input name="reviewIssue" type="checkbox" value="İçerik eksik ve/veya hatalı"> <span>İçerik eksik ve/veya hatalı</span></label>
+          <label><input name="reviewIssue" type="checkbox" value="Müşteri bilgileri eksik ve/veya hatalı"> <span>Müşteri bilgileri eksik ve/veya hatalı</span></label>
+          <label><input name="reviewIssue" type="checkbox" value="Planlanan kurulum tarihi uygun değil"> <span>Planlanan kurulum tarihi uygun değil</span></label>
+          <label><input name="reviewIssue" type="checkbox" value="Diğer"> <span>Diğer</span></label>
+        </div>
+        <label id="reviewExplanationField" class="review-explanation role-hidden">Açıklama <span class="required-mark">*</span><textarea id="reviewExplanation" name="reviewExplanation" rows="5" placeholder="Satış mühendisine iletilecek düzeltme açıklamasını yazın"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button id="returnRequestButton" class="danger-button role-hidden" type="button">Talebi geri gönder</button><button id="acceptRequestButton" class="primary-button" type="button">Talebi kabul et</button></div>
+    </form>
   </dialog>
 
   <dialog id="planningDialog">
