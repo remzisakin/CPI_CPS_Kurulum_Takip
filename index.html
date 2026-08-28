@@ -355,8 +355,9 @@
 
   <dialog id="serviceReportEditorDialog" class="service-report-editor-dialog">
     <div class="dialog-header"><div><p class="eyebrow">RAPOR DÜZENLEYİCİ</p><h2 id="serviceReportEditorTitle">Kurulum raporu</h2><p id="serviceReportEditorSubtitle" class="muted"></p></div><button id="closeServiceReportEditor" class="icon-button" type="button" aria-label="Kapat">×</button></div>
-    <div class="report-editor-placeholder"><span>01</span><div><strong>Rapor içerik ekranı sonraki aşamada oluşturulacak</strong><p>Referans Word dosyaları temel alınarak seçim, işaretleme ve hazır standart ifadeler ağırlıklı mobil uyumlu bir form burada yer alacak.</p></div></div>
-    <div class="dialog-actions"><button id="cancelServiceReportEditor" class="secondary-button" type="button">Kapat</button><button id="saveServiceReportDraft" class="primary-button" type="button">Rapor taslağını kaydet</button></div>
+    <div id="serviceReportEditorProgress" class="report-editor-progress"></div>
+    <form id="serviceReportEditorForm" class="service-report-editor-form" novalidate><div id="serviceReportEditorBody"></div></form>
+    <div class="dialog-actions report-editor-actions"><span id="serviceReportAutosaveState">Değişiklikler otomatik kaydedilir.</span><button id="cancelServiceReportEditor" class="secondary-button" type="button">Kapat ve sonra devam et</button><button id="saveServiceReportDraft" class="secondary-button" type="button">Taslağı kaydet</button><button id="completeServiceReport" class="primary-button" type="button">Formu tamamla</button></div>
   </dialog>
 
   <dialog id="serviceReportExportDialog" class="service-report-dialog report-export-dialog">
