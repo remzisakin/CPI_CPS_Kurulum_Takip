@@ -54,6 +54,7 @@ Planlanan kurulum tarihi, planlanan süre/birim ve servis teknisyeni satış mü
 - Varsa MTB ve son kullanıcı bilgilerinin ayrı tutulması
 - Sorumlu satış mühendisi veya mühendisleri
 - SO No — Sales Order Number
+- Proje ismi / tanımı (opsiyonel)
 - Talep tarihi — kurulum talebinin sisteme girildiği tarih
 - Satış mühendisi
 - PTD No (opsiyonel)
