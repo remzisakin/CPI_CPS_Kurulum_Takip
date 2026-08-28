@@ -185,7 +185,10 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 
 - Satış Mühendisi tarafından oluşturulan yeni kurulum önce `Taslak` durumuyla kaydedilir.
 - Taslak kayıtlar Servis Supervisor ekranında ve bu role ait sayaçlarda görünmez.
-- Satış Mühendisi `Planlamaya gönder` düğmesine bastığında kayıt `Planlama bekliyor` durumuna geçer ve Servis Supervisor kuyruğunda görünür.
+- Satış Mühendisi `Planlamaya gönder` düğmesine bastığında kayıt `İnceleme bekliyor` durumuna geçer ve Servis Supervisor kuyruğunda görünür. Bu aşamada henüz planlama yapılamaz.
+- Servis Supervisor önce `Talebi İncele` işlemini açar. `İçerik eksik ve/veya hatalı`, `Müşteri bilgileri eksik ve/veya hatalı`, `Planlanan kurulum tarihi uygun değil` ve `Diğer` başlıklarından biri seçilirse açıklama zorunlu olur ve talep `Satış düzeltmesi bekliyor` durumuyla satış mühendisine geri gönderilir.
+- İncelemede hiçbir sorun seçilmezse `Talebi kabul et` işlemi kaydı `Planlama bekliyor` aşamasına taşır ve ancak bundan sonra Supervisor için `Planla` düğmesi görünür.
+- Kabul edilmemiş talepler Servis Teknisyeni ekranında görünmez; servis kaydı yalnızca planlanmış kurulumlarda açılır.
 - Satış Mühendisi listedeki `Düzenle` düğmesiyle müşteri, kontak, sipariş, ürün, tarih, not, ek ve sevkiyat alanlarının tamamını yeniden açıp düzenleyebilir.
 - Parçalı sevkiyat seçimi, ilgili kurulumun sipariş içeriğindeki gerçek ürünlerden oluşturulur.
 - Tahmini kurulum tarihi, tahmini sevkiyat/teslim tarihinden önce seçilemez.
