@@ -359,6 +359,17 @@
     <div class="dialog-actions"><button id="cancelServiceReportEditor" class="secondary-button" type="button">Kapat</button><button id="saveServiceReportDraft" class="primary-button" type="button">Rapor taslağını kaydet</button></div>
   </dialog>
 
+  <dialog id="serviceReportExportDialog" class="service-report-dialog report-export-dialog">
+    <form id="serviceReportExportForm" method="dialog">
+      <div class="dialog-header"><div><p class="eyebrow">RAPOR ÇIKTISI</p><h2>Çıktı formatını seçin</h2><p id="serviceReportExportTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="report-format-list">
+        <label><input name="reportFormat" type="radio" value="word" required><span class="format-logo word-logo" aria-hidden="true"><i>W</i><b></b></span><span><strong>Microsoft Word</strong><small>Düzenlenebilir Word belgesi (.doc)</small></span></label>
+        <label><input name="reportFormat" type="radio" value="pdf" required><span class="format-logo pdf-logo" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 4h20l8 8v32H10z"/><path d="M30 4v10h9"/><path class="pdf-mark" d="M15 32c7-3 12-11 13-19 1 8 4 14 9 18-8-2-15-1-22 1z"/></svg></span><span><strong>PDF</strong><small>Paylaşıma hazır PDF belgesi (.pdf)</small></span></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button id="downloadServiceReport" class="primary-button" value="default" disabled>İndir</button></div>
+    </form>
+  </dialog>
+
   <dialog id="orderEditDialog" class="wide-dialog">
     <form id="orderEditForm" method="dialog">
       <input id="orderEditInstallationId" name="installationId" type="hidden">
