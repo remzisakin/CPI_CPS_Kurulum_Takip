@@ -306,6 +306,10 @@
           <div id="serviceCustomerParticipants" class="service-customer-participants"><p>Henüz müşteri çalışanı eklenmedi.</p></div>
         </fieldset>
         <fieldset class="form-section wide"><legend>Rapor ve tamamlama</legend><div class="section-grid">
+          <section class="generated-report-section wide">
+            <div class="generated-report-heading"><div><strong>Kurulum raporları</strong><small>Rapor yükleyebilir veya standart bir raporu sistemde oluşturabilirsiniz.</small></div><button id="createServiceReport" class="primary-button" type="button">＋ Yeni Rapor Oluştur</button></div>
+            <div id="serviceGeneratedReports" class="generated-report-list"><p>Henüz sistemde oluşturulmuş rapor bulunmuyor.</p></div>
+          </section>
           <label class="wide file-field">Kurulum raporu / fotoğraf / belge <small>(sonradan da eklenebilir)</small><input name="serviceAttachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"></label>
           <label class="wide">Notlar <small>(opsiyonel)</small><textarea name="serviceNotes" rows="3"></textarea></label>
           <label class="check-row wide"><input id="installationCompleted" name="completed" type="checkbox"> Kurulum tamamlandı</label>
@@ -333,6 +337,26 @@
       <div id="serviceParticipantWarning" class="service-participant-warning role-hidden"></div>
     </div>
     <div class="dialog-actions"><button id="cancelServiceCustomerPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveServiceCustomerParticipant" class="primary-button" type="button">Kontak ekle</button></div>
+  </dialog>
+
+  <dialog id="serviceReportTypeDialog" class="service-report-dialog">
+    <form id="serviceReportTypeForm" method="dialog">
+      <div class="dialog-header"><div><p class="eyebrow">YENİ KURULUM RAPORU</p><h2>Rapor tipini seçin</h2><p class="muted">Aynı kuruluma birden fazla rapor ekleyebilirsiniz.</p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="report-type-list">
+        <label><input name="reportType" type="radio" value="tightening" required><span><strong>Sıkıcı Sistemleri Kurulum Raporu</strong><small>Tightening System Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="screwFeeding" required><span><strong>Vida Besleme Sistemleri Kurulum Raporu</strong><small>Screw-feeding Units Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="demeter" required><span><strong>Demeter Kurulum Raporu</strong><small>Demeter Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="nexonar" required><span><strong>Nexonar Kurulum Raporu</strong><small>Nexonar Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="other" required><span><strong>Diğer</strong><small>Other installation report</small></span></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Rapor taslağını oluştur</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="serviceReportEditorDialog" class="service-report-editor-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">RAPOR DÜZENLEYİCİ</p><h2 id="serviceReportEditorTitle">Kurulum raporu</h2><p id="serviceReportEditorSubtitle" class="muted"></p></div><button id="closeServiceReportEditor" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="report-editor-placeholder"><span>01</span><div><strong>Rapor içerik ekranı sonraki aşamada oluşturulacak</strong><p>Referans Word dosyaları temel alınarak seçim, işaretleme ve hazır standart ifadeler ağırlıklı mobil uyumlu bir form burada yer alacak.</p></div></div>
+    <div class="dialog-actions"><button id="cancelServiceReportEditor" class="secondary-button" type="button">Kapat</button><button id="saveServiceReportDraft" class="primary-button" type="button">Rapor taslağını kaydet</button></div>
   </dialog>
 
   <dialog id="orderEditDialog" class="wide-dialog">
