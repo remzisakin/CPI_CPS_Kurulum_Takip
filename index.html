@@ -124,7 +124,7 @@
         <fieldset id="directContactFields" class="form-section wide">
           <legend>Müşteri kontak bilgileri</legend>
           <div class="section-grid contact-grid">
-            <label>Ad <span class="required-mark">*</span><input name="contactFirstName" data-required required></label>
+            <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="contactFirstNameInput" name="contactFirstName" data-required required autocomplete="off" aria-autocomplete="list" aria-controls="contactSuggestions"></label><div id="contactSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
             <label>Soyad <span class="required-mark">*</span><input name="contactLastName" data-required required></label>
             <label>E-posta <span class="required-mark">*</span><input name="contactEmail" type="email" data-required required></label>
             <label>Telefon <small>(opsiyonel)</small><input name="contactPhone" type="tel"></label>
@@ -135,7 +135,7 @@
           <fieldset class="form-section">
             <legend>MTB kontak bilgileri</legend>
             <div class="section-grid contact-grid">
-              <label>Ad <span class="required-mark">*</span><input name="mtbContactFirstName" data-required></label>
+              <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="mtbContactFirstNameInput" name="mtbContactFirstName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="mtbContactSuggestions"></label><div id="mtbContactSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
               <label>Soyad <span class="required-mark">*</span><input name="mtbContactLastName" data-required></label>
               <label>E-posta <span class="required-mark">*</span><input name="mtbContactEmail" type="email" data-required></label>
               <label>Telefon <small>(opsiyonel)</small><input name="mtbContactPhone" type="tel"></label>
@@ -144,7 +144,7 @@
           <fieldset class="form-section">
             <legend>Son kullanıcı kontak bilgileri</legend>
             <div class="section-grid contact-grid">
-              <label>Ad <span class="required-mark">*</span><input name="endUserContactFirstName" data-required></label>
+              <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="endUserContactFirstNameInput" name="endUserContactFirstName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="endUserContactSuggestions"></label><div id="endUserContactSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
               <label>Soyad <span class="required-mark">*</span><input name="endUserContactLastName" data-required></label>
               <label>E-posta <span class="required-mark">*</span><input name="endUserContactEmail" type="email" data-required></label>
               <label>Telefon <small>(opsiyonel)</small><input name="endUserContactPhone" type="tel"></label>
@@ -199,6 +199,25 @@
     <div class="dialog-header"><div><p class="eyebrow">MÜŞTERİ ADRESİ BULUNDU</p><h2>Kurulum adresi</h2></div><button id="closeAddressSuggestion" class="icon-button" type="button" aria-label="Kapat">×</button></div>
     <div class="address-suggestion-body"><strong id="selectedAccountName"></strong><p id="selectedAccountAddress"></p><span id="selectedAddressQuestion">Kurulum adresi olarak bu adres kullanılsın mı?</span></div>
     <div class="dialog-actions"><button id="useNewAddress" class="secondary-button" type="button">Yeni adres</button><button id="useSuggestedAddress" class="primary-button" type="button">Evet, bu adresi kullan</button></div>
+  </dialog>
+
+  <dialog id="contactMissingEmailDialog" class="contact-data-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">E-POSTA BULUNAMADI</p><h2>Kontak e-postası</h2></div></div>
+    <div class="contact-data-body"><p>Bu kontak için veri tabanında e-posta adresi bulunamadı. Devam etmek için e-posta adresini girin.</p><label>E-posta adresi<input id="missingContactEmail" type="email" placeholder="ornek@firma.com"></label><div id="missingContactEmailError" class="form-error"></div></div>
+    <div class="dialog-actions"><button id="cancelMissingContactEmail" class="secondary-button" type="button">Yeni giriş yap</button><button id="saveMissingContactEmail" class="primary-button" type="button">E-postayı kullan</button></div>
+  </dialog>
+
+  <dialog id="contactMissingPhoneDialog" class="contact-data-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">TELEFON BULUNAMADI</p><h2>Telefon bilgisi</h2></div></div>
+    <div class="contact-data-body"><p>Bu kontak için geçerli cep veya sabit telefon bulunamadı. Telefon bilgisi eklemek ister misiniz?</p><label id="missingContactPhoneField" class="role-hidden">Telefon numarası<input id="missingContactPhone" type="tel" placeholder="05xx xxx xx xx"></label><div id="missingContactPhoneError" class="form-error"></div></div>
+    <div class="dialog-actions"><button id="skipMissingContactPhone" class="secondary-button" type="button">Hayır, devam et</button><button id="addMissingContactPhone" class="primary-button" type="button">Evet, telefon ekle</button><button id="saveMissingContactPhone" class="primary-button role-hidden" type="button">Telefonu kullan</button></div>
+  </dialog>
+
+  <dialog id="contactSuggestionDialog" class="contact-data-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">KONTAK BULUNDU</p><h2>Kontak bilgileri</h2></div><button id="closeContactSuggestion" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div id="selectedContactSummary" class="contact-summary-grid"></div>
+    <div class="contact-data-question">Bu kontak bilgileri kullanılsın mı?</div>
+    <div class="dialog-actions"><button id="useNewContact" class="secondary-button" type="button">Yeni giriş</button><button id="useSuggestedContact" class="primary-button" type="button">Evet, bilgileri kullan</button></div>
   </dialog>
 
   <dialog id="installationDetailDialog" class="installation-detail-dialog">
@@ -300,6 +319,7 @@
   <script src="demodata/accounts-data.js"></script>
   <script src="demodata/product-data.js"></script>
   <script src="demodata/user-data.js"></script>
+  <script src="demodata/contact-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
