@@ -170,7 +170,7 @@ Mevcut prototipte:
 - Online/offline durum algılanır.
 - Offline durumda yeni kayıt engellenir.
 - Mobil uyumlu görünüm vardır.
-- Türkçe/İngilizce geçişinin yalnızca temel menü bölümü uygulanmıştır; tüm ekran çevirisi henüz tamamlanmamıştır.
+- Türkçe/İngilizce geçişi navigasyonun yanı sıra form etiketlerini, butonları, tablo durumlarını, seçim seçeneklerini, yer tutucuları, uyarıları, toast mesajlarını ve JavaScript ile oluşturulan detay/inceleme/planlama/servis içeriklerini kapsar. Kayıtların Türkçe durum ve birim değerleri çeviriden etkilenmez.
 - Arayüz Desoutter'ın resmî sitesindeki tasarım diline yaklaştırılmıştır. Resmî Desoutter logo varlığı kullanılır. Resmî CSS'ten doğrulanan ana renkler `#0D0D0E` siyah, `#252526` koyu gri, beyaz/gri metinler ve `#EC4936` kırmızı-turuncu vurgudur; sarı kullanılmaz. Üst başlıkta logo ve kullanıcı araçları, ayrı koyu satırda navigasyon bulunur. Mobil görünümde navigasyon yatay kaydırılabilir.
 
 Demo hesapları yalnızca prototip içindir:
@@ -269,7 +269,7 @@ Tarayıcı koduna gerçek kullanıcı şifresi yazılmamalı ve `localStorage` �
 6. Supervisor teknisyen atama ekranını geliştir.
 7. Tekrarlanan saha ziyareti ve süre aşımı sistemini geliştir.
 8. Dosya/fotoğraf yükleme altyapısını ekle.
-9. Türkçe ve İngilizce çevirileri tamamla.
+9. Yeni ekranlar eklendikçe Türkçe ve İngilizce sözlüğünü birlikte güncel tut.
 10. Offline salt-okunur davranışı gerçek verilerle güvenli hâle getir.
 
 ## 11. Henüz kesinleşmeyen sorular
