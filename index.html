@@ -278,12 +278,13 @@
           <label class="wide">Demo ürün açıklaması <small>(opsiyonel)</small><textarea name="demoProductNote" rows="2"></textarea></label>
           <label class="wide">Müşteri ile kurulum öncesi check-list durumu <span class="required-mark">*</span><select name="checklistStatus" required><option value="">Durum seçin</option><option>Tamamlandı</option><option>Eksikler var</option><option>Müşteri onayı bekleniyor</option><option>Uygulanamadı</option></select></label>
         </div></fieldset>
-        <fieldset class="form-section wide"><legend>Kurulum katılımcıları ve süre</legend><div class="section-grid">
-          <label>Kuruluma giden teknisyenler <span class="required-mark">*</span><textarea name="technicians" rows="3" required placeholder="Her satıra bir teknisyen adı yazın"></textarea><small>Çoklu giriş için her adı ayrı satıra yazın.</small></label>
-          <label>Eşlik eden müşteri çalışanları <span class="required-mark">*</span><textarea name="customerParticipants" rows="3" required placeholder="Her satıra bir kişi adı yazın"></textarea><small>Çoklu giriş için her adı ayrı satıra yazın.</small></label>
-          <label>Yol için harcanan süre <span class="required-mark">*</span><div class="inline-fields"><input name="travelDuration" type="number" min="0" step="0.25" required><select name="travelUnit"><option>Saat</option><option>Gün</option></select></div></label>
-          <label>Sahada harcanan süre <span class="required-mark">*</span><div class="inline-fields"><input name="siteDuration" type="number" min="0" step="0.25" required><select name="siteUnit"><option>Saat</option><option>Gün</option></select></div></label>
-        </div></fieldset>
+        <fieldset class="form-section wide service-participants-section"><legend>Kurulum katılımcıları ve süre</legend>
+          <div class="service-participant-heading"><div><strong>Kuruluma giden teknisyenler <span class="required-mark">*</span></strong><small>Her teknisyenin yol ve saha süresini ayrı girin.</small></div><button id="addServiceTechnician" class="secondary-button" type="button">＋ Teknisyen ekle</button></div>
+          <div id="serviceTechnicianRows" class="service-technician-rows"></div>
+          <div class="service-duration-total"><span>Bu kurulum için toplam gerçekleşen süre</span><strong id="serviceDurationTotal">0 Saat</strong></div>
+          <div class="service-customer-heading"><div><strong>Eşlik eden müşteri çalışanları</strong><small>Kontak listesinden seçin veya yeni kişi girin.</small></div><button id="addServiceCustomerParticipant" class="secondary-button" type="button">＋ Kontak ekle</button></div>
+          <div id="serviceCustomerParticipants" class="service-customer-participants"><p>Henüz müşteri çalışanı eklenmedi.</p></div>
+        </fieldset>
         <fieldset class="form-section wide"><legend>Rapor ve tamamlama</legend><div class="section-grid">
           <label class="wide file-field">Kurulum raporu / fotoğraf / belge <small>(sonradan da eklenebilir)</small><input name="serviceAttachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"></label>
           <label class="wide">Notlar <small>(opsiyonel)</small><textarea name="serviceNotes" rows="3"></textarea></label>
@@ -296,6 +297,22 @@
       </div>
       <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Kurulum kaydını kaydet</button></div>
     </form>
+  </dialog>
+
+  <dialog id="serviceTechnicianPickerDialog" class="service-picker-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">SERVİS EKİBİ</p><h2>Teknisyen seç</h2></div><button id="closeServiceTechnicianPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body"><label>İsimle ara<input id="serviceTechnicianSearch" type="search" autocomplete="off" placeholder="Teknisyen veya süpervisör adı yazın"></label><div id="serviceTechnicianOptions" class="service-picker-options"></div></div>
+  </dialog>
+
+  <dialog id="serviceCustomerPickerDialog" class="service-picker-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">MÜŞTERİ KATILIMCISI</p><h2>Kontak ekle</h2></div><button id="closeServiceCustomerPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body">
+      <label id="serviceParticipantCompanyField">Firma <span class="required-mark">*</span><select id="serviceParticipantCompany"></select></label>
+      <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="serviceParticipantFirstName" autocomplete="off" placeholder="Kontak adını yazın"></label><div id="serviceParticipantSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
+      <div class="service-participant-form"><label>Soyad <span class="required-mark">*</span><input id="serviceParticipantLastName"></label><label>E-posta <small>(opsiyonel)</small><input id="serviceParticipantEmail" type="email"></label><label>Telefon <small>(opsiyonel)</small><input id="serviceParticipantPhone" type="tel"></label></div>
+      <div id="serviceParticipantWarning" class="service-participant-warning role-hidden"></div>
+    </div>
+    <div class="dialog-actions"><button id="cancelServiceCustomerPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveServiceCustomerParticipant" class="primary-button" type="button">Kontak ekle</button></div>
   </dialog>
 
   <dialog id="orderEditDialog" class="wide-dialog">
