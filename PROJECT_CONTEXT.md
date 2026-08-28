@@ -115,6 +115,10 @@ Her kurulum ziyareti ayrı kaydedilir:
 - Kurulum tamamlandı mı?
 - Tamamlanmadıysa planlanan sonraki kurulum tarihi
 
+Servis kaydındaki teknisyenler serbest metin değildir. Planlamada atanan teknisyen ilk ve silinemez satır olarak otomatik gelir; `Değiştir` ve `Teknisyen ekle` pencerelerinde yalnızca Servis Teknisyeni veya Servis Süpervisörü yetkili aktif kullanıcılar akıllı isim aramasıyla seçilebilir. İkinci ve sonraki teknisyenler silinebilir. Her teknisyen için yol ve saha süresi/birimi ayrı tutulur; ziyaretin gerçekleşen toplam süresi bütün teknisyen sürelerinin toplamıdır ve planlanan süre aşımı buna göre hesaplanır.
+
+Servis ziyaretindeki müşteri çalışanları yapılandırılmış kontak kartlarıdır. Doğrudan son kullanıcı kaydında müşteri hesabı otomatik seçilir; MTB + son kullanıcı kaydında kontak aramasından önce firma seçimi zorunludur. Kontak dizininden adla arama yapılabilir veya manuel kişi girilebilir. Kart ve kurulum detayında ad-soyad, firma, opsiyonel e-posta ve telefon gösterilir; servis saha katılımcılarında e-posta zorunlu değildir.
+
 Toplam gerçekleşen süre hesabına hem yol hem saha süresi dahildir. Planlanan süre aşılırsa teknisyene onay sorulmalı. Onaydan sonra ek süre kaydedilebilmeli ve süre aşımı yönetici ekranında belirgin biçimde gösterilmelidir.
 
 Kurulum raporu için:
