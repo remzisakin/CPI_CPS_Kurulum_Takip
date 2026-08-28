@@ -188,6 +188,9 @@ Her demo kullanıcısı giriş yaptığında rolüne uygun menüleri görür. Ye
 - Satış Mühendisi `Planlamaya gönder` düğmesine bastığında kayıt `İnceleme bekliyor` durumuna geçer ve Servis Supervisor kuyruğunda görünür. Bu aşamada henüz planlama yapılamaz.
 - Servis Supervisor önce `Talebi İncele` işlemini açar. `İçerik eksik ve/veya hatalı`, `Müşteri bilgileri eksik ve/veya hatalı`, `Planlanan kurulum tarihi uygun değil` ve `Diğer` başlıklarından biri seçilirse açıklama zorunlu olur ve talep `Satış düzeltmesi bekliyor` durumuyla satış mühendisine geri gönderilir.
 - İncelemede hiçbir sorun seçilmezse `Talebi kabul et` işlemi kaydı `Planlama bekliyor` aşamasına taşır ve ancak bundan sonra Supervisor için `Planla` düğmesi görünür.
+- Talep satışa geri gönderilip yeniden incelemeye geldiğinde önceki geri bildirim geçmişi kabul edilene kadar Supervisor inceleme penceresinde korunur. Geri gönderme anındaki kayıt görüntüsü ile satışın yeniden gönderdiği kayıt karşılaştırılır; değişen müşteri, kontak, adres, sipariş, tarih, not ve sevkiyat alanları detay ekranında yeşil vurguyla ve inceleme özetinde alan adlarıyla gösterilir.
+- Planlama kaydedildikten sonra Supervisor `Planlamayı düzenle` işlemiyle planlanan tarihi, süreyi ve atanmış teknisyeni değiştirebilir.
+- Kurulum listesindeki durum temelli işlemler görsel olarak ayrılır: inceleme amber, planlama kırmızı/gri, sevkiyat mavi ve servis kaydı yeşil ton kullanır.
 - Kabul edilmemiş talepler Servis Teknisyeni ekranında görünmez; servis kaydı yalnızca planlanmış kurulumlarda açılır.
 - Satış Mühendisi listedeki `Düzenle` düğmesiyle müşteri, kontak, sipariş, ürün, tarih, not, ek ve sevkiyat alanlarının tamamını yeniden açıp düzenleyebilir.
 - Parçalı sevkiyat seçimi, ilgili kurulumun sipariş içeriğindeki gerçek ürünlerden oluşturulur.
