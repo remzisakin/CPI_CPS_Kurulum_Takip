@@ -114,7 +114,9 @@ Her kurulum ziyareti ayrı kaydedilir:
 - Kurulum raporu; ilk kayıttan sonra da yüklenebilir
 - `Rapor ve tamamlama` bölümündeki dosya yükleme akışı korunur. `Yeni Rapor Oluştur` işlemi ayrıca rapor tipi seçtirerek aynı servis ziyaretine birden fazla sistem içi rapor taslağı ekler. İlk katalog: Sıkıcı Sistemleri / Tightening System Start-Up, Vida Besleme Sistemleri / Screw-feeding Units Start-Up, Demeter, Nexonar ve Diğer. Eklenen raporlar listede görünür ve `Düzenle` ile kendi içerik ekranı iskeletinde açılır.
 - Her sistem içi rapor kartında `Düzenle`, çıktı alma ve `Sil` işlemleri bulunur. Silme onay ister. Çıktı işleminde Word veya PDF formatı seçilir; çevrimdışı da çalışabilen yerel üretici raporun temel kurulum metadatasını `.doc` ya da `.pdf` dosyası olarak indirir. Rapor içerik şemaları tamamlandığında aynı üreticiler form içeriğini de çıktıya taşıyacaktır.
-- Sistem içi rapor içerikleri henüz tanımlanmamıştır. Referans Word dosyaları alındıktan sonra mobil kullanım için klavye girişini azaltan seçim, işaretleme ve standart ifade bileşenleriyle rapor tipine özel hazırlanacaktır. Rapor tipi kataloğu ileride merkezi yapıdan artırılıp azaltılabilir.
+- Vida Besleme Sistemleri rapor içeriği `Desoutter Vida besleme Start-Up_V5` referansına göre tanımlandı. Kutu açılımı, ön toplantı, MTB mekanik/akış, I/O input-output, son kullanıcı kurulumu/testi, sıkıcı-ünite ve eğitim bölümleri seçimli çalışır; uygunsuzlukta açıklama zorunludur. Bölüm bazında tüm kontrolleri uygun işaretleme, seri numarası ve katılımcı ekleme desteklenir.
+- Vida besleme raporu müşteri, SO, proje/istasyon, sipariş ürünleri, teknisyenler ve müşteri katılımcılarını kurulum kaydından otomatik alır. Yarım raporlar `Form hazırlanıyor` durumunda ziyaret bazında otomatik kaydedilir ve sonradan devam ettirilebilir. Tüm zorunlu alanlar tamamlanınca `Form tamamlandı` olur; Word/PDF çıktısı yalnızca tamamlanan raporlarda açılır.
+- Diğer sistem içi rapor türlerinin içerikleri henüz tanımlanmamıştır. Rapor tipi kataloğu ileride merkezi yapıdan artırılıp azaltılabilir.
 - Notlar
 - Kurulum tamamlandı mı?
 - Tamamlanmadıysa planlanan sonraki kurulum tarihi
