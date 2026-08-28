@@ -74,6 +74,8 @@ Satış mühendisi “Yeni kurulum” formunda doğrudan son kullanıcı veya MT
 
 Satış Mühendisi, mevcut bir kaydın sevkiyat bilgilerini Kurulumlar tablosundaki “Sevkiyat” düğmesinden daha sonra güncelleyebilir. Bu işlem sevk tarihi zorunluluğunu ve parçalı sevkiyat ürün seçimini yeniden uygular.
 
+Yeni kurulum formundaki doğrudan müşteri, MTB ve son kullanıcı kontak adları kendi firma alanlarına göre `Contacts w Accounts Report-*.xlsx` kaynaklı yerel dizinde otomatik tamamlanır. Kontak seçilince ad, soyad, e-posta ve öncelikle cep telefonu (yoksa sabit telefon) onay penceresinde gösterilir. E-posta eksik/geçersizse zorunlu e-posta giriş penceresi; geçerli telefon yoksa opsiyonel telefon ekleme penceresi açılır. Geçerli Türkiye cep/sabit telefon biçimine uymayan değerler veri üretiminde elenir.
+
 Sipariş içeriği serbest metin değildir. Ürünler `Part No`, `Description`, `Qty` ve opsiyonel `Set Bilgisi` alanlarıyla satır satır tutulur. Satış mühendisi “Ürün ekle” ile manuel satır oluşturup alanları düzenleyebilir veya `Order_Form_2026.xlsx` benzeri `.xlsx`, `.xls` ve `.csv` dosyalarının ilk sayfasından ürünleri aktarabilir. Excel başlıkları Part No/Part Number, Description/Açıklama, Qty/Quantity/Adet ve opsiyonel Set Bilgisi/Set olarak eşleştirilir. Set Bilgisi görünümü aynı set adına sahip ürünleri gruplar. Kaydedilmiş bir kurulumun ürünleri Kurulumlar tablosundaki “Ürünler” işlemiyle daha sonra düzenlenebilir, silinebilir veya yeni satır/Excel içeriği eklenebilir. Excel okuma cihaz içinde, projeye yerel eklenen SheetJS 0.20.3 ile yapılır.
 
 ## 4. Ürün ve sevkiyat gereksinimleri
