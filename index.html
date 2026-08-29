@@ -360,6 +360,24 @@
     <div class="dialog-actions report-editor-actions"><span id="serviceReportAutosaveState">Değişiklikler otomatik kaydedilir.</span><button id="cancelServiceReportEditor" class="secondary-button" type="button">Kapat ve sonra devam et</button><button id="saveServiceReportDraft" class="secondary-button" type="button">Taslağı kaydet</button><button id="completeServiceReport" class="primary-button" type="button">Formu tamamla</button></div>
   </dialog>
 
+  <dialog id="reportProductPickerDialog" class="service-picker-dialog report-picker-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">RAPOR ÜRÜNÜ</p><h2>Ürün seçin</h2><p class="muted">Kurulum ürünlerinden seçin veya liste harici ürün girin.</p></div><button id="closeReportProductPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body"><label>Ürün ara<input id="reportProductSearch" type="search" autocomplete="off" placeholder="Part No veya açıklama yazın"></label><div id="reportProductOptions" class="service-picker-options"></div><button id="useExternalReportProduct" class="secondary-button" type="button">Liste harici ürün girişi</button><div id="externalReportProductFields" class="report-picker-fields role-hidden"><label>Part No <span class="required-mark">*</span><input id="externalReportPartNo"></label><label>Açıklama <span class="required-mark">*</span><input id="externalReportDescription"></label></div><div id="selectedReportProduct" class="selected-report-product role-hidden"></div><label>Seri No <span class="required-mark">*</span><input id="reportProductSerial"></label></div>
+    <div class="dialog-actions"><button id="cancelReportProductPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveReportProduct" class="primary-button" type="button">Ürünü ekle</button></div>
+  </dialog>
+
+  <dialog id="reportPersonPickerDialog" class="service-picker-dialog report-picker-dialog">
+    <div class="dialog-header"><div><p id="reportPersonPickerEyebrow" class="eyebrow">RAPOR KATILIMCISI</p><h2 id="reportPersonPickerTitle">Kişi seçin</h2></div><button id="closeReportPersonPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body"><label>İsimle ara<input id="reportPersonSearch" type="search" autocomplete="off" placeholder="Ad veya soyad yazın"></label><div id="reportPersonOptions" class="service-picker-options"></div><button id="useManualReportPerson" class="secondary-button" type="button">Liste harici kişi girişi</button><div id="manualReportPersonFields" class="report-picker-fields role-hidden"><label>Ad Soyad <span class="required-mark">*</span><input id="manualReportPersonName"></label><label id="manualReportPersonDepartmentField">Bölüm / Firma<input id="manualReportPersonDepartment"></label></div></div>
+    <div class="dialog-actions"><button id="cancelReportPersonPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveReportPerson" class="primary-button" type="button">Kişiyi kullan</button></div>
+  </dialog>
+
+  <dialog id="serviceReportViewDialog" class="service-report-view-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">KURULUM RAPORU</p><h2 id="serviceReportViewTitle">Rapor görüntüleme</h2><p id="serviceReportViewSubtitle" class="muted"></p></div><button id="closeServiceReportView" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div id="serviceReportViewBody" class="service-report-view-body"></div>
+    <div class="dialog-actions"><button id="editViewedServiceReport" class="secondary-button" type="button">Düzenle</button><button id="closeServiceReportViewButton" class="primary-button" type="button">Kapat</button></div>
+  </dialog>
+
   <dialog id="serviceReportExportDialog" class="service-report-dialog report-export-dialog">
     <form id="serviceReportExportForm" method="dialog">
       <div class="dialog-header"><div><p class="eyebrow">RAPOR ÇIKTISI</p><h2>Çıktı formatını seçin</h2><p id="serviceReportExportTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
