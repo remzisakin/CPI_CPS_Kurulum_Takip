@@ -1,26 +1,61 @@
 # CPS Kurulum Takip
 
-SatÄ±ÅŸ, sevkiyat ve saha kurulum sÃ¼reÃ§lerini izlemek iÃ§in hazÄ±rlanmÄ±ÅŸ ilk Ã§alÄ±ÅŸan prototip.
+Satış, sevkiyat ve saha kurulum süreçlerini izlemek için hazırlanmış ilk çalışan prototip.
 
-## Demo giriÅŸi
+## Kullanıcı girişleri
 
-- KullanÄ±cÄ± adÄ±: `supervisor`
-- Åifre: `Demo123!`
+Aktif kullanıcılar `demodata/Kullanıcı bilgileri ve yetkileri.xlsx` dosyasından alınır. Kullanıcı adları `ad.soyad` biçiminde üretilir; prototipin ortak geçici parolası `Cps2026!` değeridir. Excel ve üretilen kullanıcı verisi güvenlik nedeniyle GitHub'a gönderilmez.
 
-`index.html` dosyasÄ± modern bir tarayÄ±cÄ±da doÄŸrudan aÃ§Ä±larak arayÃ¼z incelenebilir. Yeni kurulum kayÄ±tlarÄ± prototip aÅŸamasÄ±nda yalnÄ±zca o tarayÄ±cÄ±nÄ±n yerel hafÄ±zasÄ±nda saklanÄ±r.
+Excel güncellendiğinde kullanıcı dizinini yenilemek için:
 
-## Bu sÃ¼rÃ¼mde Ã§alÄ±ÅŸan bÃ¶lÃ¼mler
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-user-data.ps1
+```
 
-- KullanÄ±cÄ± adÄ± ve ÅŸifre ekranÄ± (demo)
-- YÃ¶netici/Supervisor genel bakÄ±ÅŸ paneli
-- Ã–rnek kurulum verileri ve durum uyarÄ±larÄ±
+Yönetici, Satış Mühendisi, Servis Süpervisor ve Servis Teknisyeni yetkileri Excel'deki `Yetkisi` sütunundan atanır. Eski sabit demo hesapları artık kullanılmaz.
+
+`index.html` dosyası modern bir tarayıcıda doğrudan açılarak arayüz incelenebilir. Yeni kurulum kayıtları prototip aşamasında yalnızca o tarayıcının yerel hafızasında saklanır.
+
+### Yerel müşteri arama verisini hazırlama
+
+Gerçek müşteri Excel'i güvenlik nedeniyle GitHub'a gönderilmez. `Accounts Report-*.xlsx` dosyasını `demodata` klasörüne koyduktan sonra aşağıdaki komut çalıştırılır:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-account-data.ps1
+```
+
+Bu işlem, uygulamanın müşteri adı otomatik tamamlama alanında kullandığı yerel `demodata/accounts-data.js` dosyasını üretir. Bu dosya da GitHub'a gönderilmez.
+
+Ürün Part No otomatik tamamlama dizini için `demodata/Desoutter_Product.xlsm` dosyası kullanılır:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-product-data.ps1
+```
+
+Komut, `TP List` sekmesindeki `Reference` ile `Ref. Description` alanlarını ve `PRICE LIST 2026` sekmesindeki `615 Part number` ile `Item Description` alanlarını birleştirerek yerel `demodata/product-data.js` dosyasını üretir. Kaynak Excel ve üretilen ürün dizini GitHub'a gönderilmez.
+
+Müşteri kontak otomatik tamamlama dizini için `Contacts w Accounts Report-*.xlsx` dosyası kullanılır:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-contact-data.ps1
+```
+
+Komut `Account Name`, `First Name`, `Last Name`, `Email`, `Mobile` ve `Phone` alanlarını okur; geçersiz e-posta ve Türkiye telefon formatına uymayan numaraları ayıklar. Üretilen yerel `demodata/contact-data.js` ile kaynak Excel kişisel veri içerdiğinden GitHub'a gönderilmez.
+
+## Bu sürümde çalışan bölümler
+
+- Kullanıcı adı ve şifre ekranı (demo)
+- Yönetici/Supervisor genel bakış paneli
+- Örnek kurulum verileri ve durum uyarıları
 - Kurulum listesinde arama ve filtreleme
-- Yeni kurulum oluÅŸturma
-- Mobil uyumlu arayÃ¼z
-- Offline durum algÄ±lama ve salt-okunur uyarÄ±sÄ±
-- Uygulama manifesti ve Ã§evrimdÄ±ÅŸÄ± Ã¶nbellek altyapÄ±sÄ±
+- Yeni kurulum oluşturma
+- Excel kaynaklı müşteri adı otomatik tamamlama ve adres önerisi
+- Excel kaynaklı Part No otomatik tamamlama ve Description doldurma
+- Mobil uyumlu arayüz
+- Offline durum algılama ve salt-okunur uyarısı
+- Uygulama manifesti ve çevrimdışı önbellek altyapısı
 
-## GÃ¼venlik notu
+## Güvenlik notu
 
-Bu sÃ¼rÃ¼m bir arayÃ¼z prototipidir. GerÃ§ek kullanÄ±cÄ± ÅŸifreleri tarayÄ±cÄ± kodunda tutulmamalÄ±dÄ±r. Ãœretim sÃ¼rÃ¼mÃ¼nde sunucu, veritabanÄ±, gÃ¼venli parola Ã¶zeti, oturum yÃ¶netimi, kullanÄ±cÄ± rolleri ve dosya depolama altyapÄ±sÄ± kurulacaktÄ±r.
+Bu sürüm bir arayüz prototipidir. Gerçek kullanıcı şifreleri tarayıcı kodunda tutulmamalıdır. Üretim sürümünde sunucu, veritabanı, güvenli parola özeti, oturum yönetimi, kullanıcı rolleri ve dosya depolama altyapısı kurulacaktır.
 

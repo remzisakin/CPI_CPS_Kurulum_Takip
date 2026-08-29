@@ -1,0 +1,10 @@
+{
+  "name":"CPS Kurulum Takip",
+  "short_name":"CPS Takip",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f4f6f7",
+  "theme_color":"#173f5f",
+  "description":"SatÄ±ÅŸ, sevkiyat ve kurulum sÃ¼reÃ§leri iÃ§in takip uygulamasÄ±"
+}
+

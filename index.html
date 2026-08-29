@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173f5f">
+  <meta name="description" content="CPI/CPS kurulum ve sevkiyat takip uygulaması">
+  <title>CPS Kurulum Takip</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="loginView" class="login-page">
+    <div class="login-brand">
+      <img class="official-logo login-logo" src="assets/desoutter-logo.webp" alt="Desoutter">
+      <p class="eyebrow">CPI / CPS OPERATIONS</p>
+      <h1>Kurulumları tek bir yerden yönetin.</h1>
+      <p>Satıştan sevkiyata, saha ziyaretinden müşteri raporuna kadar tüm süreç görünür ve düzenli.</p>
+      <div class="brand-feature"><span>01</span><div><b>Canlı takip</b><small>Kurulum durumları ve kritik uyarılar</small></div></div>
+      <div class="brand-feature"><span>02</span><div><b>Saha odaklı</b><small>Telefon ve bilgisayarda kolay kullanım</small></div></div>
+      <div class="brand-feature"><span>03</span><div><b>Offline görünüm</b><small>Son görüntülenen kayıtlara erişim</small></div></div>
+    </div>
+    <div class="login-panel">
+      <button id="loginLanguage" class="language-button" type="button">EN</button>
+      <form id="loginForm" class="login-card">
+        <p class="eyebrow">HOŞ GELDİNİZ</p>
+        <h2>Hesabınıza giriş yapın</h2>
+        <p class="muted">Devam etmek için kullanıcı bilgilerinizi girin.</p>
+        <label>Kullanıcı adı<input id="username" autocomplete="username" placeholder="ad.soyad" required></label>
+        <label>Şifre<input id="password" type="password" autocomplete="current-password" required></label>
+        <div id="loginError" class="form-error" role="alert"></div>
+        <button class="primary-button" type="submit">Giriş yap <span>→</span></button>
+        <div id="quickLoginAccounts" class="demo-accounts" aria-label="Hızlı giriş hesapları"></div>
+        <div class="login-source-note">Kullanıcılar ve yetkiler şirket kullanıcı listesinden alınır.</div>
+      </form>
+    </div>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <header class="site-header">
+      <div class="header-main">
+        <div class="app-brand"><img class="official-logo" src="assets/desoutter-logo.webp" alt="Desoutter"><div class="app-title"><b>Kurulum Takip</b><small>CPI / CPS Operations</small></div></div>
+        <div class="header-tools">
+          <div id="connectionState" class="connection online"><i></i><span>Çevrimiçi</span></div>
+          <button id="languageButton" class="header-button">TR</button>
+          <button class="header-button notification-button" aria-label="Bildirimler">Bildirimler<i class="notification-dot"></i></button>
+          <div class="user-summary"><div id="currentUserInitials" class="avatar">TŞ</div><div><b id="currentUserName">Tevfik Şahinbaş</b><small id="currentUserRole">Servis Supervisor</small></div></div>
+          <button id="logoutButton" class="logout-button" title="Çıkış">Çıkış</button>
+        </div>
+      </div>
+      <nav id="mainNav" class="header-nav" aria-label="Ana menü">
+        <button class="nav-item active" data-view="dashboard" data-roles="admin,sales,supervisor,technician"><span>⌂</span> <i data-i18n="overview">Genel Bakış</i></button>
+        <button class="nav-item" data-view="installations" data-roles="admin,sales,supervisor,technician"><span>▦</span> <i data-i18n="installations">Kurulumlar</i> <em id="navCount">8</em></button>
+        <button class="nav-item" data-view="calendar" data-roles="admin,supervisor,technician"><span>□</span> <i data-i18n="calendar">Takvim</i></button>
+        <button class="nav-item" data-view="customers" data-roles="admin,sales,supervisor"><span>♙</span> <i data-i18n="customers">Müşteriler</i></button>
+        <button class="nav-item" data-view="products" data-roles="admin,sales,supervisor"><span>◇</span> <i data-i18n="products">Ürünler</i></button>
+        <button class="nav-item" data-view="reports" data-roles="admin,supervisor,technician"><span>▥</span> <i data-i18n="reports">Raporlar</i></button>
+        <button class="nav-item" data-view="users" data-roles="admin"><span>♧</span> <i data-i18n="users">Kullanıcılar</i></button>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <section id="dashboardView" class="view active-view">
+        <div class="page-heading"><div><p class="eyebrow">26 AĞUSTOS 2026, ÇARŞAMBA</p><h1 id="welcomeHeading">Merhaba, Tevfik</h1><p id="welcomeDescription">Kurulum operasyonlarının bugünkü görünümü.</p></div><button id="newInstallationButton" class="primary-button sales-action">＋ Yeni kurulum</button></div>
+        <div class="stat-grid">
+          <article class="stat-card dark"><div class="stat-icon">▦</div><span>AKTİF KURULUM</span><strong id="activeCount">8</strong><small><b>↑ 2</b> bu hafta eklendi</small></article>
+          <article class="stat-card"><div class="stat-icon blue">□</div><span>BU HAFTA</span><strong>5</strong><small>3 kurulum bugün</small></article>
+          <article class="stat-card"><div class="stat-icon amber">!</div><span>DİKKAT GEREKTİREN</span><strong id="attentionCount">3</strong><small>Eksik ürün veya gecikme</small></article>
+          <article class="stat-card"><div class="stat-icon coral">↗</div><span>SÜRE AŞIMI</span><strong id="overrunCount">2</strong><small>Planlanan süre aşıldı</small></article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel installations-panel">
+            <div class="panel-header"><div><h2>Aktif kurulumlar</h2><p>Öncelik ve planlanan tarihe göre</p></div><button id="showAllButton" class="text-link">Tümünü gör →</button></div>
+            <div class="table-wrap"><table><thead><tr><th>MÜŞTERİ / SİPARİŞ</th><th>DURUM</th><th>PLANLANAN TARİH</th><th>TEKNİSYEN</th><th>İLERLEME</th><th></th></tr></thead><tbody id="installationRows"></tbody></table></div>
+          </section>
+          <aside class="right-column">
+            <section class="panel agenda-panel"><div class="panel-header"><div><h2>Bugünün programı</h2><p>3 planlı aktivite</p></div><button class="icon-button">•••</button></div><div id="agendaList"></div></section>
+            <section class="panel alerts-panel"><div class="panel-header"><div><h2>Kritik uyarılar</h2><p>İşlem bekleyen konular</p></div><span class="alert-count">3</span></div><div id="alertsList"></div></section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="installationsView" class="view">
+        <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>Tüm sevkiyat ve kurulum işlerini takip edin.</p></div><button class="primary-button open-new sales-action">＋ Yeni kurulum</button></div>
+        <section class="panel installation-list-panel">
+          <div class="toolbar installation-toolbar"><input id="searchInput" type="search" placeholder="Müşteri, SO, PTD veya satış mühendisi ara..."><select id="statusFilter" aria-label="Duruma göre filtrele"><option value="">Tüm durumlar</option><option>Taslak</option><option>İnceleme bekliyor</option><option>Satış düzeltmesi bekliyor</option><option>Planlama bekliyor</option><option>Planlandı</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>Süre aşıldı</option><option>Tamamlandı</option></select></div>
+          <div class="table-wrap"><table class="installations-table"><thead><tr><th><span class="filterable-heading">MÜŞTERİ<button type="button" data-column-filter="customer" aria-label="Müşteri filtresi">⌄</button></span></th><th><span class="filterable-heading">SO NO<button type="button" data-column-filter="salesOrderNumber" aria-label="SO No filtresi">⌄</button></span><small>SALES ORDER NUMBER</small></th><th><span class="filterable-heading">TALEP TARİHİ<button type="button" data-column-filter="requestDate" aria-label="Talep tarihi filtresi">⌄</button></span></th><th><span class="filterable-heading">SATIŞ MÜHENDİSİ<button type="button" data-column-filter="salesEngineer" aria-label="Satış mühendisi filtresi">⌄</button></span></th><th><span class="filterable-heading">DURUM<button type="button" data-column-filter="status" aria-label="Durum filtresi">⌄</button></span></th><th><span class="filterable-heading">PLANLANAN KURULUM<button type="button" data-column-filter="plannedDate" aria-label="Planlanan kurulum filtresi">⌄</button></span></th><th><span class="filterable-heading">TEKNİSYEN<button type="button" data-column-filter="technician" aria-label="Teknisyen filtresi">⌄</button></span></th><th><span class="filterable-heading">İLERLEME<button type="button" data-column-filter="progress" aria-label="İlerleme filtresi">⌄</button></span></th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div>
+          <div id="columnFilterPopover" class="column-filter-popover role-hidden" role="dialog" aria-label="Sütun filtresi"><div class="column-filter-header"><strong id="columnFilterTitle">Filtrele</strong><button id="closeColumnFilter" class="icon-button" type="button" aria-label="Kapat">×</button></div><input id="columnFilterSearch" type="search" placeholder="Listede ara..."><div id="columnFilterOptions" class="column-filter-options"></div><div class="column-filter-actions"><button id="clearColumnFilter" class="secondary-button" type="button">Temizle</button><button id="applyColumnFilter" class="primary-button" type="button">Uygula</button></div></div>
+        </section>
+      </section>
+
+      <section id="usersView" class="view"><div class="page-heading"><div><p class="eyebrow">YÖNETİM</p><h1>Kullanıcılar</h1><p>Excel kullanıcı listesine göre aktif hesaplar ve yetkileri.</p></div></div><section class="panel"><div class="table-wrap"><table class="users-table"><thead><tr><th>AD SOYAD</th><th>GÖREVİ</th><th>YETKİSİ</th><th>KULLANICI ADI</th><th>DURUM</th></tr></thead><tbody id="userRows"></tbody></table></div></section></section>
+      <section id="placeholderView" class="view"><div class="empty-state"><span>◇</span><h1 id="placeholderTitle">Bu bölüm hazırlanıyor</h1><p>İlk prototipte ana takip ve yeni kurulum akışına odaklandık.</p></div></section>
+    </main>
+  </div>
+
+  <dialog id="installationDialog">
+    <form id="installationForm" method="dialog">
+      <div class="dialog-header"><div><p id="installationDialogEyebrow" class="eyebrow">YENİ KAYIT</p><h2 id="installationDialogTitle">Yeni kurulum oluştur</h2></div><div class="dialog-header-actions"><button id="toggleInstallationFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div></div>
+      <div class="steps"><span class="active">1 Müşteri</span><span>2 Sipariş</span></div>
+      <div class="form-grid">
+        <fieldset class="form-section wide">
+          <legend>Müşteri ve sipariş bilgileri</legend>
+          <div class="section-grid">
+            <div class="customer-search-field"><label>Müşteri adı <span class="required-mark">*</span><input id="customerNameInput" name="customer" required autocomplete="off" aria-autocomplete="list" aria-controls="customerSuggestions" placeholder="Müşteri adını yazmaya başlayın"></label><div id="customerSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
+            <label>Müşteri yapısı<select id="customerType" name="customerType"><option value="direct">Doğrudan son kullanıcı</option><option value="mtb">MTB ve son kullanıcı ayrı</option></select></label>
+            <div id="mtbCompanyFields" class="conditional-fields wide role-hidden">
+              <div class="customer-search-field"><label>MTB firma adı <span class="required-mark">*</span><input id="mtbNameInput" name="mtbName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="mtbSuggestions" placeholder="MTB firma adını yazmaya başlayın"></label><div id="mtbSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
+              <div class="customer-search-field"><label>Son kullanıcı firma adı <span class="required-mark">*</span><input id="endUserNameInput" name="endUserName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="endUserSuggestions" placeholder="Son kullanıcı firma adını yazmaya başlayın"></label><div id="endUserSuggestions" class="customer-suggestions role-hidden" role="listbox"></div></div>
+            </div>
+            <label>Müşteriden sorumlu satış mühendisi <span class="required-mark">*</span><select name="salesEngineer" required><option>İrem Oğuzkan</option><option>Remzi Sakin</option></select></label>
+            <label>SO No — Sales Order Number <span class="required-mark">*</span><input name="salesOrderNumber" required placeholder="SO-2026-000"></label>
+            <label class="wide">Proje ismi / tanımı <small>(opsiyonel)</small><input name="projectName" placeholder="Projenin kısa ismini veya tanımını yazın"></label>
+            <label>PTD No <small>(opsiyonel)</small><input name="ptd" placeholder="Varsa girin"></label>
+            <label>Kurulum tutarı (€) <span class="required-mark">*</span><input name="amount" type="number" min="0" step="0.01" required placeholder="0"></label>
+            <label id="directAddressField">Kurulum adresi <small>(opsiyonel)</small><input name="address" placeholder="Şehir / adres"></label>
+            <div id="splitAddressFields" class="conditional-fields wide role-hidden">
+              <label>Kurulum Adresi MTB <small>(opsiyonel)</small><input name="mtbAddress" placeholder="MTB kurulum adresi"></label>
+              <label>Kurulum Adresi Son Kullanıcı <small>(opsiyonel)</small><input name="endUserAddress" placeholder="Son kullanıcı kurulum adresi"></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset id="directContactFields" class="form-section wide">
+          <legend>Müşteri kontak bilgileri</legend>
+          <div class="section-grid contact-grid">
+            <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="contactFirstNameInput" name="contactFirstName" data-required required autocomplete="off" aria-autocomplete="list" aria-controls="contactSuggestions"></label><div id="contactSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
+            <label>Soyad <span class="required-mark">*</span><input name="contactLastName" data-required required></label>
+            <label>E-posta <span class="required-mark">*</span><input name="contactEmail" type="email" data-required required></label>
+            <label>Telefon <small>(opsiyonel)</small><input name="contactPhone" type="tel"></label>
+          </div>
+        </fieldset>
+
+        <div id="splitContactFields" class="conditional-fields wide role-hidden">
+          <fieldset class="form-section">
+            <legend>MTB kontak bilgileri</legend>
+            <div class="section-grid contact-grid">
+              <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="mtbContactFirstNameInput" name="mtbContactFirstName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="mtbContactSuggestions"></label><div id="mtbContactSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
+              <label>Soyad <span class="required-mark">*</span><input name="mtbContactLastName" data-required></label>
+              <label>E-posta <span class="required-mark">*</span><input name="mtbContactEmail" type="email" data-required></label>
+              <label>Telefon <small>(opsiyonel)</small><input name="mtbContactPhone" type="tel"></label>
+            </div>
+          </fieldset>
+          <fieldset class="form-section">
+            <legend>Son kullanıcı kontak bilgileri</legend>
+            <div class="section-grid contact-grid">
+              <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="endUserContactFirstNameInput" name="endUserContactFirstName" data-required autocomplete="off" aria-autocomplete="list" aria-controls="endUserContactSuggestions"></label><div id="endUserContactSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
+              <label>Soyad <span class="required-mark">*</span><input name="endUserContactLastName" data-required></label>
+              <label>E-posta <span class="required-mark">*</span><input name="endUserContactEmail" type="email" data-required></label>
+              <label>Telefon <small>(opsiyonel)</small><input name="endUserContactPhone" type="tel"></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <fieldset class="form-section wide order-content-section">
+          <legend>Sipariş içeriği <span class="required-mark">*</span></legend>
+          <div class="order-toolbar">
+            <div class="order-tabs"><button class="order-tab active" type="button" data-order-tab="products">Ürün Listesi</button><button class="order-tab" type="button" data-order-tab="sets">Set Bilgisi</button></div>
+            <div class="order-actions"><input id="orderFileInput" type="file" accept=".xlsx,.xls,.csv" hidden><button id="importOrderButton" class="secondary-button" type="button">Dosya ekle</button><button id="addOrderProductButton" class="primary-button" type="button">＋ Ürün ekle</button></div>
+          </div>
+          <div id="orderFileStatus" class="order-file-status">Excel sütunları: Part No, Description, Qty; opsiyonel: Set Bilgisi</div>
+          <div id="productsTabPanel" class="order-tab-panel">
+            <div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO <span class="required-mark">*</span></th><th>DESCRIPTION <span class="required-mark">*</span></th><th>QTY <span class="required-mark">*</span></th><th>SET BİLGİSİ <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="orderProductRows"></tbody></table></div>
+          </div>
+          <div id="setsTabPanel" class="order-tab-panel role-hidden"><div id="setGroups" class="set-groups"></div></div>
+        </fieldset>
+
+        <fieldset class="form-section wide">
+          <legend>Tarihler, notlar ve ekler</legend>
+          <div class="section-grid">
+            <label>Tahmini sevkiyat / teslim tarihi <small>(opsiyonel)</small><input id="estimatedDeliveryDate" name="estimatedDeliveryDate" type="date"></label>
+            <label>Tahmini kurulum tarihi <small>(opsiyonel)</small><input id="estimatedInstallationDate" name="estimatedInstallationDate" type="date"></label>
+            <label class="wide">Notlar <small>(opsiyonel)</small><textarea name="notes" rows="2" placeholder="Varsa önemli notlar"></textarea></label>
+            <label class="wide file-field">Dosya ekle<input name="attachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"><small>Fotoğraf, PDF, Word veya Excel dosyaları seçilebilir.</small></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section wide shipment-section">
+          <legend>Sevkiyat bilgileri</legend>
+          <label class="check-row"><input id="productsShipped" name="productsShipped" type="checkbox"> Ürünler müşteriye sevk edildi</label>
+          <div id="shipmentFields" class="conditional-fields role-hidden">
+            <div class="section-grid">
+              <label>Sevk tarihi <span class="required-mark">*</span><input name="shipmentDate" type="date" data-required></label>
+              <label class="check-row field-aligned"><input id="partialShipment" name="partialShipment" type="checkbox"> Parçalı sevkiyat</label>
+            </div>
+            <div id="partialProductFields" class="product-checklist role-hidden">
+              <p>Bu sevkiyatta gönderilen ürünler</p>
+            </div>
+            <label class="wide">Demo ürün notu<textarea name="demoProductNote" rows="2" placeholder="Demo ürün kullanılacaksa açıklama ekleyin"></textarea></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button id="saveInstallation" class="primary-button" value="default">Taslağı kaydet</button></div>
+      <div id="productSuggestions" class="product-suggestions role-hidden" role="listbox"></div>
+    </form>
+  </dialog>
+
+  <dialog id="addressSuggestionDialog" class="address-suggestion-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">MÜŞTERİ ADRESİ BULUNDU</p><h2>Kurulum adresi</h2></div><button id="closeAddressSuggestion" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="address-suggestion-body"><strong id="selectedAccountName"></strong><p id="selectedAccountAddress"></p><span id="selectedAddressQuestion">Kurulum adresi olarak bu adres kullanılsın mı?</span></div>
+    <div class="dialog-actions"><button id="useNewAddress" class="secondary-button" type="button">Yeni adres</button><button id="useSuggestedAddress" class="primary-button" type="button">Evet, bu adresi kullan</button></div>
+  </dialog>
+
+  <dialog id="contactMissingEmailDialog" class="contact-data-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">E-POSTA BULUNAMADI</p><h2>Kontak e-postası</h2></div></div>
+    <div class="contact-data-body"><p>Bu kontak için veri tabanında e-posta adresi bulunamadı. Devam etmek için e-posta adresini girin.</p><label>E-posta adresi<input id="missingContactEmail" type="email" placeholder="ornek@firma.com"></label><div id="missingContactEmailError" class="form-error"></div></div>
+    <div class="dialog-actions"><button id="cancelMissingContactEmail" class="secondary-button" type="button">Yeni giriş yap</button><button id="saveMissingContactEmail" class="primary-button" type="button">E-postayı kullan</button></div>
+  </dialog>
+
+  <dialog id="contactMissingPhoneDialog" class="contact-data-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">TELEFON BULUNAMADI</p><h2>Telefon bilgisi</h2></div></div>
+    <div class="contact-data-body"><p>Bu kontak için geçerli cep veya sabit telefon bulunamadı. Telefon bilgisi eklemek ister misiniz?</p><label id="missingContactPhoneField" class="role-hidden">Telefon numarası<input id="missingContactPhone" type="tel" placeholder="05xx xxx xx xx"></label><div id="missingContactPhoneError" class="form-error"></div></div>
+    <div class="dialog-actions"><button id="skipMissingContactPhone" class="secondary-button" type="button">Hayır, devam et</button><button id="addMissingContactPhone" class="primary-button" type="button">Evet, telefon ekle</button><button id="saveMissingContactPhone" class="primary-button role-hidden" type="button">Telefonu kullan</button></div>
+  </dialog>
+
+  <dialog id="contactSuggestionDialog" class="contact-data-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">KONTAK BULUNDU</p><h2>Kontak bilgileri</h2></div><button id="closeContactSuggestion" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div id="selectedContactSummary" class="contact-summary-grid"></div>
+    <div class="contact-data-question">Bu kontak bilgileri kullanılsın mı?</div>
+    <div class="dialog-actions"><button id="useNewContact" class="secondary-button" type="button">Yeni giriş</button><button id="useSuggestedContact" class="primary-button" type="button">Evet, bilgileri kullan</button></div>
+  </dialog>
+
+  <dialog id="installationDetailDialog" class="installation-detail-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">KURULUM TALEBİ</p><h2 id="detailDialogTitle">Kurulum detayı</h2><p id="detailDialogSubtitle" class="muted"></p></div><div class="dialog-header-actions"><button id="toggleDetailFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button id="closeInstallationDetail" class="icon-button" type="button" aria-label="Kapat">×</button></div></div>
+    <div id="installationDetailBody" class="installation-detail-body"></div>
+    <div class="dialog-actions"><button id="detailDeleteButton" class="danger-button role-hidden" type="button">Sil</button><button id="detailCloseButton" class="secondary-button" type="button">Kapat</button></div>
+  </dialog>
+
+  <dialog id="requestReviewDialog" class="request-review-dialog">
+    <form id="requestReviewForm" method="dialog">
+      <input id="reviewInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SERVİS SUPERVISOR</p><h2>Kurulum talebini incele</h2><p id="reviewRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="request-review-body">
+        <section id="reviewHistoryPanel" class="review-history-panel role-hidden"></section>
+        <p>Talepte sorun varsa ilgili başlıkları işaretleyin. Hiçbir sorun işaretlenmezse talep kabul edilebilir.</p>
+        <div class="review-checklist">
+          <label><input name="reviewIssue" type="checkbox" value="İçerik eksik ve/veya hatalı"> <span>İçerik eksik ve/veya hatalı</span></label>
+          <label><input name="reviewIssue" type="checkbox" value="Müşteri bilgileri eksik ve/veya hatalı"> <span>Müşteri bilgileri eksik ve/veya hatalı</span></label>
+          <label><input name="reviewIssue" type="checkbox" value="Planlanan kurulum tarihi uygun değil"> <span>Planlanan kurulum tarihi uygun değil</span></label>
+          <label><input name="reviewIssue" type="checkbox" value="Diğer"> <span>Diğer</span></label>
+        </div>
+        <label id="reviewExplanationField" class="review-explanation role-hidden">Açıklama <span class="required-mark">*</span><textarea id="reviewExplanation" name="reviewExplanation" rows="5" placeholder="Satış mühendisine iletilecek düzeltme açıklamasını yazın"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button id="returnRequestButton" class="danger-button role-hidden" type="button">Talebi geri gönder</button><button id="acceptRequestButton" class="primary-button" type="button">Talebi kabul et</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="planningDialog">
+    <form id="planningForm" method="dialog">
+      <input id="planningInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SERVİS SUPERVISOR</p><h2>Servis planlaması</h2><p id="planningRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="supervisor-notice">Bu alanlar yalnızca Servis Supervisor tarafından düzenlenir.</div>
+      <div class="form-grid planning-grid">
+        <label>Planlanan kurulum tarihi<input name="plannedDate" type="date" required></label>
+        <label>Planlanan süre<div class="inline-fields"><input name="plannedDuration" type="number" min="1" value="8" required><select name="plannedUnit"><option>Saat</option><option>Gün</option></select></div></label>
+        <label class="wide">Servis teknisyeni<select name="technician" required><option value="">Teknisyen seçin</option><option>Gürcan Girgin</option><option>Ahmet Kaya</option><option>Selin Demir</option><option>Murat Çelik</option></select></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Planlamayı kaydet</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="shipmentDialog">
+    <form id="shipmentForm" method="dialog">
+      <input id="shipmentInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SATIŞ MÜHENDİSİ</p><h2>Sevkiyat bilgilerini güncelle</h2><p id="shipmentRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="form-grid planning-grid">
+        <fieldset class="form-section wide shipment-section">
+          <label class="check-row"><input id="editProductsShipped" name="productsShipped" type="checkbox"> Ürünler müşteriye sevk edildi</label>
+          <div id="editShipmentFields" class="conditional-fields role-hidden">
+            <div class="section-grid">
+              <label>Sevk tarihi<input name="shipmentDate" type="date" data-required></label>
+              <label class="check-row field-aligned"><input id="editPartialShipment" name="partialShipment" type="checkbox"> Parçalı sevkiyat</label>
+            </div>
+            <div id="editPartialProductFields" class="product-checklist role-hidden">
+              <p>Bu sevkiyatta gönderilen ürünler</p>
+            </div>
+            <label>Demo ürün notu<textarea name="demoProductNote" rows="2" placeholder="Demo ürün kullanılacaksa açıklama ekleyin"></textarea></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Sevkiyatı kaydet</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="serviceEntryDialog" class="wide-dialog service-entry-dialog">
+    <form id="serviceEntryForm" method="dialog">
+      <input id="serviceInstallationId" name="installationId" type="hidden">
+      <input id="serviceVisitIndex" name="visitIndex" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SERVİS SAHA KAYDI</p><h2>Kurulum raporu</h2><p id="serviceRecordTitle" class="muted"></p></div><div class="dialog-header-actions"><button id="toggleServiceFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div></div>
+      <div id="serviceVisitTabs" class="service-visit-tabs"></div>
+      <div class="form-grid service-entry-grid">
+        <fieldset class="form-section wide"><legend>Plan ve ürün durumu</legend><div class="section-grid">
+          <label>Planlanan kurulum tarihi<input id="servicePlannedDate" data-i18n-value readonly></label>
+          <label>Planlanan süre<input id="servicePlannedDuration" data-i18n-value readonly></label>
+          <label class="wide">Sevk edilen ürünlerin durumu <span class="required-mark">*</span><select id="serviceProductStatus" name="productStatus" required><option value="complete">Ürünler tam</option><option value="missing">Ürün eksik</option><option value="demo">Demo ürün ile kurulum yapılacak</option></select></label>
+          <div id="missingProductFields" class="wide role-hidden"><div id="missingProductChecklist" class="product-checklist"></div></div>
+          <label class="wide">Demo ürün açıklaması <small>(opsiyonel)</small><textarea name="demoProductNote" rows="2"></textarea></label>
+          <label class="wide">Müşteri ile kurulum öncesi check-list durumu <span class="required-mark">*</span><select name="checklistStatus" required><option value="">Durum seçin</option><option>Tamamlandı</option><option>Eksikler var</option><option>Müşteri onayı bekleniyor</option><option>Uygulanamadı</option></select></label>
+        </div></fieldset>
+        <fieldset class="form-section wide service-participants-section"><legend>Kurulum katılımcıları ve süre</legend>
+          <div class="service-participant-heading"><div><strong>Kuruluma giden teknisyenler <span class="required-mark">*</span></strong><small>Her teknisyenin yol ve saha süresini ayrı girin.</small></div><button id="addServiceTechnician" class="secondary-button" type="button">＋ Teknisyen ekle</button></div>
+          <div id="serviceTechnicianRows" class="service-technician-rows"></div>
+          <div class="service-duration-total"><span>Bu kurulum için toplam gerçekleşen süre</span><strong id="serviceDurationTotal">0 Saat</strong></div>
+          <div class="service-customer-heading"><div><strong>Eşlik eden müşteri çalışanları</strong><small>Kontak listesinden seçin veya yeni kişi girin.</small></div><button id="addServiceCustomerParticipant" class="secondary-button" type="button">＋ Kontak ekle</button></div>
+          <div id="serviceCustomerParticipants" class="service-customer-participants"><p>Henüz müşteri çalışanı eklenmedi.</p></div>
+        </fieldset>
+        <fieldset class="form-section wide"><legend>Rapor ve tamamlama</legend><div class="section-grid">
+          <section class="generated-report-section wide">
+            <div class="generated-report-heading"><div><strong>Kurulum raporları</strong><small>Rapor yükleyebilir veya standart bir raporu sistemde oluşturabilirsiniz.</small></div><button id="createServiceReport" class="primary-button" type="button">＋ Yeni Rapor Oluştur</button></div>
+            <div id="serviceGeneratedReports" class="generated-report-list"><p>Henüz sistemde oluşturulmuş rapor bulunmuyor.</p></div>
+          </section>
+          <label class="wide file-field">Kurulum raporu / fotoğraf / belge <small>(sonradan da eklenebilir)</small><input name="serviceAttachments" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"></label>
+          <label class="wide">Notlar <small>(opsiyonel)</small><textarea name="serviceNotes" rows="3"></textarea></label>
+          <label class="check-row wide"><input id="installationCompleted" name="completed" type="checkbox"> Kurulum tamamlandı</label>
+          <div id="nextInstallationDateField" class="wide"><label>Planlanan sonraki kurulum tarihi <span class="required-mark">*</span><input name="nextInstallationDate" type="date" data-required></label></div>
+          <label class="check-row wide"><input id="reportShared" name="reportShared" type="checkbox"> Kurulum raporu müşteri ile paylaşıldı</label>
+          <div id="sharedEmailField" class="wide role-hidden"><label>Paylaşılan e-maili ekle <span class="required-mark">*</span><input name="sharedEmailAttachment" type="file" accept=".msg,.eml,.pdf"></label></div>
+        </div></fieldset>
+        <div id="serviceOverrunNotice" class="service-overrun-notice wide role-hidden">Planlanan kurulum süresi aşılmıştır.</div>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Kurulum kaydını kaydet</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="serviceTechnicianPickerDialog" class="service-picker-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">SERVİS EKİBİ</p><h2>Teknisyen seç</h2></div><button id="closeServiceTechnicianPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body"><label>İsimle ara<input id="serviceTechnicianSearch" type="search" autocomplete="off" placeholder="Teknisyen veya süpervisör adı yazın"></label><div id="serviceTechnicianOptions" class="service-picker-options"></div></div>
+  </dialog>
+
+  <dialog id="serviceCustomerPickerDialog" class="service-picker-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">MÜŞTERİ KATILIMCISI</p><h2>Kontak ekle</h2></div><button id="closeServiceCustomerPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body">
+      <label id="serviceParticipantCompanyField">Firma <span class="required-mark">*</span><select id="serviceParticipantCompany"></select></label>
+      <div class="contact-search-field"><label>Ad <span class="required-mark">*</span><input id="serviceParticipantFirstName" autocomplete="off" placeholder="Kontak adını yazın"></label><div id="serviceParticipantSuggestions" class="contact-suggestions role-hidden" role="listbox"></div></div>
+      <div class="service-participant-form"><label>Soyad <span class="required-mark">*</span><input id="serviceParticipantLastName"></label><label>E-posta <small>(opsiyonel)</small><input id="serviceParticipantEmail" type="email"></label><label>Telefon <small>(opsiyonel)</small><input id="serviceParticipantPhone" type="tel"></label></div>
+      <div id="serviceParticipantWarning" class="service-participant-warning role-hidden"></div>
+    </div>
+    <div class="dialog-actions"><button id="cancelServiceCustomerPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveServiceCustomerParticipant" class="primary-button" type="button">Kontak ekle</button></div>
+  </dialog>
+
+  <dialog id="serviceReportTypeDialog" class="service-report-dialog">
+    <form id="serviceReportTypeForm" method="dialog">
+      <div class="dialog-header"><div><p class="eyebrow">YENİ KURULUM RAPORU</p><h2>Rapor tipini seçin</h2><p class="muted">Aynı kuruluma birden fazla rapor ekleyebilirsiniz.</p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="report-type-list">
+        <label><input name="reportType" type="radio" value="tightening" required><span><strong>Sıkıcı Sistemleri Kurulum Raporu</strong><small>Tightening System Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="screwFeeding" required><span><strong>Vida Besleme Sistemleri Kurulum Raporu</strong><small>Screw-feeding Units Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="demeter" required><span><strong>Demeter Kurulum Raporu</strong><small>Demeter Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="nexonar" required><span><strong>Nexonar Kurulum Raporu</strong><small>Nexonar Start-Up</small></span></label>
+        <label><input name="reportType" type="radio" value="other" required><span><strong>Diğer</strong><small>Other installation report</small></span></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Rapor taslağını oluştur</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="serviceReportEditorDialog" class="service-report-editor-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">RAPOR DÜZENLEYİCİ</p><h2 id="serviceReportEditorTitle">Kurulum raporu</h2><p id="serviceReportEditorSubtitle" class="muted"></p></div><button id="closeServiceReportEditor" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div id="serviceReportEditorProgress" class="report-editor-progress"></div>
+    <form id="serviceReportEditorForm" class="service-report-editor-form" novalidate><div id="serviceReportEditorBody"></div></form>
+    <div class="dialog-actions report-editor-actions"><span id="serviceReportAutosaveState">Değişiklikler otomatik kaydedilir.</span><button id="cancelServiceReportEditor" class="secondary-button" type="button">Kapat ve sonra devam et</button><button id="saveServiceReportDraft" class="secondary-button" type="button">Taslağı kaydet</button><button id="completeServiceReport" class="primary-button" type="button">Formu tamamla</button></div>
+  </dialog>
+
+  <dialog id="reportProductPickerDialog" class="service-picker-dialog report-picker-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">RAPOR ÜRÜNÜ</p><h2>Ürün seçin</h2><p class="muted">Kurulum ürünlerinden seçin veya liste harici ürün girin.</p></div><button id="closeReportProductPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body"><label>Ürün ara<input id="reportProductSearch" type="search" autocomplete="off" placeholder="Part No veya açıklama yazın"></label><div id="reportProductOptions" class="service-picker-options"></div><button id="useExternalReportProduct" class="secondary-button" type="button">Liste harici ürün girişi</button><div id="externalReportProductFields" class="report-picker-fields role-hidden"><label>Part No <span class="required-mark">*</span><input id="externalReportPartNo"></label><label>Açıklama <span class="required-mark">*</span><input id="externalReportDescription"></label></div><div id="selectedReportProduct" class="selected-report-product role-hidden"></div><label>Seri No <span class="required-mark">*</span><input id="reportProductSerial"></label></div>
+    <div class="dialog-actions"><button id="cancelReportProductPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveReportProduct" class="primary-button" type="button">Ürünü ekle</button></div>
+  </dialog>
+
+  <dialog id="reportPersonPickerDialog" class="service-picker-dialog report-picker-dialog">
+    <div class="dialog-header"><div><p id="reportPersonPickerEyebrow" class="eyebrow">RAPOR KATILIMCISI</p><h2 id="reportPersonPickerTitle">Kişi seçin</h2></div><button id="closeReportPersonPicker" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="service-picker-body"><label>İsimle ara<input id="reportPersonSearch" type="search" autocomplete="off" placeholder="Ad veya soyad yazın"></label><div id="reportPersonOptions" class="service-picker-options"></div><button id="useManualReportPerson" class="secondary-button" type="button">Liste harici kişi girişi</button><div id="manualReportPersonFields" class="report-picker-fields role-hidden"><label>Ad Soyad <span class="required-mark">*</span><input id="manualReportPersonName"></label><label id="manualReportPersonDepartmentField">Bölüm / Firma<input id="manualReportPersonDepartment"></label></div></div>
+    <div class="dialog-actions"><button id="cancelReportPersonPicker" class="secondary-button" type="button">Vazgeç</button><button id="saveReportPerson" class="primary-button" type="button">Kişiyi kullan</button></div>
+  </dialog>
+
+  <dialog id="serviceReportViewDialog" class="service-report-view-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">KURULUM RAPORU</p><h2 id="serviceReportViewTitle">Rapor görüntüleme</h2><p id="serviceReportViewSubtitle" class="muted"></p></div><button id="closeServiceReportView" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div id="serviceReportViewBody" class="service-report-view-body"></div>
+    <div class="dialog-actions"><button id="editViewedServiceReport" class="secondary-button" type="button">Düzenle</button><button id="closeServiceReportViewButton" class="primary-button" type="button">Kapat</button></div>
+  </dialog>
+
+  <dialog id="serviceReportExportDialog" class="service-report-dialog report-export-dialog">
+    <form id="serviceReportExportForm" method="dialog">
+      <div class="dialog-header"><div><p class="eyebrow">RAPOR ÇIKTISI</p><h2>Çıktı formatını seçin</h2><p id="serviceReportExportTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="report-format-list">
+        <label><input name="reportFormat" type="radio" value="word" required><span class="format-logo word-logo" aria-hidden="true"><i>W</i><b></b></span><span><strong>Microsoft Word</strong><small>Düzenlenebilir Word belgesi (.doc)</small></span></label>
+        <label><input name="reportFormat" type="radio" value="pdf" required><span class="format-logo pdf-logo" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 4h20l8 8v32H10z"/><path d="M30 4v10h9"/><path class="pdf-mark" d="M15 32c7-3 12-11 13-19 1 8 4 14 9 18-8-2-15-1-22 1z"/></svg></span><span><strong>PDF</strong><small>Paylaşıma hazır PDF belgesi (.pdf)</small></span></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button id="downloadServiceReport" class="primary-button" value="default" disabled>İndir</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="orderEditDialog" class="wide-dialog">
+    <form id="orderEditForm" method="dialog">
+      <input id="orderEditInstallationId" name="installationId" type="hidden">
+      <div class="dialog-header"><div><p class="eyebrow">SATIŞ MÜHENDİSİ</p><h2>Sipariş ürünlerini düzenle</h2><p id="orderEditRecordTitle" class="muted"></p></div><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div>
+      <div class="order-toolbar edit-order-toolbar">
+        <div class="order-tabs"><button class="order-tab active" type="button" data-edit-order-tab="products">Ürün Listesi</button><button class="order-tab" type="button" data-edit-order-tab="sets">Set Bilgisi</button></div>
+        <div class="order-actions"><input id="editOrderFileInput" type="file" accept=".xlsx,.xls,.csv" hidden><button id="editImportOrderButton" class="secondary-button" type="button">Dosya ekle</button><button id="editAddOrderProductButton" class="primary-button" type="button">＋ Ürün ekle</button></div>
+      </div>
+      <div id="editOrderFileStatus" class="order-file-status">Mevcut satırları düzenleyebilir veya yeni ürün ekleyebilirsiniz.</div>
+      <div id="editProductsTabPanel" class="order-tab-panel"><div class="table-wrap order-editor-wrap"><table class="order-editor-table"><thead><tr><th>PART NO</th><th>DESCRIPTION</th><th>QTY</th><th>SET BİLGİSİ <small>(opsiyonel)</small></th><th></th></tr></thead><tbody id="editOrderProductRows"></tbody></table></div></div>
+      <div id="editSetsTabPanel" class="order-tab-panel role-hidden"><div id="editSetGroups" class="set-groups"></div></div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Vazgeç</button><button class="primary-button" value="default">Ürünleri kaydet</button></div>
+      <div id="editProductSuggestions" class="product-suggestions role-hidden" role="listbox"></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="demodata/accounts-data.js"></script>
+  <script src="demodata/product-data.js"></script>
+  <script src="demodata/user-data.js"></script>
+  <script src="demodata/contact-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
