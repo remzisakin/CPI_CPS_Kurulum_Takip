@@ -215,15 +215,65 @@ async function buildScrewFeedingPdf(report){
   let page,pageNo=1,y;
   const addPage=()=>{page=pdf.addPage([595.28,841.89]);pageNo++;page.drawLine({start:{x:38,y:804},end:{x:557,y:804},thickness:1.5,color:gray});page.drawText('Desoutter start-up report',{x:38,y:813,size:7,font:regular,color:gray});page.drawLine({start:{x:30,y:38},end:{x:565,y:38},thickness:.6,color:gray});const scale=82/logo.width;page.drawImage(logo,{x:(595-logo.width*scale)/2,y:12,width:logo.width*scale,height:logo.height*scale});y=780;return page};
   const sectionTitle=title=>{if(y<114)addPage();else y-=9;page.drawRectangle({x:38,y:y-20,width:519,height:20,color:red});page.drawText(title,{x:47,y:y-14,size:10,font:bold,color:white});y-=26};
-  const tableHeader=cols=>{page.drawRectangle({x:38,y:y-17,width:519,height:17,color:light});let x=38;cols.forEach(col=>{page.drawText(col.label,{x:x+5,y:y-12,size:7,font:bold,color:dark});x+=col.width});y-=17};
-  const row=(cells,cols,height=24)=>{if(y-height<52){addPage();tableHeader(cols)}let x=38;cells.forEach((cell,index)=>{page.drawRectangle({x,y:y-height,width:cols[index].width,height,borderColor:rgb(.55,.55,.55),borderWidth:.45});pdfDrawWrapped(page,cell,{x:x+5,y:y-10,width:cols[index].width-10,font:index===1?bold:regular,size:7,color:dark,lineHeight:8,maxLines:2});x+=cols[index].width});y-=height};
+  const tableHeader=cols=>{page.drawRectangle({x:38,y:y-18,width:519,height:18,color:light});let x=38;cols.forEach(col=>{page.drawText(col.label,{x:x+5,y:y-13,size:8,font:bold,color:dark});x+=col.width});y-=18};
+  const rowLayout=(cells,cols,minHeight=26)=>{
+    const lines=cells.map((cell,index)=>pdfWrapText(cell,index===1?bold:regular,8,cols[index].width-10));
+    const lineCount=Math.max(...lines.map(cellLines=>cellLines.length));
+    return {lines,lineCount,height:Math.max(minHeight,8+lineCount*10)};
+  };
+  const row=(cells,cols,minHeight=26)=>{
+    const {lines,lineCount}=rowLayout(cells,cols,minHeight);
+    let firstLine=0;
+    while(firstLine<lineCount){
+      if(y-52<minHeight){addPage();tableHeader(cols)}
+      const available=y-52;
+      const visibleLines=Math.min(lineCount-firstLine,Math.floor((available-8)/10));
+      const height=Math.max(minHeight,8+visibleLines*10);
+      if(visibleLines<1||height>available){addPage();tableHeader(cols);continue}
+      let x=38;
+      lines.forEach((cellLines,index)=>{
+        page.drawRectangle({x,y:y-height,width:cols[index].width,height,borderColor:rgb(.55,.55,.55),borderWidth:.45});
+        cellLines.slice(firstLine,firstLine+visibleLines).forEach((line,lineIndex)=>{
+          if(line)page.drawText(line,{x:x+5,y:y-11-lineIndex*10,size:8,font:index===1?bold:regular,color:dark});
+        });
+        x+=cols[index].width;
+      });
+      y-=height;
+      firstLine+=visibleLines;
+    }
+  };
   addPage();sectionTitle('Kurulumu yap\u0131lan \u00fcr\u00fcnlerin listesi');
-  const productCols=[{label:'PART NO',width:105},{label:'DESCRIPTION',width:279},{label:'QTY',width:55},{label:'SET',width:80}];tableHeader(productCols);(content.products||[]).forEach(product=>row([product.partNo||'-',product.description||'-',String(product.qty||1),product.setInfo||''],productCols,25));
+  const productCols=[{label:'PART NO',width:105},{label:'DESCRIPTION',width:279},{label:'QTY',width:55},{label:'SET',width:80}];tableHeader(productCols);(content.products||[]).forEach(product=>row([product.partNo||'-',product.description||'-',String(product.qty||1),product.setInfo||''],productCols,26));
   const preMeetingWarningHeight=146,drawPreMeetingWarnings=()=>{if(y-preMeetingWarningHeight<52)addPage();page.drawRectangle({x:38,y:y-preMeetingWarningHeight,width:519,height:preMeetingWarningHeight,color:light,borderColor:red,borderWidth:.8});page.drawText('UYARILAR ;',{x:48,y:y-20,size:9,font:bold,color:red});let warningY=y-39;preMeetingWarnings.forEach(text=>{page.drawText('\u2022',{x:49,y:warningY,size:8,font:bold,color:dark});warningY=pdfDrawWrapped(page,text,{x:62,y:warningY,width:482,font:regular,size:7.4,color:dark,lineHeight:9.4});warningY-=4});y=Math.min(y-preMeetingWarningHeight-8,warningY-4)};
-  const serialCols=[{label:'PART NO',width:125},{label:'DESCRIPTION',width:274},{label:'SER\u0130 NO',width:120}],drawSerialNumbers=()=>{if(y<145)addPage();sectionTitle('\u00dcr\u00fcn Seri Numaralar\u0131');tableHeader(serialCols);(content.serialProducts||[]).forEach(item=>row([item.partNo||'-',item.description||'-',item.serial||'-'],serialCols,25))};
+  const serialCols=[{label:'PART NO',width:125},{label:'DESCRIPTION',width:274},{label:'SER\u0130 NO',width:120}],drawSerialNumbers=()=>{if(y<145)addPage();sectionTitle('\u00dcr\u00fcn Seri Numaralar\u0131');tableHeader(serialCols);(content.serialProducts||[]).forEach(item=>row([item.partNo||'-',item.description||'-',item.serial||'-'],serialCols,26))};
   const trainingInfoHeight=68,drawTrainingInfo=()=>{if(y-trainingInfoHeight<52)addPage();page.drawRectangle({x:38,y:y-62,width:519,height:62,color:light,borderColor:red,borderWidth:.8});page.drawText('UYARILAR ;',{x:48,y:y-19,size:9,font:bold,color:red});pdfDrawWrapped(page,trainingMaintenanceWarning,{x:48,y:y-38,width:495,font:regular,size:7.8,color:dark,lineHeight:10});y-=68};
   const checkCols=[{label:'\u0130\u015eLEM',width:320},{label:'DURUM',width:90},{label:'NOT',width:109}],statusLabels={ok:'UYGUN',nok:'UYGUN DE\u011e\u0130L',na:'\u0130LG\u0130L\u0130 DE\u011e\u0130L'};
-  screwFeedingReportSections.forEach((section,index)=>{const commentText=content.comments?.[section.id]||'',commentLineCount=commentText?pdfWrapText(commentText,regular,7,463).length:0,commentHeight=commentText?Math.max(40,18+commentLineCount*8):0,extraHeight=section.id==='preMeeting'?preMeetingWarningHeight:section.id==='training'?trainingInfoHeight:0,sectionHeight=52+section.items.length*26+commentHeight+extraHeight;if(y-sectionHeight<52)addPage();sectionTitle(`${index+1}. ${section.title}`);tableHeader(checkCols);section.items.forEach((item,itemIndex)=>{const data=screwItemData(item),check=content.checks[`${section.id}-${itemIndex}`]||{},quantity=data.quantityField?` - Adet: ${content.quantities?.[data.quantityField]||0}`:'';row([`${data.label}${data.code?` (${data.code})`:''}${quantity}`,statusLabels[check.status]||'-',check.note||''],checkCols,26)});if(section.id==='preMeeting')drawPreMeetingWarnings();if(commentText){if(y-commentHeight<52)addPage();page.drawRectangle({x:38,y:y-commentHeight,width:519,height:commentHeight,color:light});page.drawText('Yorum:',{x:45,y:y-13,size:7,font:bold,color:dark});pdfDrawWrapped(page,commentText,{x:84,y:y-13,width:463,font:regular,size:7,color:dark,lineHeight:8});y-=commentHeight+6}if(section.id==='tighteningUnit')drawSerialNumbers();if(section.id==='training')drawTrainingInfo()});
+  screwFeedingReportSections.forEach((section,index)=>{
+    const commentText=content.comments?.[section.id]||'';
+    const commentLineCount=commentText?pdfWrapText(commentText,regular,8,463).length:0;
+    const commentHeight=commentText?Math.max(42,18+commentLineCount*10):0;
+    const extraHeight=section.id==='preMeeting'?preMeetingWarningHeight:section.id==='training'?trainingInfoHeight:0;
+    const checkRows=section.items.map((item,itemIndex)=>{
+      const data=screwItemData(item),check=content.checks[`${section.id}-${itemIndex}`]||{};
+      const quantity=data.quantityField?` - Adet: ${content.quantities?.[data.quantityField]||0}`:'';
+      return [`${data.label}${data.code?` (${data.code})`:''}${quantity}`,statusLabels[check.status]||'-',check.note||''];
+    });
+    const sectionHeight=53+checkRows.reduce((sum,cells)=>sum+rowLayout(cells,checkCols,26).height,0)+commentHeight+extraHeight;
+    if(y-sectionHeight<52)addPage();
+    sectionTitle(`${index+1}. ${section.title}`);
+    tableHeader(checkCols);
+    checkRows.forEach(cells=>row(cells,checkCols,26));
+    if(section.id==='preMeeting')drawPreMeetingWarnings();
+    if(commentText){
+      if(y-commentHeight<52)addPage();
+      page.drawRectangle({x:38,y:y-commentHeight,width:519,height:commentHeight,color:light});
+      page.drawText('Yorum:',{x:45,y:y-14,size:8,font:bold,color:dark});
+      pdfDrawWrapped(page,commentText,{x:84,y:y-14,width:463,font:regular,size:8,color:dark,lineHeight:10});
+      y-=commentHeight+6;
+    }
+    if(section.id==='tighteningUnit')drawSerialNumbers();
+    if(section.id==='training')drawTrainingInfo();
+  });
   if(y<180)addPage();sectionTitle('Kat\u0131l\u0131mc\u0131lar');const participantCols=[{label:'AD SOYAD',width:190},{label:'B\u00d6L\u00dcM / F\u0130RMA',width:190},{label:'TAR\u0130H',width:139}];tableHeader(participantCols);(content.participants||[]).forEach(person=>row([person.name||'-',person.department||'',person.date||''],participantCols,25));if(y-24<52)addPage();page.drawRectangle({x:38,y:y-24,width:519,height:24,color:light,borderColor:gray,borderWidth:.5});page.drawText('E\u011e\u0130TMEN:',{x:48,y:y-16,size:7,font:bold,color:dark});page.drawText(content.trainer||'-',{x:96,y:y-16,size:7,font:regular,color:dark});page.drawText('G\u00f6revi:',{x:285,y:y-16,size:7,font:bold,color:dark});page.drawText(staffTitleByName(content.trainer)||'-',{x:322,y:y-16,size:7,font:regular,color:dark});y-=24;page=pdf.addPage([595.28,841.89]);pageNo++;page.drawLine({start:{x:38,y:804},end:{x:557,y:804},thickness:4,color:red});page.drawText('Kurulumun Tamamlanması',{x:60,y:758,size:17,font:bold,color:dark});page.drawText('BU KURULUM RAPORUYLA SİSTEMİNİZİN GARANTİ SÜRECİ BAŞLAMIŞTIR.',{x:60,y:720,size:10,font:bold,color:red});let completeY=690;const notices=['Kurulum raporunda uygun görmediğiniz bir madde olması halinde 3 iş günü içerisinde tarafımıza yazılı dönüş yapılması gerekmektedir. Aksi halde kurulum raporu geçerli sayılacaktır.','Sıkım proseslerinin sonuçları birçok parametreden etkilenebilir. Vida değişimi, sıkılan üründeki değişimler, sıkıcı değiştirme veya ünite sıkım parametrelerinde yapılacak değişiklikler uygulanan torku değiştirebilir. Bu nedenle sıkım prosesinin belirlenen frekanslarda doğrulanması önemlidir.','Vida besleme sistemleri tek bir vidaya özel tasarlanır. Vidadaki herhangi bir değişiklik sistemin çalışmasını bozabilir; sistemin tasarlandığı vida ile kullanılması kritiktir.','Vida besleme kazanı manyetik etkilerden korunmalıdır. Manyetize olmuş vida veya somunlar kullanılmamalıdır. Vakumlu sistemlerde demir tozu vakum kanallarını tıkayarak sistemi etkileyebilir.'];notices.forEach(text=>{completeY=pdfDrawWrapped(page,text,{x:60,y:completeY,width:475,font:regular,size:8.5,color:dark,lineHeight:12});completeY-=13});page.drawRectangle({x:60,y:260,width:475,height:100,color:light,borderColor:rgb(.7,.7,.7),borderWidth:.7});page.drawText('Kurulum ile ilgili müşteri yorumları',{x:72,y:342,size:8,font:bold,color:gray});pdfDrawWrapped(page,content.customerComments||'',{x:72,y:320,width:450,font:regular,size:9,color:dark,lineHeight:12,maxLines:4});page.drawText('Müşteri yetkilisi İsim-Soyisim / İmza',{x:60,y:220,size:8,font:bold,color:dark});page.drawText(content.customerSigner||'',{x:72,y:196,size:9,font:regular,color:dark});page.drawRectangle({x:60,y:90,width:220,height:115,borderColor:gray,borderWidth:.8});page.drawText('Desoutter Montör İsim-Soyisim / İmza',{x:315,y:220,size:8,font:bold,color:dark});page.drawText(content.installerSigner||'',{x:327,y:196,size:9,font:regular,color:dark});page.drawRectangle({x:315,y:90,width:220,height:115,borderColor:gray,borderWidth:.8});page.drawLine({start:{x:30,y:38},end:{x:565,y:38},thickness:.6,color:gray});const logoScale=82/logo.width;page.drawImage(logo,{x:(595-logo.width*logoScale)/2,y:12,width:logo.width*logoScale,height:logo.height*logoScale});await addMaintenanceAppendix(pdf,{regular,bold,logo,red,dark,gray,light,startPage:pageNo});
   const totalPages=pdf.getPageCount();
   pdf.getPages().forEach((reportPage,index)=>{if(index===0)return;reportPage.drawText(`Page ${index+1}/${totalPages}`,{x:515,y:813,size:7,font:regular,color:gray})});

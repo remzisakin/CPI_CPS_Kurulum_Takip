@@ -112,7 +112,78 @@ $('#reportExportExcel')?.addEventListener('click',()=>{if(!hasPermission('report
 function reportFilterDescription(){return[['Ekip',reportState.team],['Satış',reportState.sales],['Servis',reportState.service],['Müşteri',reportState.customer],['Faaliyet',reportState.activity],['İş grubu',reportState.business],['Durum',reportState.status]].filter(([,value])=>value).map(([label,value])=>`${label}: ${value}`).join(' · ')||'Ek filtre yok'}
 async function reportPdfFont(pdf){try{if(window.fontkit){pdf.registerFontkit(window.fontkit);const bytes=await fetchReportAsset('assets/report-templates/NotoSans-Regular.ttf');return await pdf.embedFont(bytes,{subset:true})}}catch{}return pdf.embedFont(PDFLib.StandardFonts.Helvetica)}
 function reportPdfSafe(value,font){const text=String(value??'');try{font.encodeText(text);return text}catch{return text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x00-\x7F]/g,'')}}
-async function exportReportPdf(){if(!hasPermission('reports.export')||!window.PDFLib){showToast('PDF dışa aktarma bileşeni kullanılamıyor.');return}const button=$('#reportExportPdf');button.disabled=true;button.textContent='Hazırlanıyor...';try{const {PDFDocument,rgb}=PDFLib,pdf=await PDFDocument.create(),font=await reportPdfFont(pdf),bold=font,model=reportExportModel(),definition=reportDefinitions[reportState.type],red=rgb(.925,.286,.212),dark=rgb(.12,.12,.125),gray=rgb(.42,.44,.46),light=rgb(.94,.95,.955),white=rgb(1,1,1),pageSize=[841.89,595.28];let page=pdf.addPage(pageSize),y=548;const draw=(text,x,yy,size=9,color=dark)=>page.drawText(reportPdfSafe(text,font),{x,y:yy,size,font:bold,color});const addPage=()=>{page=pdf.addPage(pageSize);y=548;page.drawRectangle({x:0,y:0,width:pageSize[0],height:pageSize[1],color:white})};page.drawRectangle({x:0,y:0,width:pageSize[0],height:pageSize[1],color:white});try{const logoBytes=await fetchReportAsset('assets/report-templates/desoutter-logo.png'),logo=await pdf.embedPng(logoBytes),scale=125/logo.width;page.drawImage(logo,{x:680,y:520,width:logo.width*scale,height:logo.height*scale})}catch{}draw(definition.title,42,y,22);y-=22;draw(definition.subtitle,42,y,9,gray);y-=20;draw(`Olusturan: ${currentUser.name} | ${new Date().toLocaleString('tr-TR')} | Donem: ${model.period.start} - ${model.period.end}`,42,y,8,gray);y-=14;draw(`Filtreler: ${reportFilterDescription()}`,42,y,8,gray);y-=30;const boxWidth=184;model.kpis.forEach((kpi,index)=>{const x=42+(index%4)*(boxWidth+12);page.drawRectangle({x,y:y-67,width:boxWidth,height:67,color:light,borderColor:rgb(.82,.83,.84),borderWidth:.7});page.drawRectangle({x,y:y-4,width:boxWidth,height:4,color:red});draw(kpi.label,x+10,y-18,7,gray);draw(kpi.value,x+10,y-43,18,dark);draw(kpi.note,x+10,y-57,7,gray)});y-=94;const chart=model.charts[0],chartData=chart?.data.slice(0,9)||[];draw(chart?.title||'Grafik',42,y,12);y-=18;const max=Math.max(...chartData.map(row=>row.value),1),chartWidth=720,step=chartWidth/Math.max(chartData.length,1);chartData.forEach((row,index)=>{const height=Math.max(2,row.value/max*120),x=48+index*step;page.drawRectangle({x,y:y-135,width:Math.max(12,step-12),height:height,color:index===0?red:rgb(.34,.5,.63)});draw(String(row.label).slice(0,15),x,y-149,6,gray);draw(reportFormatNumber(row.value),x,y-19-height,7,dark)});y-=178;draw('Kayit ayrintilari',42,y,12);y-=18;const headers=['Kayit','Musteri','Durum','Planlanan','Gerceklesen','Sevkiyat'],widths=[100,200,120,90,90,100],drawHeader=()=>{let x=42;page.drawRectangle({x,y:y-18,width:700,height:18,color:dark});headers.forEach((header,index)=>{page.drawText(reportPdfSafe(header,font),{x:x+5,y:y-12,size:7,font:bold,color:white});x+=widths[index]});y-=18};drawHeader();for(const record of model.records){if(y<50){addPage();draw(definition.title,42,y,15);y-=25;drawHeader()}const values=[record.workOrderNumber||record.salesOrderNumber||'',record.customer||'',record.status||'',reportPlans(record)[0]?.date||'',(record.serviceVisits||[]).map(visit=>visit.actualVisitDate).filter(Boolean).sort().at(-1)||'',reportShipmentState(record)];let x=42;values.forEach((value,index)=>{page.drawRectangle({x,y:y-22,width:widths[index],height:22,borderColor:rgb(.82,.83,.84),borderWidth:.4});page.drawText(reportPdfSafe(String(value).slice(0,index===1?35:20),font),{x:x+5,y:y-14,size:6.5,font:bold,color:dark});x+=widths[index]});y-=22}const bytes=await pdf.save();downloadBlob(new Blob([bytes],{type:'application/pdf'}),reportDownloadName('pdf'));reportAudit('pdf-exported',{type:reportState.type,count:model.records.length});showToast('PDF raporu indirildi.')}catch(error){console.error(error);showToast('PDF oluşturulamadı.')}finally{button.disabled=false;button.textContent='PDF indir'}}
+async function exportReportPdf(){
+  if(!hasPermission('reports.export')||!window.PDFLib){showToast('PDF dışa aktarma bileşeni kullanılamıyor.');return}
+  const button=$('#reportExportPdf');button.disabled=true;button.textContent='Hazırlanıyor...';
+  try{
+    const {PDFDocument,rgb}=PDFLib,pdf=await PDFDocument.create(),font=await reportPdfFont(pdf),bold=font;
+    const model=reportExportModel(),definition=reportDefinitions[reportState.type];
+    const red=rgb(.925,.286,.212),dark=rgb(.12,.12,.125),gray=rgb(.36,.39,.41);
+    const light=rgb(.94,.95,.955),white=rgb(1,1,1),pageSize=[841.89,595.28];
+    let page=pdf.addPage(pageSize),y=548;
+    const fit=(value,width,size)=>{
+      let result=reportPdfSafe(value,font);
+      if(font.widthOfTextAtSize(result,size)<=width)return result;
+      while(result.length&&font.widthOfTextAtSize(`${result}...`,size)>width)result=result.slice(0,-1);
+      return `${result}...`;
+    };
+    const draw=(value,x,yy,size=9,color=dark,width)=>page.drawText(width?fit(value,width,size):reportPdfSafe(value,font),{x,y:yy,size,font:bold,color});
+    const addPage=()=>{page=pdf.addPage(pageSize);y=548;page.drawRectangle({x:0,y:0,width:pageSize[0],height:pageSize[1],color:white})};
+    page.drawRectangle({x:0,y:0,width:pageSize[0],height:pageSize[1],color:white});
+    try{
+      const logoBytes=await fetchReportAsset('assets/report-templates/desoutter-logo.png');
+      const logo=await pdf.embedPng(logoBytes),scale=125/logo.width;
+      page.drawImage(logo,{x:680,y:520,width:logo.width*scale,height:logo.height*scale});
+    }catch{}
+    draw(definition.title,42,y,22);y-=22;
+    draw(definition.subtitle,42,y,9,gray);y-=20;
+    draw(`Olusturan: ${currentUser.name} | ${new Date().toLocaleString('tr-TR')} | Donem: ${model.period.start} - ${model.period.end}`,42,y,9,gray,750);y-=15;
+    draw(`Filtreler: ${reportFilterDescription()}`,42,y,9,gray,750);y-=30;
+    const boxWidth=184;
+    model.kpis.forEach((kpi,index)=>{
+      const x=42+(index%4)*(boxWidth+12);
+      page.drawRectangle({x,y:y-67,width:boxWidth,height:67,color:light,borderColor:rgb(.82,.83,.84),borderWidth:.7});
+      page.drawRectangle({x,y:y-4,width:boxWidth,height:4,color:red});
+      draw(kpi.label,x+10,y-18,8,gray,boxWidth-20);
+      draw(kpi.value,x+10,y-43,18,dark,boxWidth-20);
+      draw(kpi.note,x+10,y-57,8,gray,boxWidth-20);
+    });
+    y-=94;
+    const chart=model.charts[0],chartData=chart?.data.slice(0,9)||[];
+    draw(chart?.title||'Grafik',42,y,12);y-=18;
+    const max=Math.max(...chartData.map(row=>row.value),1),chartWidth=720,step=chartWidth/Math.max(chartData.length,1);
+    chartData.forEach((row,index)=>{
+      const height=Math.max(2,row.value/max*120),x=48+index*step;
+      page.drawRectangle({x,y:y-135,width:Math.max(12,step-12),height,color:index===0?red:rgb(.34,.5,.63)});
+      draw(row.label,x,y-149,8,gray,step-10);
+      draw(reportFormatNumber(row.value),x,y-19-height,8,dark,step-10);
+    });
+    y-=178;draw('Kayit ayrintilari',42,y,12);y-=18;
+    const headers=['Kayit','Musteri','Durum','Planlanan','Gerceklesen','Sevkiyat'],widths=[100,200,120,90,90,100];
+    const drawHeader=()=>{
+      let x=42;page.drawRectangle({x,y:y-22,width:700,height:22,color:dark});
+      headers.forEach((header,index)=>{draw(header,x+5,y-15,8,white,widths[index]-10);x+=widths[index]});
+      y-=22;
+    };
+    drawHeader();
+    for(const record of model.records){
+      if(y<82){addPage();draw(definition.title,42,y,15);y-=25;drawHeader()}
+      const values=[record.workOrderNumber||record.salesOrderNumber||'',record.customer||'',record.status||'',reportPlans(record)[0]?.date||'',(record.serviceVisits||[]).map(visit=>visit.actualVisitDate).filter(Boolean).sort().at(-1)||'',reportShipmentState(record)];
+      let x=42;
+      values.forEach((value,index)=>{
+        page.drawRectangle({x,y:y-29,width:widths[index],height:29,borderColor:rgb(.82,.83,.84),borderWidth:.4});
+        draw(value,x+5,y-18,8,dark,widths[index]-10);
+        x+=widths[index];
+      });
+      y-=29;
+    }
+    const bytes=await pdf.save();
+    downloadBlob(new Blob([bytes],{type:'application/pdf'}),reportDownloadName('pdf'));
+    reportAudit('pdf-exported',{type:reportState.type,count:model.records.length});
+    showToast('PDF raporu indirildi.');
+  }catch(error){console.error(error);showToast('PDF oluşturulamadı.')}
+  finally{button.disabled=false;button.textContent='PDF indir'}
+}
 $('#reportExportPdf')?.addEventListener('click',exportReportPdf);
 
 const showViewV158Base=showView;showView=name=>{showViewV158Base(name);if(name==='reports')renderReports()};

@@ -1412,3 +1412,83 @@ html[data-theme="light"] .service-report-editor-form :is(input,textarea)[aria-in
 html[data-theme="light"] :is(#serviceEntryDialog,#planningDialog,#shipmentDialog,#serviceReportEditorDialog) :is(button,input,select,textarea,summary):focus-visible,
 html[data-theme="light"] :is(.report-type-list,.report-format-list) label:has(input:focus-visible),
 html[data-theme="light"] .service-report-editor-form .report-status-options input:focus-visible+span{outline-color:#bf3d31}
+
+/* Rapor karar alanlari ve kullaniciya ozel yetkiler, her iki temada okunur kalir. */
+.report-primary-controls label,.report-filter-grid label,
+#reportSaveDialog .form-grid label,#reportTargetsDialog .form-grid label,
+.permission-matrix b{font-size:11px;line-height:1.45}
+.report-filter-details summary span,.report-target-list span,
+.permission-matrix small,.permission-matrix-section p{font-size:11px;line-height:1.45}
+.permission-matrix select,.report-target-list button{font-size:11px}
+.report-target-list small{font-size:11px;line-height:1.45}
+html[data-theme="dark"] :is(.report-primary-controls label,.report-filter-grid label,.report-filter-details summary span,.report-target-list small,.permission-matrix small,.permission-matrix-section p){color:#b8bdc1}
+html[data-theme="light"] :is(.report-primary-controls label,.report-filter-grid label,.report-filter-details summary span,.report-target-list small,.permission-matrix small,.permission-matrix-section p){color:#536069}
+
+/* Ekran onizlemesi ile yazdirma/PDF tablolari ayri bir okunurluk duzeyi kullanir. */
+.report-print-document{font-size:11px;line-height:1.45}
+.report-print-header td{padding:8px;overflow-wrap:anywhere}
+.report-print-section h2{font-size:14px;line-height:1.35}
+.report-print-table{font-size:11px;line-height:1.4;table-layout:fixed}
+.report-print-table th,.report-print-table td{padding:7px;overflow-wrap:anywhere;vertical-align:top}
+.report-print-table thead{display:table-header-group}
+.report-print-table tr{break-inside:avoid;page-break-inside:avoid}
+.report-print-table small{font-size:10px;line-height:1.35}
+@media print{
+  .report-print-document{color:#111;background:#fff}
+  .report-print-section h2{break-after:avoid;page-break-after:avoid}
+  .report-print-table th,.report-print-table td{border-color:#666}
+}
+
+/* Rapor ve yetki formlarinin normal, secili, odakli, hatali ve pasif halleri. */
+html[data-theme="dark"]{
+  --decision-field-bg:#19191a;--decision-field-fg:#f0f2f3;--decision-field-border:#62676a;
+  --decision-muted:#b8bdc1;--decision-disabled-bg:#303236;
+  --decision-disabled-fg:#c2c9cd;--decision-focus:#ed705e;--decision-error:#e66a5d;
+}
+html[data-theme="light"]{
+  --decision-field-bg:#fff;--decision-field-fg:#202428;--decision-field-border:#aebbc3;
+  --decision-muted:#536069;--decision-disabled-bg:#eef1f3;
+  --decision-disabled-fg:#53636c;--decision-focus:#bf3d31;--decision-error:#bd4438;
+}
+:is(.report-primary-controls,.report-filter-grid,#reportSaveDialog,#reportTargetsDialog,.permission-matrix) :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  background:var(--decision-field-bg);color:var(--decision-field-fg);border-color:var(--decision-field-border);
+}
+:is(.report-primary-controls,.report-filter-grid,#reportSaveDialog,#reportTargetsDialog,.permission-matrix) :is(input,select,textarea):focus-visible,
+:is(.report-type-list,.report-format-list) label:has(input:focus-visible),
+.report-status-options input:focus-visible+span{
+  outline:2px solid var(--decision-focus);outline-offset:2px;
+}
+:is(.report-primary-controls,.report-filter-grid,#reportSaveDialog,#reportTargetsDialog,.permission-matrix) :is(input,select,textarea)[aria-invalid="true"]{
+  border-color:var(--decision-error)!important;box-shadow:0 0 0 1px var(--decision-error);
+}
+:is(.report-primary-controls,.report-filter-grid,#reportSaveDialog,#reportTargetsDialog,.permission-matrix) :is(input,select,textarea):disabled{
+  opacity:1;background:var(--decision-disabled-bg)!important;color:var(--decision-disabled-fg)!important;
+}
+.report-status-options input:checked+span{font-weight:800}
+
+/* Dar ekranda bilgi tasiyan formlar ve secim kartlari rahatca okunur/dokunulur. */
+@media(max-width:620px){
+  .report-primary-controls label,.report-filter-grid label,
+  #reportSaveDialog .form-grid label,#reportTargetsDialog .form-grid label,
+  .permission-matrix b,.permission-matrix small{font-size:12px}
+  .report-primary-controls :is(input,select),.report-filter-grid :is(input,select),
+  #reportSaveDialog :is(input,select),#reportTargetsDialog :is(input,select),
+  .permission-matrix select{min-height:44px;font-size:14px}
+  .report-status-options{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .report-status-options span{display:grid;min-height:44px;place-items:center;box-sizing:border-box;padding:7px 4px;font-size:11px;line-height:1.25}
+  .report-check-title strong,.report-check-title small,
+  .screw-report-intro label,.screw-report-section>summary small,
+  .report-editor-progress span,
+  #planningDialog .planning-schedule-rows label,
+  #planningDialog .planning-schedule-rows label>small,
+  #shipmentDialog .shipment-quantity-row>span small,
+  #shipmentDialog .shipment-history-list article>header small{font-size:12px;line-height:1.45}
+  .report-check-note{min-height:44px;font-size:12px}
+  .report-bulk-actions button,.report-repeat-row button,.report-smart-person button,
+  .report-type-list label,.report-format-list label{min-height:44px}
+  .service-report-editor-form :is(input:not([type="radio"]),textarea,select){font-size:14px}
+  #planningDialog .planning-schedule-rows :is(input,select),
+  #shipmentDialog .shipment-quantity-row input,
+  #serviceEntryDialog .form-grid :is(input,select){min-height:44px;font-size:14px}
+  .report-dialog .dialog-actions button,.user-permission-dialog .dialog-actions button{min-height:44px}
+}

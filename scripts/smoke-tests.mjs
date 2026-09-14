@@ -585,6 +585,151 @@ test('Servis plan bilgileri ve sevkiyat miktarları iki temada okunur', async ()
   }
 });
 
+test('Rapor filtreleri, yetki kararları ve çıktı tablosu iki temada okunur', async () => {
+  const previousTheme = await protocol.evaluate('document.documentElement.dataset.theme');
+  try {
+    for (const theme of ['light', 'dark']) {
+      const result = await protocol.evaluate(`(() => {
+        document.documentElement.dataset.theme = ${JSON.stringify(theme)};
+        const fixture = document.createElement('div');
+        fixture.style.cssText = 'position:fixed;left:-9999px;top:0;width:600px';
+        fixture.innerHTML = '<div class="report-primary-controls"><label>Rapor filtresi<input></label></div>'
+          + '<div class="permission-matrix-section"><p>Yetki istisnası</p><div class="permission-matrix"><label><span><b>Paylaşım</b><small>Profil varsayılanı</small></span><select><option>İzin ver</option></select></label></div></div>'
+          + '<div class="report-print-document"><table class="report-print-table"><tr><td>Ürün ve kontrol sonucu</td></tr></table></div>'
+          + '<div class="report-status-options"><label><input type="radio" checked><span>Uygun</span></label><label><input type="radio"><span>Uygun değil</span></label></div>';
+        document.body.append(fixture);
+        const style = selector => getComputedStyle(fixture.querySelector(selector));
+        const field = fixture.querySelector('.report-primary-controls input');
+        const normalBorder = style('.report-primary-controls input').borderColor;
+        field.setAttribute('aria-invalid', 'true');
+        const errorBorder = style('.report-primary-controls input').borderColor;
+        field.removeAttribute('aria-invalid');
+        field.disabled = true;
+        const disabledOpacity = style('.report-primary-controls input').opacity;
+        const result = {
+          filter: parseFloat(style('.report-primary-controls label').fontSize),
+          permission: parseFloat(style('.permission-matrix small').fontSize),
+          permissionHint: parseFloat(style('.permission-matrix-section p').fontSize),
+          printTable: parseFloat(style('.report-print-table').fontSize),
+          selected: style('.report-status-options label:first-child span').backgroundColor,
+          unselected: style('.report-status-options label:last-child span').backgroundColor,
+          normalBorder, errorBorder, disabledOpacity,
+        };
+        fixture.remove();
+        return result;
+      })()`);
+      assert.ok(result.filter >= 11, `${theme}: rapor filtresi küçük kaldı.`);
+      assert.ok(result.permission >= 11 && result.permissionHint >= 11, `${theme}: yetki açıklaması küçük kaldı.`);
+      assert.ok(result.printTable >= 11, `${theme}: çıktı tablosu küçük kaldı.`);
+      assert.notEqual(result.selected, result.unselected, `${theme}: seçili rapor durumu ayırt edilmiyor.`);
+      assert.notEqual(result.normalBorder, result.errorBorder, `${theme}: alan hatası görünmüyor.`);
+      assert.equal(result.disabledOpacity, '1', `${theme}: devre dışı alan soluk kaldı.`);
+    }
+  } finally {
+    await protocol.evaluate(`document.documentElement.dataset.theme = ${JSON.stringify(previousTheme)}`);
+  }
+});
+
+test('390 px rapor ve yetki seçimleri dokunmaya uygun', async () => {
+  await protocol.command('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  try {
+    const result = await protocol.evaluate(`(() => {
+      const fixture = document.createElement('div');
+      fixture.style.cssText = 'position:fixed;left:-9999px;top:0;width:340px';
+      fixture.innerHTML = '<div class="report-primary-controls"><label>Filtre<select><option>Tümü</option></select></label></div>'
+        + '<div class="report-status-options"><label><input type="radio"><span>Uygun</span></label><label><input type="radio"><span>Uygun değil</span></label><label><input type="radio"><span>İlgili değil</span></label></div>'
+        + '<div id="planningDialog"><div class="planning-schedule-rows"><label>Tarih <small>Plan notu</small><input></label></div></div>'
+        + '<div id="shipmentDialog"><div class="shipment-quantity-row"><input type="number"></div></div>';
+      document.body.append(fixture);
+      const select = fixture.querySelector('select');
+      const options = [...fixture.querySelectorAll('.report-status-options span')];
+      const result = { selectHeight: select.getBoundingClientRect().height,
+        optionHeights: options.map(option => option.getBoundingClientRect().height),
+        optionTops: options.map(option => option.getBoundingClientRect().top),
+        optionFonts: options.map(option => parseFloat(getComputedStyle(option).fontSize)),
+        planningFont: parseFloat(getComputedStyle(fixture.querySelector('.planning-schedule-rows label')).fontSize),
+        planningHeight: fixture.querySelector('.planning-schedule-rows input').getBoundingClientRect().height,
+        shipmentHeight: fixture.querySelector('.shipment-quantity-row input').getBoundingClientRect().height };
+      fixture.remove();
+      return result;
+    })()`);
+    assert.ok(result.selectHeight >= 44, 'Mobil rapor filtresi dokunma alanı dar.');
+    assert.ok(result.optionHeights.every(height => height >= 44), 'Mobil rapor seçeneği dokunma alanı dar.');
+    assert.ok(result.optionFonts.every(size => size >= 11), 'Mobil rapor seçenek yazısı küçük.');
+    assert.ok(Math.max(...result.optionTops) - Math.min(...result.optionTops) < 2, 'Mobil rapor seçenekleri gereksiz yere alt alta diziliyor.');
+    assert.ok(result.planningFont >= 12 && result.planningHeight >= 44, 'Mobil planlama alanı küçük kaldı.');
+    assert.ok(result.shipmentHeight >= 44, 'Mobil sevkiyat miktarı alanı dar kaldı.');
+  } finally {
+    await protocol.command('Emulation.clearDeviceMetricsOverride');
+  }
+});
+
+test('Yönetim ve servis PDF çıktıları geçerli dosya üretiyor', async () => {
+  await loginAs('Yönetici');
+  try {
+    const result = await protocol.evaluate(`(async () => {
+      const originalDownload = window.downloadBlob;
+      let finishDownload;
+      const managementDownload = new Promise(resolve => { finishDownload = resolve; });
+      window.downloadBlob = blob => { finishDownload(blob); };
+      try {
+        document.querySelector('#mainNav [data-view="reports"]').click();
+        document.querySelector('#reportExportPdf').click();
+        const managementBlob = await Promise.race([
+          managementDownload,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Yönetim PDF indirmesi zaman aşımına uğradı.')), 10000))
+        ]);
+        const checks = {};
+        screwFeedingReportSections.forEach(section => section.items.forEach((_, index) => {
+          checks[section.id + '-' + index] = { status: 'ok', note: '' };
+        }));
+        const serviceReport = { type: 'screwFeeding', content: {
+          date: '2026-09-15', company: 'Test Müşteri', station: 'Test İstasyon',
+          feedSystemCode: 'TEST-1', products: [{partNo:'12345',description:'Test ürünü',qty:1}],
+          checks, comments: {}, quantities: {}, serialProducts: [], participants: []
+        }};
+        const serviceBytes = await buildScrewFeedingPdf(serviceReport);
+        const managementBytes = new Uint8Array(await managementBlob.arrayBuffer());
+        const magic = bytes => bytes && new TextDecoder().decode(bytes.slice(0, 5));
+        if (!window.pdfjsLib) await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'vendor/pdf.min.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.append(script);
+        });
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
+        const extractPages = async bytes => {
+          const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+          const pages = [];
+          for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+            const page = await pdf.getPage(pageNo);
+            pages.push((await page.getTextContent()).items.map(item => item.str).join(' '));
+          }
+          await pdf.destroy();
+          return pages;
+        };
+        const compactPages = await extractPages(serviceBytes);
+        const inputsPage = compactPages.findIndex((text, index) => index > 0 && text.includes('5. I/O Fonksiyon Testleri - Inputs'));
+        const lastInputPage = compactPages.findIndex(text => text.includes('TORQUE NOK (From Controller)'));
+        serviceReport.content.checks['inputs-0'].note = 'KONTROL_NOTU_BASLANGIC ' + 'bağlantı ve sinyal kontrol edildi '.repeat(90) + 'KONTROL_NOTU_SON';
+        const longNotePages = await extractPages(await buildScrewFeedingPdf(serviceReport));
+        return { managementMagic: magic(managementBytes), managementSize: managementBytes?.length || 0,
+          serviceMagic: magic(serviceBytes), serviceSize: serviceBytes.length,
+          inputsPage, lastInputPage,
+          longNoteComplete: longNotePages.join(' ').includes('KONTROL_NOTU_SON') };
+      } finally { window.downloadBlob = originalDownload; }
+    })()`);
+    assert.equal(result.managementMagic, '%PDF-', 'Yönetim raporu PDF üretilemedi.');
+    assert.equal(result.serviceMagic, '%PDF-', 'Servis raporu PDF üretilemedi.');
+    assert.ok(result.managementSize > 1000 && result.serviceSize > 1000, 'PDF çıktısı beklenenden küçük.');
+    assert.ok(result.inputsPage > 0 && result.inputsPage === result.lastInputPage, 'Inputs tablosu gereksiz yere sonraki sayfaya taşıyor.');
+    assert.equal(result.longNoteComplete, true, 'Uzun kontrol notunun sonu PDF çıktısında kayboldu.');
+  } finally {
+    await logout();
+  }
+});
+
 test('Rapor doğrulama hatası alan yanında görünür ve düzeltildikçe kalkar', async () => {
   await loginAs('Servis Teknisyeni');
   try {
