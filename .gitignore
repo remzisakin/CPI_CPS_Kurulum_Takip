@@ -8,3 +8,16 @@ demodata/user-data.js
 demodata/Contacts w Accounts Report-*.xlsx
 demodata/contact-data.js
 
+# Müşteriye ait raporlar ve sipariş örnekleri yerelde kalır.
+demodata/kurulum_rapor/
+demodata/Order Form_*.xlsx
+demodata/Order_Form_*.xlsx
+demodata/orderform_sample.png
+
+# Yerel tanılama, geçici çıktı ve geri dönüş kopyaları GitHub'a gönderilmez.
+debug.log
+tmp/
+_backups/
+_test-*.png
+satir-bazli-degisiklik-onizleme.png
+qa-*.docx

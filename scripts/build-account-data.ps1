@@ -33,4 +33,3 @@ $content = "window.CPS_ACCOUNT_DATA=$json;"
 $outputPath = Join-Path (Get-Location) $Output
 [System.IO.File]::WriteAllText($outputPath, $content, [System.Text.UTF8Encoding]::new($false))
 Write-Output "$($accounts.Count) müşteri kaydı oluşturuldu: $Output"
-

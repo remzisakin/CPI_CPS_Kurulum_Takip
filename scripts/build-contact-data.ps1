@@ -81,4 +81,3 @@ $json = @($contacts) | ConvertTo-Json -Compress -Depth 3
 $emailMissing = @($contacts | Where-Object { [string]::IsNullOrWhiteSpace($_.email) }).Count
 $phoneMissing = @($contacts | Where-Object { [string]::IsNullOrWhiteSpace($_.mobile) -and [string]::IsNullOrWhiteSpace($_.phone) }).Count
 Write-Output "$($contacts.Count) kontak olusturuldu. E-posta eksik: $emailMissing, gecerli telefon eksik: $phoneMissing"
-

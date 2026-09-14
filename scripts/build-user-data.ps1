@@ -94,4 +94,3 @@ $content = "window.CPS_USER_DATA=$json;"
 $outputPath = Join-Path (Get-Location) $Output
 [System.IO.File]::WriteAllText($outputPath, $content, [System.Text.UTF8Encoding]::new($false))
 Write-Output "$($users.Count) kullanıcı kaydı oluşturuldu: $Output"
-

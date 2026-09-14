@@ -296,3 +296,43 @@ Tarayıcı koduna gerçek kullanıcı şifresi yazılmamalı ve `localStorage` �
 
 Yeni bir çalışma oturumunda önce bu dosyayı ve `README.md` dosyasını oku. Ardından mevcut dosyaları ve GitHub durumunu kontrol et. Kullanıcının yeni kararı bu dosyayla çelişirse en güncel kullanıcı talebini uygula ve bu dosyayı aynı çalışma içinde güncelle.
 
+## 13. Son arayüz güncellemesi (29.08.2026)
+
+- Vida besleme kurulum raporunun uygulama içi görüntüleme ekranı, baskı/çıktı şablonundan ayrıldı.
+- Rapor görüntüleme penceresi kurulum talebi detayına benzer koyu, okunaklı ve daha dar bir özet yapısına dönüştürüldü.
+- Kontrol bölümleri varsayılan olarak kapalı gösterilir; başlıktan açılabilir ve bölüm ilerlemesi ile uygunsuz madde sayısı başlıkta görülebilir.
+- Ürünler, seri numaraları, katılımcılar ve onay bilgileri kompakt kart/satır düzeninde gösterilir.
+- Word ve PDF çıktı şablonları bu değişiklikten etkilenmez.
+
+## 14. Vida besleme PDF şablonu (29.08.2026)
+
+- PDF çıktısı artık yazdırma penceresi açmadan tarayıcı içinde oluşturulur ve doğrudan `.pdf` olarak indirilir.
+- Orijinal 16 sayfalık vida besleme raporu şablon olarak sisteme eklenmiştir.
+- Kapak sayfasının kırmızı-beyaz geometrisi, Start-up raporu alanı, Desoutter logosu ve vida besleme sistemi görseli orijinal PDF sayfasından korunur; tarih, firma ve istasyon/proje bilgileri sistem verileriyle kapakta yeniden yazılır.
+- Dinamik kontrol sayfaları sabit üst/alt boşluk, Desoutter alt logosu ve taşmayı önleyen sayfalama ile oluşturulur.
+- Kurulumun Tamamlanması bölümü her zaman yeni bir sayfada başlar; müşteri ve Desoutter montör için ayrı, geniş imza alanları içerir.
+- Orijinal raporun bakım ve servis eki olan son 5 sayfası görselleriyle birlikte PDF sonuna aynen eklenir.
+- Türkçe karakterler için gömülü Noto Sans fontları kullanılır; uygulama `file://` üzerinden açıldığında da çalışması için şablon/font verileri `demodata/report-template-data.js` içine gömülüdür.
+- Rapor katılımcısı akıllı aramadan seçildiğinde yalnızca kişinin adı aktarılır; Bölüm/Firma alanı kullanıcı tarafından elle girilir.
+
+### Kapak ve bakım sayfaları revizyonu
+
+- Kapaktaki orijinal üst tarih kaldırılmış, yalnızca gri bilgi alanındaki dinamik tarih bırakılmıştır.
+- Gri bilgi alanının sağ kenarı kırmızı diyagonal alanın altında kalacak şekilde şekillendirilmiş ve kırmızı kapak geometrisi korunmuştur.
+- Kapak içerik listesi formdaki 10 kontrol bölümünün güncel adları ve sırasıyla yeniden oluşturulmuştur.
+- Dinamik rapor sayfalarında birbirini takip eden bölüm başlıkları arasına ayırt edici dikey boşluk eklenmiştir.
+- Bakım ve servis eklerinin üst bilgisi, kırmızı bölüm başlığı, sayfa numarası ve alt Desoutter logosu dinamik rapor sayfalarıyla ortak görsel sisteme alınmıştır.
+- Kapaktaki referans PDF'den kalan müşteri, tarih ve istasyon metinleri gri bilgi alanı tamamen temizlenerek kaldırılmıştır; bu alanda yalnızca form verileri gösterilir.
+- Referans PDF'nin eski 8 maddelik içerik listesi ve QR kodu tamamen kapatılmıştır; kapakta yalnızca güncel 10 maddelik dinamik içerik listesi yer alır.
+- Kapak sayfası artık referans PDF sayfasının üzerine kapatma katmanları eklenerek değil, tamamen yeni bir A4 vektör sayfa olarak oluşturulur.
+- Beyaz zemin, gri bilgi kartı, siyah yatay şerit ve kırmızı diyagonal alan PDF geometrileriyle sıfırdan çizilir; bu nedenle eski referans metinlerinin veya QR kodunun görünmesi mümkün değildir.
+- Desoutter logosu ve vida besleme sistemi görseli ayrı, temiz kapak varlıkları olarak yeni vektör kapağa yerleştirilir.
+- Kapak içerik listesi referans tasarımdaki akışa uygun olarak siyah yatay şeridin altındaki sol alana taşınmıştır.
+- Kırmızı diyagonal alan daraltılmış, içerik metinleri büyütülmüş ve vida besleme görseli alt kırmızı alanda daha büyük gösterilmiştir.
+- Kapak kırmızısı, ürün görselinin kırmızı arka planıyla eşleştirilerek görselin çevresindeki dikdörtgen renk farkı giderilmiştir.
+- “Start-up raporu” başlığı siyah şerit içine alınmış ve beyaz, büyük başlık olarak düzenlenmiştir.
+- Desoutter logosu siyah şeridin sağ ucuyla aynı yatay eksene taşınmış, slogan logonun altına yerleştirilmiştir.
+- Güncel 10 maddelik içerik listesi siyah şeridin altında büyütülerek dengeli aralıklarla gösterilir.
+- Vida besleme sistemi görselinin kırmızı arka planı şeffaflaştırılmış, makine kesiti kırmızı kapak alanına arka plan dikdörtgeni olmadan yerleştirilmiştir.
+- PDF sayfalamasında her kontrol bölümünün başlığı, tablo başlığı, tüm alt maddeleri ve varsa bölüm yorumu için gereken yükseklik önceden hesaplanır.
+- Bir kontrol bölümü kalan sayfa alanına bütünüyle sığmıyorsa bölüm parçalanmaz; başlığı ve tüm alt maddeleriyle birlikte sonraki sayfadan başlatılır.
