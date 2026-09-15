@@ -184,7 +184,7 @@ test('Ayrılan JavaScript dosyaları sırayla yükleniyor ve çevrimdışı list
   const worker=await readFile(join(projectRoot,'service-worker.js'),'utf8');
   const expected=[
     'app.js','js/planning-calendar.js','js/customer-list.js','js/dashboard.js',
-    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js',
+    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/operational-state.js',
     'js/customers.js','js/app-events.js','js/operation-policy.js','js/reports.js',
     'js/organization.js','js/sales-changes.js','js/goodwill.js','js/installation-file-print.js'
   ];
@@ -1777,6 +1777,98 @@ test('Operational State Faz 2: yerel takvim günü UTC gününden bağımsız ve
     };
   })()`);
   assert.deepEqual(result,{local:'2026-09-16',utc:'2026-09-15',yesterday:'past',today:'today',tomorrow:'future',preservedDateOnly:'2026-09-16',invalid:'invalid'});
+});
+
+test('Operational State Resolver V1: workflow aksiyonları ve owner rolleri ayrışır', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const base={orderProducts:[],installationSchedule:[],serviceVisits:[],salesEngineer:'Satış Mühendisi',createdBy:'sales.user'};
+    const pick=item=>{const state=resolveOperationalState({...base,...item},{today:'2026-09-16'});return{signal:state.primarySignal,reason:state.signalReason.code,action:state.nextAction,role:state.actionOwnerRole,users:state.actionOwnerUsers,ownerConfidence:state.ownerConfidence}};
+    return{
+      draft:pick({workflowStage:'draft'}),review:pick({workflowStage:'awaitingReview'}),returned:pick({workflowStage:'returnedToSales'}),planning:pick({workflowStage:'awaitingPlanning'}),
+      pendingChange:pick({workflowStage:'awaitingPlanning',pendingSalesChangeRequest:{status:'pending'}}),
+      correction:pick({workflowStage:'planned',pendingSalesChangeRequest:{status:'correctionRequired'}}),
+      continuation:pick({workflowStage:'inService',pendingContinuationPlanning:true}),
+      unsupported:(()=>{const state=resolveOperationalState({...base,workflowStage:'legacyUnknown'},{today:'2026-09-16'});return{signal:state.primarySignal,reason:state.signalReason.code,action:state.nextAction,confidence:state.confidence}})()
+    };
+  })()`);
+  assert.deepEqual(result.draft,{signal:'ACTION_REQUIRED',reason:'WORKFLOW_DRAFT',action:'SEND_FOR_REVIEW',role:'sales',users:['Satış Mühendisi'],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.review,{signal:'ACTION_REQUIRED',reason:'AWAITING_INSTALLATION_REVIEW',action:'REVIEW_INSTALLATION_REQUEST',role:'supervisor',users:[],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.returned,{signal:'ACTION_REQUIRED',reason:'RETURNED_TO_SALES',action:'CORRECT_AND_RESUBMIT',role:'sales',users:['Satış Mühendisi'],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.planning,{signal:'ACTION_REQUIRED',reason:'AWAITING_SERVICE_PLANNING',action:'CREATE_SERVICE_PLAN',role:'supervisor',users:[],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.pendingChange,{signal:'BLOCKED',reason:'PENDING_SALES_CHANGE_REQUEST',action:'REVIEW_SALES_CHANGE_REQUEST',role:'supervisor',users:[],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.correction,{signal:'BLOCKED',reason:'SALES_CHANGE_CORRECTION_REQUIRED',action:'RESPOND_TO_SALES_CHANGE_CORRECTION',role:'sales',users:['Satış Mühendisi'],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.continuation,{signal:'BLOCKED',reason:'PENDING_CONTINUATION_PLANNING',action:'CREATE_CONTINUATION_PLAN',role:'supervisor',users:[],ownerConfidence:'HIGH'});
+  assert.deepEqual(result.unsupported,{signal:'NORMAL',reason:'UNSUPPORTED_WORKFLOW_STATE',action:'NONE',confidence:'PARTIAL'});
+});
+
+test('Operational State Resolver V1: gelecek, bugün ve geçmiş planlar doğru aksiyon ve teknisyenleri üretir', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const slot=(id,date,technicians=['Teknisyen A'])=>({id:id+'-slot',workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians});
+    const resolve=installationSchedule=>resolveOperationalState({workflowStage:'planned',orderProducts:[],serviceVisits:[],installationSchedule},{today:'2026-09-16'});
+    const future=resolve([slot('future','2026-09-17',['Teknisyen A','Teknisyen B'])]),today=resolve([slot('today','2026-09-16',['Teknisyen A','Teknisyen B','Teknisyen A'])]),past=resolve([slot('past','2026-09-15')]),noTechnician=resolve([slot('empty','2026-09-16',[])]);
+    const multipleItem={workflowStage:'inService',orderProducts:[],installationSchedule:[slot('resolved','2026-09-14'),slot('next','2026-09-16',['Teknisyen B']),slot('inactive','2026-09-13',['Teknisyen C'])],serviceVisits:[{workPlanId:'resolved',serviceOutcome:'planCompleted',completed:true}],inactiveWorkPlanIds:['inactive']};
+    const ordered=resolveOperationalState(multipleItem,{today:'2026-09-16'});
+    return{
+      future:{signal:future.primarySignal,action:future.nextAction,role:future.actionOwnerRole,users:future.actionOwnerUsers,waiting:future.isWaiting},
+      today:{signal:today.primarySignal,action:today.nextAction,role:today.actionOwnerRole,users:today.actionOwnerUsers},
+      past:{signal:past.primarySignal,reason:past.signalReason.code,action:past.nextAction},
+      noTechnician:{signal:noTechnician.primarySignal,role:noTechnician.actionOwnerRole,users:noTechnician.actionOwnerUsers,confidence:noTechnician.ownerConfidence},
+      ordered:{signal:ordered.primarySignal,next:ordered.context.nextPlanId,active:ordered.context.activePlanIds,unresolved:ordered.context.unresolvedActivePlanIds}
+    };
+  })()`);
+  assert.deepEqual(result.future,{signal:'WAITING',action:'NONE',role:null,users:[],waiting:true});
+  assert.deepEqual(result.today,{signal:'DUE_TODAY',action:'RECORD_SERVICE_RESULT',role:'technician',users:['Teknisyen A','Teknisyen B']});
+  assert.deepEqual(result.past,{signal:'DELAYED',reason:'ACTIVE_PLAN_DATE_PASSED_UNRESOLVED',action:'RECORD_SERVICE_RESULT'});
+  assert.deepEqual(result.noTechnician,{signal:'DUE_TODAY',role:'technician',users:[],confidence:'PARTIAL'});
+  assert.deepEqual(result.ordered,{signal:'DUE_TODAY',next:'next',active:['resolved','next'],unresolved:['next']});
+});
+
+test('Operational State Resolver V1: secondary risk ile active ve historical variance ayrı tutulur', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const product={partNo:'P-1',description:'Ürün',qty:2},slot={id:'p1-slot',workPlanId:'p1',date:'2026-09-17',startTime:'09:00',endTime:'18:00',technicians:['Teknisyen A']};
+    const incomplete={workflowStage:'planned',orderProducts:[product],shipment:{history:[{items:[{partNo:'P-1',quantity:1}]}]},installationSchedule:[slot],serviceVisits:[],serviceOverrun:true};
+    const completed={...incomplete,workflowStage:'completed',serviceVisits:[{workPlanId:'p1',serviceOutcome:'installationCompleted',completed:true,actualVisitDate:'2026-09-18'}]};
+    const shipped={...incomplete,shipment:{history:[{items:[{partNo:'P-1',quantity:2}]}]},serviceOverrun:false};
+    const shipmentOnly={...incomplete,installationSchedule:[{...slot,endTime:'10:00'}],serviceOverrun:false};
+    const overrunOnly={...incomplete,orderProducts:[],shipment:{history:[]},installationSchedule:[{...slot,endTime:'10:00'}]};
+    const summarize=item=>{const state=resolveOperationalState(item,{today:'2026-09-16'});return{signal:state.primarySignal,risks:state.secondaryRisks.map(risk=>risk.code),active:state.activeVariance.map(risk=>risk.code),historical:state.historicalVariance.map(risk=>risk.code),action:state.nextAction}};
+    return{incomplete:summarize(incomplete),completed:summarize(completed),shipped:summarize(shipped),shipmentOnly:summarize(shipmentOnly),overrunOnly:summarize(overrunOnly)};
+  })()`);
+  assert.deepEqual(result.incomplete,{signal:'WAITING',risks:['INCOMPLETE_SHIPMENT','EXTENDED_SHIFT','SERVICE_OVERRUN'],active:['SERVICE_OVERRUN'],historical:[],action:'NONE'});
+  assert.equal(result.completed.signal,'COMPLETED');assert.deepEqual(result.completed.risks,[]);assert.deepEqual(result.completed.active,[]);assert.deepEqual(result.completed.historical.sort(),['SERVICE_OVERRUN','VISIT_DATE_VARIANCE']);assert.equal(result.completed.action,'NONE');
+  assert.deepEqual(result.shipped,{signal:'WAITING',risks:['EXTENDED_SHIFT'],active:[],historical:[],action:'NONE'});
+  assert.deepEqual(result.shipmentOnly,{signal:'WAITING',risks:['INCOMPLETE_SHIPMENT'],active:[],historical:[],action:'NONE'});
+  assert.deepEqual(result.overrunOnly,{signal:'WAITING',risks:['SERVICE_OVERRUN'],active:['SERVICE_OVERRUN'],historical:[],action:'NONE'});
+});
+
+test('Operational State Resolver V1: primary priority concurrent gerçekleri kaybetmeden deterministiktir', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const plan={id:'past-slot',workPlanId:'past-plan',date:'2026-09-15',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']},product={partNo:'P-1',qty:1};
+    const pending=resolveOperationalState({workflowStage:'planned',pendingSalesChangeRequest:{status:'pending'},orderProducts:[product],installationSchedule:[plan],serviceVisits:[]},{today:'2026-09-16'});
+    const review=resolveOperationalState({workflowStage:'awaitingReview',orderProducts:[product],installationSchedule:[],serviceVisits:[]},{today:'2026-09-16'});
+    const completed=resolveOperationalState({workflowStage:'completed',serviceOverrun:true,orderProducts:[product],installationSchedule:[plan],serviceVisits:[]},{today:'2026-09-16'});
+    return{
+      pending:{signal:pending.primarySignal,reason:pending.signalReason,action:pending.nextAction,risks:pending.secondaryRisks.map(risk=>risk.code)},
+      review:{signal:review.primarySignal,action:review.nextAction,risks:review.secondaryRisks.map(risk=>risk.code)},
+      completed:{signal:completed.primarySignal,action:completed.nextAction,risks:completed.secondaryRisks.map(risk=>risk.code),historical:completed.historicalVariance.map(item=>item.code)}
+    };
+  })()`);
+  assert.equal(result.pending.signal,'BLOCKED');assert.equal(result.pending.action,'REVIEW_SALES_CHANGE_REQUEST');assert.deepEqual(result.pending.reason.scope,['review','planning']);assert.deepEqual(result.pending.risks,['INCOMPLETE_SHIPMENT','PAST_UNRESOLVED_PLAN']);
+  assert.deepEqual(result.review,{signal:'ACTION_REQUIRED',action:'REVIEW_INSTALLATION_REQUEST',risks:['INCOMPLETE_SHIPMENT']});
+  assert.deepEqual(result.completed,{signal:'COMPLETED',action:'NONE',risks:[],historical:['SERVICE_OVERRUN']});
+});
+
+test('Operational State Resolver V1: legacy ziyaret, saflık ve yetkiden bağımsız owner invariantları korunur', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const input={workflowStage:'inService',orderProducts:[],installationSchedule:[
+      {workPlanId:'legacy',date:'2026-09-15',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']},
+      {workPlanId:'future',date:'2026-09-17',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen B']}
+    ],serviceVisits:[{workPlanId:'legacy',serviceOutcome:'continuation'},{workPlanId:'legacy',serviceOutcome:'planCompleted',completed:true}]};
+    const before=JSON.stringify(input),first=resolveOperationalState(input,{today:'2026-09-16'}),second=resolveOperationalState(input,{today:'2026-09-16'}),originalUser=currentUser;
+    currentUser=userDirectory.find(user=>user.role==='admin')||originalUser;const asAdmin=resolveOperationalState(input,{today:'2026-09-16'});currentUser=originalUser;
+    return{unchanged:before===JSON.stringify(input),deterministic:JSON.stringify(first)===JSON.stringify(second),signal:first.primarySignal,next:first.context.nextPlanId,ownerRole:first.actionOwnerRole,ownerUsers:first.actionOwnerUsers,adminSame:JSON.stringify(first)===JSON.stringify(asAdmin)};
+  })()`);
+  assert.deepEqual(result,{unchanged:true,deterministic:true,signal:'WAITING',next:'future',ownerRole:null,ownerUsers:[],adminSame:true});
 });
 
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {
