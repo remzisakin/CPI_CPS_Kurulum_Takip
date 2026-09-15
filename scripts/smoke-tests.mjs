@@ -1371,6 +1371,50 @@ test('Kurulum Detayı bağımsız ve A4 uyumlu Kurulum Dosyası önizlemesi olu�
   }
 });
 
+test('Set Listesi mevcut A4 altyapısında set bazlı kontrol belgesi oluşturuyor', async () => {
+  await loginAs('Yönetici');
+  try {
+    const state=await protocol.evaluate(`(() => {
+      showView('installations');
+      const record=installations[0],originalProducts=structuredClone(record.orderProducts||[]);
+      const product=(partNo,setInfo,qty=1)=>({partNo,description:'Test ürün '+partNo,qty,setInfo});
+      const single=buildSetListModel({...record,orderProducts:[product('P-1','SET 1'),product('P-2','SET 1',2)]});
+      const multiple=buildSetListModel({...record,orderProducts:[product('P-1','SET 1'),product('P-2','SET 2')]});
+      const mixed=buildSetListModel({...record,orderProducts:[product('P-1','SET 1'),product('P-X',''),product('P-Y','   ')]});
+      const noneRecord={...record,orderProducts:[product('P-X',''),product('P-Y','   ')]};
+      const none=buildSetListModel(noneRecord);
+      const long=buildSetListModel({...record,orderProducts:Array.from({length:90},(_,index)=>product('LONG-'+index,'UZUN SET',index+1))});
+      const multipleHtml=renderSetList(multiple),mixedHtml=renderSetList(mixed),longHtml=renderSetList(long),layoutCss=dimInstallationPrintStyles();
+      record.orderProducts=noneRecord.orderProducts;openInstallationDetail(record.id);
+      const disabled=document.querySelector('#openSetList').disabled;
+      const unavailableVisible=!document.querySelector('#setListUnavailableMessage').classList.contains('role-hidden');
+      closeInstallationDetail();
+      record.orderProducts=[product('P-1','SET 1'),product('P-2','SET 2')];openInstallationDetail(record.id);document.querySelector('#openSetList').click();
+      const preview=document.querySelector('#installationFilePreviewDialog'),previewText=document.querySelector('#installationFilePreviewBody').textContent;
+      const result={
+        triggerInHeader:Boolean(document.querySelector('#installationDetailDialog .dialog-header-actions #openSetList')),
+        singleSet:single.groups.length===1&&single.groups[0].products.length===2,
+        multipleSets:multiple.groups.length===2&&(multipleHtml.match(/<section class="set-list-group">/g)||[]).length===2,
+        mixedOnlyAssigned:mixed.groups.length===1&&mixed.groups[0].products.length===1&&mixedHtml.includes('P-1')&&!mixedHtml.includes('P-X')&&!mixedHtml.includes('P-Y'),
+        noneDisabled:none.groups.length===0&&disabled&&unavailableVisible,
+        previewOpen:preview.open&&document.querySelector('#installationFilePreviewTitle').textContent.includes('Set Listesi'),
+        previewContents:previewText.includes('SET 1')&&previewText.includes('SET 2')&&previewText.includes('Kontrol'),
+        longDocument:(longHtml.match(/set-list-check/g)||[]).length===90,
+        pagination:/\.set-list-group>h2\{[^}]*break-after:avoid;page-break-after:avoid/.test(layoutCss)&&/\.set-list-table thead\{display:table-header-group\}/.test(layoutCss)&&/\.set-list-table tr\{break-inside:avoid;page-break-inside:avoid\}/.test(layoutCss),
+        controlColumn:/\.set-list-table th:first-child\{width:14mm;[^}]*text-align:center;white-space:nowrap\}/.test(layoutCss),
+        existingDocument:Boolean(dimPrintDocumentTypes.get('installation-file'))&&renderInstallationFile(buildInstallationFileModel(record)).includes('installation-file-document'),
+        sharedPreview:activeDimPrintPreview?.type==='set-list'
+      };
+      closeInstallationFilePreview();closeInstallationDetail();record.orderProducts=originalProducts;
+      return result;
+    })()`);
+    Object.entries(state).forEach(([name,value])=>assert.equal(value,true,`Set Listesi kontrolü başarısız: ${name}`));
+  } finally {
+    await protocol.evaluate(`if(document.querySelector('#installationFilePreviewDialog')?.open)closeInstallationFilePreview();if(document.querySelector('#installationDetailDialog')?.open)closeInstallationDetail();`).catch(()=>{});
+    await logout();
+  }
+});
+
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {
   assert.deepEqual(pageErrors, []);
 });
