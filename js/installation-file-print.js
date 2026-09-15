@@ -162,7 +162,7 @@ function dimMissingProductLabels(item,missingProducts=[]){
 function dimServiceVisitResultLabel(item,resolved){
   if(resolved.visit.serviceOutcome==='installationCompleted')return'Kurulum Sonucu';
   if(item.workflowStage!=='completed'||item.pendingContinuationPlanning!==false||!resolved.plan)return'Çalışma Sonucu';
-  const activePlans=serviceWorkPlans(item).filter(plan=>!inactiveServicePlanIds(item).has(plan.id)),finalPlan=activePlans.at(-1),planVisit=finalPlan?serviceVisitForPlan(item,finalPlan.id):null;
+  const activePlans=activeServiceWorkPlans(item),finalPlan=activePlans.at(-1),planVisit=finalPlan?serviceVisitForPlan(item,finalPlan.id):null;
   return finalPlan?.id===resolved.plan.id&&planVisit?.index===resolved.index&&activePlans.every(plan=>servicePlanResolved(item,plan.id))?'Kurulum Sonucu':'Çalışma Sonucu';
 }
 function buildServiceVisitSummaryModel(item,context={}){

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cps-public-shell-v194';
+const CACHE_NAME = 'cps-public-shell-v196';
 const OWN_CACHE_PREFIXES = ['cps-public-shell-', 'cps-kurulum-'];
 const OFFLINE_PAGE = './offline.html';
 
@@ -8,21 +8,21 @@ const PUBLIC_SHELL_ASSETS = [
   './index.html',
   OFFLINE_PAGE,
   './styles.css?v=187',
-  './app.js?v=168',
-  './js/planning-calendar.js?v=165',
+  './app.js?v=169',
+  './js/planning-calendar.js?v=166',
   './js/customer-list.js?v=165',
-  './js/dashboard.js?v=165',
-  './js/installation-workflows.js?v=168',
-  './js/service-reports.js?v=168',
-  './js/service-workflows.js?v=168',
+  './js/dashboard.js?v=166',
+  './js/installation-workflows.js?v=169',
+  './js/service-reports.js?v=169',
+  './js/service-workflows.js?v=170',
   './js/customers.js?v=165',
-  './js/app-events.js?v=170',
-  './js/operation-policy.js?v=165',
+  './js/app-events.js?v=171',
+  './js/operation-policy.js?v=166',
   './js/reports.js?v=169',
-  './js/organization.js?v=165',
+  './js/organization.js?v=166',
   './js/sales-changes.js?v=169',
-  './js/goodwill.js?v=165',
-  './js/installation-file-print.js?v=12',
+  './js/goodwill.js?v=166',
+  './js/installation-file-print.js?v=13',
   './word-report-docx.js?v=96',
   './manifest.webmanifest',
   './assets/icons/cps-180.png',

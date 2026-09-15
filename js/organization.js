@@ -16,7 +16,7 @@ function applyStoredUserAccess(){const settings=userAccessSettings();userDirecto
 applyStoredUserAccess();
 function hasPermission(permission,user=currentUser){if(!user||user.active===false)return false;if(user.isSuperAdmin||user.permissionProfile==='superAdmin')return true;const override=user.permissionOverrides?.[permission];if(override==='allow')return true;if(override==='deny')return false;return Boolean(permissionProfiles[user.permissionProfile||user.role]?.has(permission))}
 const hasRoleV145Base=hasRole;hasRole=(...roles)=>{if(currentUser?.isSuperAdmin)return true;const permissionForRole={admin:'users.manage',sales:'sales.manage',supervisor:'planning.manage',technician:'service.record'};return roles.some(role=>hasPermission(permissionForRole[role]||role))};
-function activeDelegateFor(user){if(!user?.delegateUsername)return null;const today=new Date().toISOString().slice(0,10);if(user.delegateStart&&today<user.delegateStart)return null;if(user.delegateEnd&&today>user.delegateEnd)return null;return userDirectory.find(item=>item.username===user.delegateUsername&&item.active!==false)||null}
+function activeDelegateFor(user){if(!user?.delegateUsername)return null;const today=localDateKey();if(user.delegateStart&&compareDateOnly(today,user.delegateStart)<0)return null;if(user.delegateEnd&&compareDateOnly(today,user.delegateEnd)>0)return null;return userDirectory.find(item=>item.username===user.delegateUsername&&item.active!==false)||null}
 function effectiveApprovalUser(user){return activeDelegateFor(user)||user}
 function directManagerFor(user){const manager=user&&userDirectory.find(item=>item.username===user.managerUsername&&item.active!==false);return effectiveApprovalUser(manager)}
 function managerApprovalRecipients(item){const requester=userDirectory.find(user=>user.username===item.goodwill?.requestedByUsername)||userDirectory.find(user=>user.name===item.salesEngineer),manager=directManagerFor(requester);if(manager&&hasPermission('goodwill.managerApprove',manager))return[manager.username];return userDirectory.filter(user=>hasPermission('goodwill.managerApprove',user)&&user.active!==false).map(user=>user.username)}
@@ -119,4 +119,3 @@ function applyStoredUserIdentity(){
   });
 }
 applyStoredUserIdentity();
-

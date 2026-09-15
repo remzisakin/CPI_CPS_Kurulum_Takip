@@ -293,8 +293,8 @@ test('Çevrimdışı önbellek eksik dosyaya dayanıyor ve hassas veriyi saklam�
   offline=true;
   const navigation=await dispatch(`${origin}index.html`,'navigate');
   assert.equal(navigation.value.body,`${origin}offline.html`,'Çevrimdışı yeni açılışta güvenli açıklama gösterilmedi.');
-  const staticFile=await dispatch(`${origin}app.js?v=168`);
-  assert.equal(staticFile.value.body,`${origin}app.js?v=168`,'Önbellekteki statik betik bulunamadı.');
+  const staticFile=await dispatch(`${origin}app.js?v=169`);
+  assert.equal(staticFile.value.body,`${origin}app.js?v=169`,'Önbellekteki statik betik bulunamadı.');
   assert.equal((await dispatch(`${origin}vendor/docx.iife.js`)).value.networkError,true,'Eksik betiğe HTML yanıtı verilmemeli.');
   assert.equal((await dispatch(`${origin}unknown.js`)).handled,false,'Bilinmeyen dosyaya HTML yanıtı verilmemeli.');
   assert.equal((await dispatch(`${origin}other-page`,'navigate')).handled,false,'İlgisiz sayfanın çevrimdışı davranışı değişmemeli.');
@@ -1485,6 +1485,298 @@ test('Servis Ziyaret Özeti yalnızca seçili ve sonuçlanmış saha ziyaretini 
     await protocol.evaluate(`if(document.querySelector('#installationFilePreviewDialog')?.open)closeInstallationFilePreview();if(document.querySelector('#serviceEntryDialog')?.open)document.querySelector('#serviceEntryDialog').close();`).catch(()=>{});
     await logout();
   }
+});
+
+test('Operational State karakterizasyonu: taslak, inceleme, satış iadesi ve planlama bekleme geçişleri', async () => {
+  const fixtureId = -910001;
+  await loginAs('Satış Mühendisi');
+  try {
+    const result = await protocol.evaluate(`(() => {
+      const sales = currentUser;
+      const supervisor = userDirectory.find(user => user.role === 'supervisor');
+      const item = {
+        id: ${fixtureId}, customer: 'OSV1 WORKFLOW', salesOrderNumber: 'OSV1-SO-1',
+        createdBy: sales.username, salesEngineer: sales.name, workflowStage: 'draft',
+        status: 'Taslak', date: '—', progress: 0, orderProducts: []
+      };
+      installations.push(item); saveOperationalData();
+      const snapshots = [{ stage: item.workflowStage, status: item.status }];
+      sendToPlanning(item.id);
+      snapshots.push({ stage: item.workflowStage, status: item.status, hasSentAt: Boolean(item.sentToPlanningAt) });
+      currentUser = supervisor; applyUser(currentUser); openRequestReview(item.id);
+      const issue = document.querySelector('#requestReviewForm input[name="reviewIssue"]');
+      issue.checked = true;
+      document.querySelector('#reviewExplanation').value = 'Karakterizasyon testi iadesi';
+      finishRequestReview(false);
+      let currentItem=operationalRecord(item.id);
+      snapshots.push({ stage: currentItem.workflowStage, status: currentItem.status, history: currentItem.reviewHistory?.length || 0 });
+      currentUser = sales; applyUser(currentUser); sendToPlanning(currentItem.id);
+      currentItem=operationalRecord(item.id);
+      snapshots.push({ stage: currentItem.workflowStage, status: currentItem.status });
+      currentUser = supervisor; applyUser(currentUser); openRequestReview(currentItem.id); finishRequestReview(true);
+      currentItem=operationalRecord(item.id);
+      snapshots.push({ stage: currentItem.workflowStage, status: currentItem.status, hasAcceptedAt: Boolean(currentItem.reviewAcceptedAt) });
+      installations = installations.filter(record => record.id !== item.id);
+      setStoredItem(NOTIFICATION_EVENT_STORE, JSON.stringify(notificationEvents().filter(event => event.installationId !== item.id)));
+      saveOperationalData(); render();
+      return snapshots;
+    })()`);
+    assert.deepEqual(result.map(entry => entry.stage), ['draft', 'awaitingReview', 'returnedToSales', 'awaitingReview', 'awaitingPlanning']);
+    assert.equal(result[1].hasSentAt, true);
+    assert.equal(result[2].history, 1);
+    assert.equal(result[4].hasAcceptedAt, true);
+  } finally {
+    await protocol.evaluate(`(() => {
+      installations = installations.filter(record => record.id !== ${fixtureId});
+      setStoredItem(NOTIFICATION_EVENT_STORE, JSON.stringify(notificationEvents().filter(event => event.installationId !== ${fixtureId})));
+      saveOperationalData(); render();
+    })()`).catch(() => {});
+    if (await protocol.evaluate(`!document.querySelector('#appView').classList.contains('hidden')`).catch(() => false)) await logout();
+  }
+});
+
+test('Operational State karakterizasyonu: bekleyen satış değişikliği inceleme ve planlamayı bloklar, servis kaydını bloklamaz', async () => {
+  const reviewId = -910002, plannedId = -910003;
+  await loginAs('Servis Süpervisörü');
+  try {
+    const result = await protocol.evaluate(`(() => {
+      const technician = userDirectory.find(user => user.role === 'technician');
+      const pending = { id: 'osv1-change', status: 'pending', requestedAt: new Date().toISOString() };
+      const reviewItem = { id:${reviewId}, customer:'OSV1 REVIEW BLOCK', salesOrderNumber:'OSV1-SO-2', workflowStage:'awaitingReview', status:'İnceleme bekliyor', pendingSalesChangeRequest:pending, orderProducts:[] };
+      const plannedItem = {
+        id:${plannedId}, customer:'OSV1 PLAN BLOCK', salesOrderNumber:'OSV1-SO-3', workflowStage:'planned', status:'Planlandı', pendingSalesChangeRequest:{...pending}, orderProducts:[], serviceVisits:[],
+        installationSchedule:[{id:'osv1-slot',workPlanId:'osv1-plan',date:'2099-01-10',startTime:'09:00',endTime:'10:00',technicians:[technician.name],activityType:'installation',productControl:'required',checklistRequirement:'required'}]
+      };
+      installations.push(reviewItem,plannedItem); saveOperationalData();
+      openRequestReview(reviewItem.id); const reviewOpened=document.querySelector('#requestReviewDialog').open;
+      openPlanning(plannedItem.id); const planningOpened=document.querySelector('#planningDialog').open;
+      openServiceEntry(plannedItem.id); const serviceOpened=document.querySelector('#serviceEntryDialog').open;
+      if(document.querySelector('#serviceEntryDialog').open)document.querySelector('#serviceEntryDialog').close();
+      installations=installations.filter(item=>![reviewItem.id,plannedItem.id].includes(item.id)); saveOperationalData(); render();
+      return {reviewOpened,planningOpened,serviceOpened};
+    })()`);
+    assert.deepEqual(result, { reviewOpened:false, planningOpened:false, serviceOpened:true });
+  } finally {
+    await protocol.evaluate(`(() => {
+      ['#requestReviewDialog','#planningDialog','#serviceEntryDialog'].forEach(selector=>{const dialog=document.querySelector(selector);if(dialog?.open)dialog.close()});
+      installations=installations.filter(item=>![${reviewId},${plannedId}].includes(item.id));saveOperationalData();render();
+    })()`).catch(()=>{});
+    if(await protocol.evaluate(`!document.querySelector('#appView').classList.contains('hidden')`).catch(()=>false))await logout();
+  }
+});
+
+test('Operational State karakterizasyonu: aktif, pasif, çözülmüş ve sıradaki çalışma planı', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const schedule=[
+      {workPlanId:'p1',date:'2026-09-10',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']},
+      {workPlanId:'p1',date:'2026-09-10',startTime:'10:00',endTime:'11:00',technicians:['Teknisyen B']},
+      {workPlanId:'p2',date:'2026-09-11',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']},
+      {workPlanId:'p3',date:'2026-09-12',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}
+    ];
+    const base={installationSchedule:schedule,serviceVisits:[],inactiveWorkPlanIds:['p3']};
+    const resolved=outcome=>servicePlanResolved({...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:outcome}]},'p1');
+    const continuationOpen={...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:'continuation'}]};
+    const continuationPlanned={...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:'continuation',continuationPlannedAt:'2026-09-10T12:00:00.000Z'}]};
+    const blockedOpen={...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:'couldNotPerform'}]};
+    const blockedPlanned={...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:'couldNotPerform',continuationPlannedAt:'2026-09-10T12:00:00.000Z'}]};
+    return {
+      planCount:serviceWorkPlans(base).length,groupedSlots:serviceWorkPlans(base)[0].slots.length,inactive:[...inactiveServicePlanIds(base)],
+      unresolvedWithoutVisit:servicePlanResolved(base,'p1'),planCompleted:resolved('planCompleted'),partialCompleted:resolved('partialCompleted'),installationCompleted:resolved('installationCompleted'),
+      continuationOpen:servicePlanResolved(continuationOpen,'p1'),continuationPlanned:servicePlanResolved(continuationPlanned,'p1'),
+      couldNotPerformOpen:servicePlanResolved(blockedOpen,'p1'),couldNotPerformPlanned:servicePlanResolved(blockedPlanned,'p1'),
+      nextInitially:nextServicePlan(base)?.id,nextAfterFirst:nextServicePlan({...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:'planCompleted'}]})?.id,
+      nextSkipsInactive:nextServicePlan({...base,serviceVisits:[{workPlanId:'p1',serviceOutcome:'planCompleted'},{workPlanId:'p2',serviceOutcome:'planCompleted'}]})
+    };
+  })()`);
+  assert.equal(result.planCount,3);assert.equal(result.groupedSlots,2);assert.deepEqual(result.inactive,['p3']);assert.equal(result.unresolvedWithoutVisit,false);
+  assert.equal(result.planCompleted,true);assert.equal(result.partialCompleted,true);assert.equal(result.installationCompleted,true);
+  assert.equal(result.continuationOpen,false);assert.equal(result.continuationPlanned,true);assert.equal(result.couldNotPerformOpen,false);assert.equal(result.couldNotPerformPlanned,true);
+  assert.equal(result.nextInitially,'p1');assert.equal(result.nextAfterFirst,'p2');assert.equal(result.nextSkipsInactive,null);
+});
+
+test('Operational State karakterizasyonu: gelecek, bugün ve geçmiş plan tarihleri ile teknisyen ataması', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const originalUser=currentUser,technician=userDirectory.find(user=>user.role==='technician');currentUser=technician;
+    const today=localDateKey(),shift=days=>{const date=new Date(today+'T12:00:00');date.setDate(date.getDate()+days);return localDateKey(date)};
+    const make=(id,date)=>({id,customer:'OSV1 DATE',salesOrderNumber:'OSV1-DATE-'+id,workflowStage:'planned',status:'Planlandı',orderProducts:[],serviceVisits:[],installationSchedule:[{workPlanId:'date-'+id,date,startTime:'09:00',endTime:'10:00',technicians:[technician.name,'İkinci Teknisyen',technician.name]}]});
+    const future=make(-1,shift(1)),current=make(-2,today),past=make(-3,shift(-1));
+    const response={futureIssues:dashboardIssues([future]).map(issue=>issue.type),todayIssues:dashboardIssues([current]).map(issue=>issue.type),pastIssues:dashboardIssues([past]).map(issue=>issue.type),assignees:calendarAssignees(current),assigned:installationAssignedToUser(current,technician)};
+    currentUser=originalUser;return response;
+  })()`);
+  assert.ok(!result.futureIssues.includes('Servis kaydı bekliyor'));assert.ok(result.todayIssues.includes('Servis kaydı bekliyor'));assert.ok(result.pastIssues.includes('Servis kaydı bekliyor'));
+  assert.equal(result.assigned,true);assert.equal(result.assignees.length,2);
+});
+
+test('Operational State karakterizasyonu: servis sonuçları, devam planlaması ve kurulum tamamlama etkileri', async () => {
+  const fixtureIds=[-910010,-910011,-910012,-910013,-910014];
+  await loginAs('Servis Süpervisörü');
+  try {
+    const result=await protocol.evaluate(`(async()=>{
+      const ids=${JSON.stringify(fixtureIds)},technician=userDirectory.find(user=>user.role==='technician'),originalAskConfirm=askConfirm;
+      askConfirm=async()=>true;
+      const slot=(planId,date,start='09:00',end='11:00')=>({id:planId+'-slot',workPlanId:planId,date,startTime:start,endTime:end,technicians:[technician.name],activityType:'installation',productControl:'required',checklistRequirement:'required'});
+      const make=(id,planCount)=>({id,customer:'OSV1 OUTCOME '+id,salesOrderNumber:'OSV1-'+Math.abs(id),workflowStage:'planned',status:'Planlandı',progress:15,orderProducts:[{partNo:'OSV1-P',description:'Test ürünü',qty:1}],shipment:{history:[{id:'ship-'+id,shipmentDate:'2026-09-01',items:[{partNo:'OSV1-P',quantity:1}]}]},installationSchedule:Array.from({length:planCount},(_,index)=>slot('p'+(index+1),'2026-09-'+String(10+index).padStart(2,'0'))),serviceVisits:[]});
+      const submit=async(item,outcome,planId='p1')=>{
+        openServiceEntry(item.id);if(document.querySelector('#serviceWorkPlanId').value!==planId)loadServiceWorkPlan(item,planId);
+        const form=document.querySelector('#serviceEntryForm');form.elements.actualVisitDate.value='2026-09-10';form.elements.serviceOutcome.value=outcome;updateServiceFields();
+        form.elements.productStatus.value='complete';form.elements.checklistStatus.value='appropriate';form.elements.completedWork.value='Test edilen işler';form.elements.remainingWork.value='Kalan test işleri';form.elements.blockerReason.value='Teknik engel';form.elements.blockerDetails.value='Karakterizasyon engeli';
+        serviceTechnicians=[{name:technician.name,travelDuration:0,travelUnit:'Saat',siteDuration:1,siteUnit:'Saat'}];
+        form.dispatchEvent(new SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:form.querySelector('.primary-button[value="default"]')}));
+        await new Promise(resolve=>setTimeout(resolve,80));if(document.querySelector('#serviceEntryDialog').open)document.querySelector('#serviceEntryDialog').close();return operationalRecord(item.id);
+      };
+      const planCompleted=make(ids[0],2),partial=make(ids[1],2),continuation=make(ids[2],1),couldNot=make(ids[3],1),completed=make(ids[4],2);
+      installations.push(planCompleted,partial,continuation,couldNot,completed);saveOperationalData();
+      await submit(planCompleted,'planCompleted');await submit(partial,'partialCompleted');await submit(continuation,'continuation');await submit(couldNot,'couldNotPerform');await submit(completed,'installationCompleted');
+      const planCompletedSaved=operationalRecord(ids[0]),partialSaved=operationalRecord(ids[1]),continuationSaved=operationalRecord(ids[2]),couldNotSaved=operationalRecord(ids[3]),completedSaved=operationalRecord(ids[4]);
+      const continuationBefore={pending:continuationSaved.pendingContinuationPlanning,resolved:servicePlanResolved(continuationSaved,'p1'),stage:continuationSaved.workflowStage};
+      openPlanning(continuationSaved.id);planningScheduleDraft.push(slot('p2','2099-12-31','09:00','10:00'));renderPlanningSchedule();
+      const planningForm=document.querySelector('#planningForm');planningForm.dispatchEvent(new SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:planningForm.querySelector('.primary-button[value="default"]')}));
+      await new Promise(resolve=>setTimeout(resolve,100));if(document.querySelector('#planningDialog').open)document.querySelector('#planningDialog').close();
+      const continuationAfterSaved=operationalRecord(ids[2]);
+      const response={
+        planCompleted:{stage:planCompletedSaved.workflowStage,resolved:servicePlanResolved(planCompletedSaved,'p1'),next:nextServicePlan(planCompletedSaved)?.id,completed:planCompletedSaved.serviceVisits[0]?.completed},
+        partial:{stage:partialSaved.workflowStage,resolved:servicePlanResolved(partialSaved,'p1'),next:nextServicePlan(partialSaved)?.id,completed:partialSaved.serviceVisits[0]?.completed},
+        continuationBefore,
+        continuationAfter:{pending:continuationAfterSaved.pendingContinuationPlanning,resolved:servicePlanResolved(continuationAfterSaved,'p1'),next:nextServicePlan(continuationAfterSaved)?.id,plannedAt:Boolean(continuationAfterSaved.serviceVisits[0]?.continuationPlannedAt),stage:continuationAfterSaved.workflowStage},
+        couldNot:{pending:couldNotSaved.pendingContinuationPlanning,resolved:servicePlanResolved(couldNotSaved,'p1'),stage:couldNotSaved.workflowStage},
+        installationCompleted:{stage:completedSaved.workflowStage,status:completedSaved.status,inactive:completedSaved.inactiveWorkPlanIds,next:nextServicePlan(completedSaved),completedAt:Boolean(completedSaved.completedAt),completionDate:completionDate(completedSaved),visitCompleted:completedSaved.serviceVisits[0]?.completed}
+      };
+      askConfirm=originalAskConfirm;installations=installations.filter(item=>!ids.includes(item.id));setStoredItem(NOTIFICATION_EVENT_STORE,JSON.stringify(notificationEvents().filter(event=>!ids.includes(event.installationId))));saveOperationalData();render();return response;
+    })()`);
+    assert.deepEqual(result.planCompleted,{stage:'inService',resolved:true,next:'p2',completed:true});
+    assert.deepEqual(result.partial,{stage:'inService',resolved:true,next:'p2',completed:true});
+    assert.deepEqual(result.continuationBefore,{pending:true,resolved:false,stage:'inService'});
+    assert.deepEqual(result.continuationAfter,{pending:false,resolved:true,next:'p2',plannedAt:true,stage:'inService'});
+    assert.deepEqual(result.couldNot,{pending:true,resolved:false,stage:'inService'});
+    assert.equal(result.installationCompleted.stage,'completed');assert.equal(result.installationCompleted.status,'Tamamlandı');assert.deepEqual(result.installationCompleted.inactive,['p2']);assert.equal(result.installationCompleted.next,null);assert.equal(result.installationCompleted.completedAt,true);assert.ok(result.installationCompleted.completionDate);assert.equal(result.installationCompleted.visitCompleted,true);
+  } finally {
+    await protocol.evaluate(`(()=>{askConfirm=async(message,options={})=>(await showActionDialog({...options,message}))!==null;['#planningDialog','#serviceEntryDialog','#standardActionDialog'].forEach(selector=>{const dialog=document.querySelector(selector);if(dialog?.open)dialog.close()});const ids=${JSON.stringify(fixtureIds)};installations=installations.filter(item=>!ids.includes(item.id));setStoredItem(NOTIFICATION_EVENT_STORE,JSON.stringify(notificationEvents().filter(event=>!ids.includes(event.installationId))));saveOperationalData();render()})()`).catch(()=>{});
+    if(await protocol.evaluate(`!document.querySelector('#appView').classList.contains('hidden')`).catch(()=>false))await logout();
+  }
+});
+
+test('Operational State karakterizasyonu: süre aşımı takvim gecikmesi değildir ve eksik sevkiyat mutlak blocker değildir', async () => {
+  const overrunId=-910020,shipmentId=-910021;
+  await loginAs('Servis Süpervisörü');
+  try {
+    const result=await protocol.evaluate(`(async()=>{
+      const ids=[${overrunId},${shipmentId}],technician=userDirectory.find(user=>user.role==='technician'),originalAskConfirm=askConfirm;askConfirm=async()=>true;
+      const make=(id,shipped)=>({id,customer:'OSV1 SERVICE '+id,salesOrderNumber:'OSV1-'+Math.abs(id),workflowStage:'planned',status:'Planlandı',progress:15,orderProducts:[{partNo:'OSV1-P',description:'Test ürünü',qty:1}],shipment:{history:shipped?[{id:'ship-'+id,shipmentDate:'2026-09-10',items:[{partNo:'OSV1-P',quantity:1}]}]:[]},installationSchedule:[{id:'p1-slot',workPlanId:'p1',date:'2026-09-10',startTime:'09:00',endTime:'10:00',technicians:[technician.name],activityType:'installation',productControl:'required',checklistRequirement:'required'},{id:'p2-slot',workPlanId:'p2',date:'2099-12-31',startTime:'09:00',endTime:'10:00',technicians:[technician.name],activityType:'installation',productControl:'required',checklistRequirement:'required'}],serviceVisits:[]});
+      const submit=async(item,hours)=>{openServiceEntry(item.id);const form=document.querySelector('#serviceEntryForm');form.elements.actualVisitDate.value='2026-09-10';form.elements.serviceOutcome.value='planCompleted';updateServiceFields();form.elements.productStatus.value='complete';form.elements.checklistStatus.value='appropriate';serviceTechnicians=[{name:technician.name,travelDuration:0,travelUnit:'Saat',siteDuration:hours,siteUnit:'Saat'}];form.dispatchEvent(new SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:form.querySelector('.primary-button[value="default"]')}));await new Promise(resolve=>setTimeout(resolve,80));if(document.querySelector('#serviceEntryDialog').open)document.querySelector('#serviceEntryDialog').close()};
+      const overrun=make(${overrunId},true),incomplete=make(${shipmentId},false);installations.push(overrun,incomplete);saveOperationalData();const completeSummary=shipmentSummary(overrun),incompleteBefore=shipmentSummary(incomplete);await submit(overrun,2);await submit(incomplete,1);
+      const response={overrun:{serviceOverrun:overrun.serviceOverrun,status:overrun.status,stage:overrun.workflowStage,dateLabel:dateDifferenceLabel('2026-09-10',overrun.serviceVisits[0]?.actualVisitDate)},completeShipment:{complete:completeSummary.complete,remaining:completeSummary.remaining},incompleteShipment:{beforeComplete:incompleteBefore.complete,remaining:incompleteBefore.remaining,visitSaved:incomplete.serviceVisits.length,stage:incomplete.workflowStage,resolved:servicePlanResolved(incomplete,'p1')}};
+      askConfirm=originalAskConfirm;installations=installations.filter(item=>!ids.includes(item.id));setStoredItem(NOTIFICATION_EVENT_STORE,JSON.stringify(notificationEvents().filter(event=>!ids.includes(event.installationId))));saveOperationalData();render();return response;
+    })()`);
+    assert.deepEqual(result.overrun,{serviceOverrun:true,status:'Süre aşıldı',stage:'inService',dateLabel:'Planlandığı gün'});
+    assert.deepEqual(result.completeShipment,{complete:true,remaining:0});
+    assert.deepEqual(result.incompleteShipment,{beforeComplete:false,remaining:1,visitSaved:1,stage:'inService',resolved:true});
+  } finally {
+    await protocol.evaluate(`(()=>{askConfirm=async(message,options={})=>(await showActionDialog({...options,message}))!==null;['#serviceEntryDialog','#standardActionDialog'].forEach(selector=>{const dialog=document.querySelector(selector);if(dialog?.open)dialog.close()});const ids=[${overrunId},${shipmentId}];installations=installations.filter(item=>!ids.includes(item.id));setStoredItem(NOTIFICATION_EVENT_STORE,JSON.stringify(notificationEvents().filter(event=>!ids.includes(event.installationId))));saveOperationalData();render()})()`).catch(()=>{});
+    if(await protocol.evaluate(`!document.querySelector('#appView').classList.contains('hidden')`).catch(()=>false))await logout();
+  }
+});
+
+test('Operational State Faz 2: plan semantiği merkezi aktif ve çözülmemiş plan kümesini üretir', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const item={
+      installationSchedule:[
+        {workPlanId:'resolved',date:'2026-09-10',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']},
+        {workPlanId:'next',date:'2026-09-11',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']},
+        {workPlanId:'inactive',date:'2026-09-12',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}
+      ],
+      serviceVisits:[{workPlanId:'resolved',serviceOutcome:'planCompleted',completed:true}],
+      inactiveWorkPlanIds:['inactive']
+    };
+    const completed={
+      workflowStage:'completed',
+      installationSchedule:item.installationSchedule,
+      serviceVisits:[{workPlanId:'resolved',serviceOutcome:'installationCompleted',completed:true}],
+      inactiveWorkPlanIds:['next','inactive']
+    };
+    return {
+      active:activeServiceWorkPlans(item).map(plan=>plan.id),
+      unresolved:unresolvedActiveServiceWorkPlans(item).map(plan=>plan.id),
+      next:nextServicePlan(item)?.id,
+      resolvedActive:servicePlanActive(item,'resolved')&&servicePlanResolved(item,'resolved'),
+      inactive:servicePlanInactive(item,'inactive'),
+      completedActive:activeServiceWorkPlans(completed).map(plan=>plan.id),
+      completedUnresolved:unresolvedActiveServiceWorkPlans(completed).map(plan=>plan.id),
+      completedNext:nextServicePlan(completed)
+    };
+  })()`);
+  assert.deepEqual(result.active,['resolved','next']);
+  assert.deepEqual(result.unresolved,['next']);
+  assert.equal(result.next,'next');
+  assert.equal(result.resolvedActive,true);
+  assert.equal(result.inactive,true);
+  assert.deepEqual(result.completedActive,['resolved']);
+  assert.deepEqual(result.completedUnresolved,[]);
+  assert.equal(result.completedNext,null);
+});
+
+test('Operational State Faz 2A: legacy çoklu ziyaretlerde plan çözülmesi ziyaret sırasından bağımsızdır', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const schedule=[{workPlanId:'legacy-plan',date:'2026-09-10',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}];
+    const visit=(serviceOutcome,extra={})=>({workPlanId:'legacy-plan',serviceOutcome,...extra});
+    const resolved=serviceVisits=>servicePlanResolved({installationSchedule:schedule,serviceVisits},'legacy-plan');
+    return {
+      singleUnresolved:resolved([visit('continuation')]),
+      singleResolved:resolved([visit('planCompleted',{completed:true})]),
+      unresolvedThenResolved:resolved([visit('continuation'),visit('planCompleted',{completed:true})]),
+      resolvedThenUnresolved:resolved([visit('planCompleted',{completed:true}),visit('continuation')]),
+      multipleUnresolved:resolved([visit('continuation'),visit('couldNotPerform')]),
+      continuationPlanned:resolved([visit('continuation'),visit('couldNotPerform',{continuationPlannedAt:'2026-09-11T09:00:00.000Z'})]),
+      matchCount:serviceVisitsForPlan({installationSchedule:schedule,serviceVisits:[visit('continuation'),visit('planCompleted')]},'legacy-plan').length
+    };
+  })()`);
+  assert.deepEqual(result,{
+    singleUnresolved:false,
+    singleResolved:true,
+    unresolvedThenResolved:true,
+    resolvedThenUnresolved:true,
+    multipleUnresolved:false,
+    continuationPlanned:true,
+    matchCount:2
+  });
+});
+
+test('Operational State Faz 2: pasif plan takvim, kapasite ve çakışma hesabına girmez', async () => {
+  const fixtureId=-910030;
+  const result=await protocol.evaluate(`(() => {
+    const item={
+      id:${fixtureId},customer:'OSV1 INACTIVE',salesOrderNumber:'OSV1-INACTIVE',workflowStage:'completed',status:'Tamamlandı',
+      installationSchedule:[
+        {id:'active-slot',workPlanId:'active',date:'2099-10-09',startTime:'09:00',endTime:'10:00',technicians:['OSV1 Teknisyen']},
+        {id:'inactive-slot',workPlanId:'inactive',date:'2099-10-10',startTime:'09:00',endTime:'17:00',technicians:['OSV1 Teknisyen']}
+      ],
+      serviceVisits:[{workPlanId:'active',serviceOutcome:'installationCompleted',completed:true,actualVisitDate:'2099-10-09'}],
+      inactiveWorkPlanIds:['inactive']
+    };
+    installations.push(item);
+    const events=buildLocalCalendarEvents().filter(event=>Number(event.installationId)===item.id&&event.type==='installation');
+    const inactiveConflict=planningSlotConflicts({date:'2099-10-10',startTime:'10:00',endTime:'11:00',technicians:['OSV1 Teknisyen']},-999999);
+    const activeConflict=planningSlotConflicts({date:'2099-10-09',startTime:'09:30',endTime:'09:45',technicians:['OSV1 Teknisyen']},-999999);
+    installations=installations.filter(record=>record.id!==item.id);
+    return {eventSlots:events.map(event=>event.scheduleSlotId),eventHours:events.reduce((sum,event)=>sum+event.hours,0),inactiveConflict:inactiveConflict.some(conflict=>conflict.installationId===item.id),activeConflict:activeConflict.some(conflict=>conflict.installationId===item.id)};
+  })()`);
+  assert.deepEqual(result,{eventSlots:['active-slot'],eventHours:1,inactiveConflict:false,activeConflict:true});
+});
+
+test('Operational State Faz 2: yerel takvim günü UTC gününden bağımsız ve deterministiktir', async () => {
+  await protocol.command('Emulation.setTimezoneOverride',{timezoneId:'Europe/Istanbul'});
+  const result=await protocol.evaluate(`(() => {
+    const instant=new Date('2026-09-15T22:30:00.000Z');
+    return {
+      local:localDateKey(instant),
+      utc:instant.toISOString().slice(0,10),
+      yesterday:dateOnlyRelation('2026-09-15','2026-09-16'),
+      today:dateOnlyRelation('2026-09-16','2026-09-16'),
+      tomorrow:dateOnlyRelation('2026-09-17','2026-09-16'),
+      preservedDateOnly:localDateKey('2026-09-16'),
+      invalid:dateOnlyRelation('geçersiz','2026-09-16')
+    };
+  })()`);
+  assert.deepEqual(result,{local:'2026-09-16',utc:'2026-09-15',yesterday:'past',today:'today',tomorrow:'future',preservedDateOnly:'2026-09-16',invalid:'invalid'});
 });
 
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {

@@ -46,7 +46,7 @@ function localDataBackup(){
 document.querySelector('#exportLocalData')?.addEventListener('click',()=>{
   try{
     const backup=localDataBackup(),blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
-    link.href=url;link.download=`cps-yerel-yedek-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    link.href=url;link.download=`cps-yerel-yedek-${localDateKey()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch{storageWarnings.add('Yerel verilere erişilemediği için yedek oluşturulamadı. Tarayıcı verilerini silmeyin.');showStorageWarning()}
 });
 function getSessionItem(key){try{return sessionStorage.getItem(key)}catch{return null}}
@@ -83,6 +83,9 @@ function parentInstallationFor(record){return record?.parentInstallationId?insta
 function saveOperationalData(){setStoredItem(WORK_ORDER_STORE_KEY,JSON.stringify(workOrders));setStoredItem('cps-installations',JSON.stringify(installations))}
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
+function localDateKey(value=new Date()){if(typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value))return value;const date=value instanceof Date?value:new Date(value);if(Number.isNaN(date.getTime()))return'';return`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`}
+function compareDateOnly(left,right=localDateKey()){const leftKey=localDateKey(left),rightKey=localDateKey(right);if(!leftKey||!rightKey)return null;return leftKey===rightKey?0:leftKey<rightKey?-1:1}
+function dateOnlyRelation(value,reference=localDateKey()){const comparison=compareDateOnly(value,reference);return comparison===null?'invalid':comparison<0?'past':comparison>0?'future':'today'}
 const INSTALLATION_STORE_KEY='cps-installations';
 const SYNC_CHANNEL_NAME='cps-installations-sync';
 const CLIENT_INSTANCE_ID=getSessionItem('cps-client-instance')||`${Date.now()}-${Math.random().toString(36).slice(2)}`;

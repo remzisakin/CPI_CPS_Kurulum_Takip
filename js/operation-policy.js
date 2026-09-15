@@ -4,7 +4,7 @@ function activityTypeLabel(value){return ACTIVITY_TYPES.find(item=>item[0]===val
 function activityDefaults(type){return['technicalMeeting','discovery','training'].includes(type)?{productControl:'na',checklistRequirement:'na'}:{productControl:'required',checklistRequirement:'required'}}
 function workPlanMetadata(item,workPlanId){const slot=installationSchedule(item).find(entry=>(entry.workPlanId||`work-${entry.date}`)===workPlanId)||{};const activityType=slot.activityType||'installation',defaults=activityDefaults(activityType);return{activityType,productControl:slot.productControl||defaults.productControl,checklistRequirement:slot.checklistRequirement||defaults.checklistRequirement,note:slot.workPlanNote||''}}
 function dateDifferenceLabel(planned,actual){if(!planned||!actual)return'';const days=Math.round((new Date(`${actual}T12:00:00`)-new Date(`${planned}T12:00:00`))/86400000);return days===0?'Planlandığı gün':days>0?`${days} gün gecikmeli`:`${Math.abs(days)} gün erken`}
-function activePlanProgress(item){const plans=serviceWorkPlans(item).filter(plan=>!inactiveServicePlanIds(item).has(plan.id));if(plans.length<=1)return'';const next=nextServicePlan(item),index=Math.max(0,plans.findIndex(plan=>plan.id===(next?.id||plans.at(-1)?.id)));return`${index+1}. çalışma · ${plans.length} plan`}
+function activePlanProgress(item){const plans=activeServiceWorkPlans(item);if(plans.length<=1)return'';const next=nextServicePlan(item),index=Math.max(0,plans.findIndex(plan=>plan.id===(next?.id||plans.at(-1)?.id)));return`${index+1}. çalışma · ${plans.length} plan`}
 function latestActualVisit(item){return[...(item.serviceVisits||[])].filter(visit=>visit.actualVisitDate).sort((a,b)=>String(a.actualVisitDate).localeCompare(String(b.actualVisitDate))).at(-1)}
 
 const installationRowTemplateV135Base=installationRowTemplate;
@@ -67,4 +67,3 @@ buildLocalCalendarEvents=()=>{const events=buildLocalCalendarEventsV135Base(),ac
 const openCalendarDetailV135Base=openCalendarDetail;openCalendarDetail=async id=>{await openCalendarDetailV135Base(id);const event=await calendarDataService.getEvent(id);if(event?.type==='actualVisit'){const label=$('#calendarDetailBody .eyebrow');if(label)label.textContent='GERÇEKLEŞEN SAHA ZİYARETİ'}};
 
 if(currentUser)render();
-
