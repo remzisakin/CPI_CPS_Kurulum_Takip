@@ -21,7 +21,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=185">
+  <link rel="stylesheet" href="styles.css?v=187">
 </head>
 <body>
   <div id="storageWarning" class="storage-warning" role="alert" hidden><strong>Yerel kayıt uyarısı</strong><span></span><button id="exportLocalData" type="button" title="İndirilen yedek müşteri ve kullanıcı bilgileri içerebilir; güvenli saklayın.">Ham verileri yedekle</button></div>
@@ -428,7 +428,7 @@
       <input id="serviceInstallationId" name="installationId" type="hidden">
       <input id="serviceVisitIndex" name="visitIndex" type="hidden">
       <input id="serviceWorkPlanId" name="workPlanId" type="hidden">
-      <div class="dialog-header"><div><p class="eyebrow">SERVİS SAHA KAYDI</p><h2>Kurulum raporu</h2><p id="serviceRecordTitle" class="muted"></p></div><div class="dialog-header-actions"><button id="toggleServiceFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div></div>
+      <div class="dialog-header"><div><p class="eyebrow">SERVİS SAHA KAYDI</p><h2>Kurulum raporu</h2><p id="serviceRecordTitle" class="muted"></p></div><div class="dialog-header-actions"><span id="serviceVisitSummaryAction" class="service-visit-summary-action"><button id="openServiceVisitSummary" class="secondary-button installation-file-trigger" type="button" title="Ziyaret Özeti önizlemesini aç" disabled><span aria-hidden="true">▤</span> Ziyaret Özeti</button><small id="serviceVisitSummaryUnavailableMessage">Ziyaret sonucu kaydedildikten sonra kullanılabilir.</small></span><button id="toggleServiceFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div></div>
       <div id="serviceVisitTabs" class="service-visit-tabs"></div>
       <div class="service-work-plan-picker role-hidden"><label>Çalışma Planı<select id="serviceWorkPlanSelect"></select></label><div id="serviceWorkPlanSummary"></div></div>
       <div class="form-grid service-entry-grid">
@@ -592,7 +592,7 @@
   <script src="js/organization.js?v=165"></script>
   <script src="js/sales-changes.js?v=169"></script>
   <script src="js/goodwill.js?v=165"></script>
-  <script src="js/installation-file-print.js?v=7"></script>
+  <script src="js/installation-file-print.js?v=12"></script>
   <script src="word-report-docx.js?v=96"></script>
 </body>
 </html>

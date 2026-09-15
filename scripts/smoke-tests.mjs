@@ -1415,6 +1415,78 @@ test('Set Listesi mevcut A4 altyapısında set bazlı kontrol belgesi oluşturuy
   }
 });
 
+test('Servis Ziyaret Özeti yalnızca seçili ve sonuçlanmış saha ziyaretini yazdırıyor', async () => {
+  await loginAs('Yönetici');
+  try {
+    const state=await protocol.evaluate(`(async() => {
+      const record=operationalRecords()[0],originalSchedule=structuredClone(record.installationSchedule||[]),originalVisits=structuredClone(record.serviceVisits||[]),planId='visit-summary-plan';
+      const visit=(number,overrides={})=>({workPlanId:planId,visitNumber:number,actualVisitDate:'2026-09-15',serviceOutcome:'continuation',activityType:'installation',technicianEntries:[{name:'Teknisyen Bir',siteDuration:3,siteUnit:'Saat',travelDuration:1,travelUnit:'Saat'},{name:'Teknisyen İki',siteDuration:2,siteUnit:'Saat',travelDuration:0.5,travelUnit:'Saat'}],completedWork:'Montaj ve ilk testler tamamlandı.',remainingWork:'Devreye alma testi kaldı.',missingProducts:['P-404','P-UNKNOWN'],blockerReason:'Teknik engel',blockerDetails:'Saha enerjisi hazır değildi.',requiredSpecialty:'Otomasyon',customerAvailability:'20-22 Eylül',checklistIssueNote:'Enerji kontrolü tekrar yapılacak.',notes:'Sonraki ziyarette test cihazı getirilecek.',generatedReports:[{type:'screwFeeding',status:'completed',createdAt:'2026-09-15T10:00:00',updatedAt:'2026-09-15T12:00:00'}],attachments:[{name:'Saha_Fotograflari.pdf',type:'application/pdf'}],...overrides});
+      const summaryItem={...record,salesOrderNumber:'SO-0005',orderProducts:[{partNo:'P-404',description:'TEST PRODUCT',qty:1},{partNo:'P-DUP',description:'A',qty:1},{partNo:'P-DUP',description:'B',qty:1}],installationSchedule:[{id:'slot-1',workPlanId:planId,date:'2026-09-15',startTime:'09:00',endTime:'16:00',technicians:['Teknisyen Bir'],activityType:'installation'}],serviceVisits:[visit(1),visit(2,{actualVisitDate:'2026-09-16',completedWork:'Yalnızca ikinci ziyarette yapılan iş.',remainingWork:'',missingProducts:[],blockerReason:'',blockerDetails:'',generatedReports:[],attachments:[]})]};
+      const first=buildServiceVisitSummaryModel(summaryItem,{visitIndex:0,workPlanId:planId}),second=buildServiceVisitSummaryModel(summaryItem,{visitIndex:1,workPlanId:planId}),firstHtml=renderServiceVisitSummary(first),secondHtml=renderServiceVisitSummary(second);
+      const planSlot=(id,date)=>({id:'slot-'+id,workPlanId:id,date,startTime:'09:00',endTime:'17:00',technicians:['Teknisyen Bir']});
+      const outcomeVisit=(id,outcome)=>visit(1,{workPlanId:id,serviceOutcome:outcome,missingProducts:[]});
+      const outcomeModel=(item,plan)=>buildServiceVisitSummaryModel(item,{workPlanId:plan});
+      const twoPlanBase={...summaryItem,installationSchedule:[planSlot('plan-1','2026-09-15'),planSlot('plan-2','2026-09-16')],workflowStage:'inService',pendingContinuationPlanning:false,inactiveWorkPlanIds:[]};
+      const planCompletedModel=outcomeModel({...twoPlanBase,serviceVisits:[outcomeVisit('plan-1','planCompleted')]},'plan-1');
+      const partialCompletedModel=outcomeModel({...twoPlanBase,serviceVisits:[outcomeVisit('plan-1','partialCompleted')]},'plan-1');
+      const continuationModel=outcomeModel({...twoPlanBase,pendingContinuationPlanning:true,serviceVisits:[outcomeVisit('plan-1','continuation')]},'plan-1');
+      const couldNotPerformModel=outcomeModel({...twoPlanBase,pendingContinuationPlanning:true,serviceVisits:[outcomeVisit('plan-1','couldNotPerform')]},'plan-1');
+      const installationCompletedModel=outcomeModel({...twoPlanBase,workflowStage:'completed',inactiveWorkPlanIds:['plan-2'],serviceVisits:[outcomeVisit('plan-1','installationCompleted')]},'plan-1');
+      const finalWorkflowModel=outcomeModel({...twoPlanBase,workflowStage:'completed',serviceVisits:[outcomeVisit('plan-1','planCompleted'),outcomeVisit('plan-2','planCompleted')]},'plan-2');
+      const earlierCompletedPlanModel=outcomeModel({...twoPlanBase,workflowStage:'completed',serviceVisits:[outcomeVisit('plan-1','planCompleted'),outcomeVisit('plan-2','planCompleted')]},'plan-1');
+      const singleContinuationModel=outcomeModel({...summaryItem,installationSchedule:[planSlot('single-plan','2026-09-15')],workflowStage:'inService',pendingContinuationPlanning:true,serviceVisits:[outcomeVisit('single-plan','continuation')]},'single-plan');
+      const noContinuationFields=model=>({...model,remainingWork:'',nextDate:'',requiredSpecialty:'',customerAvailability:'',notes:''});
+      const finalWithoutContinuationHtml=renderServiceVisitSummary(noContinuationFields(installationCompletedModel));
+      const finalWithContinuationHtml=renderServiceVisitSummary({...noContinuationFields(installationCompletedModel),notes:'Takip notu'});
+      const nonFinalWithoutContinuationHtml=renderServiceVisitSummary(noContinuationFields(planCompletedModel));
+      const unfinished=buildServiceVisitSummaryModel({...summaryItem,serviceVisits:[visit(1,{serviceOutcome:'',actualVisitDate:''})]},{visitIndex:0,workPlanId:planId});
+      const legacyUnsafe=buildServiceVisitSummaryModel({...summaryItem,installationSchedule:[summaryItem.installationSchedule[0],{...summaryItem.installationSchedule[0],id:'slot-2',workPlanId:'other-plan'}],serviceVisits:[visit(1,{workPlanId:''})]},{workPlanId:'other-plan'});
+      const longHtml=renderServiceVisitSummary(buildServiceVisitSummaryModel({...summaryItem,serviceVisits:[visit(1,{completedWork:'Uzun açıklama '.repeat(300),remainingWork:'Kalan iş '.repeat(200)})]},{visitIndex:0,workPlanId:planId}));
+      record.installationSchedule=structuredClone(summaryItem.installationSchedule);record.serviceVisits=[visit(1)];openServiceEntry(record.id);updateServiceVisitSummaryAction();
+      const button=document.querySelector('#openServiceVisitSummary'),enabled=!button.disabled;
+      button.click();
+      const preview=document.querySelector('#installationFilePreviewDialog'),previewText=document.querySelector('#installationFilePreviewBody').textContent;
+      const applicationTitle=document.title;let titleDuringPrint=null,iframeTitleDuringPrint=null;
+      const printObserver=new MutationObserver(records=>records.flatMap(record=>[...record.addedNodes]).filter(node=>node instanceof HTMLIFrameElement&&node.classList.contains('dim-print-frame')).forEach(frame=>{frame.contentWindow.print=function(){titleDuringPrint=document.title;iframeTitleDuringPrint=this.document.title;this.dispatchEvent(new Event('afterprint'))}}));
+      printObserver.observe(document.body,{childList:true});await printDimDocument('service-visit-summary',first);printObserver.disconnect();
+      const result={
+        registered:Boolean(dimPrintDocumentTypes.get('service-visit-summary')),
+        selectedVisit:first.visitNumber===1&&second.visitNumber===2&&firstHtml.includes('Montaj ve ilk testler')&&!firstHtml.includes('Yalnızca ikinci ziyarette'),
+        trustedOutcome:first.result==='Devam planı gerekli'&&buildServiceVisitSummaryModel({...summaryItem,serviceVisits:[visit(1,{serviceOutcome:'planCompleted'})]},{visitIndex:0,workPlanId:planId}).result==='Çalışma planı tamamlandı',
+        contextualResultLabels:planCompletedModel.resultLabel==='Çalışma Sonucu'&&partialCompletedModel.resultLabel==='Çalışma Sonucu'&&continuationModel.resultLabel==='Çalışma Sonucu'&&couldNotPerformModel.resultLabel==='Çalışma Sonucu'&&installationCompletedModel.resultLabel==='Kurulum Sonucu'&&finalWorkflowModel.resultLabel==='Kurulum Sonucu'&&earlierCompletedPlanModel.resultLabel==='Çalışma Sonucu'&&singleContinuationModel.resultLabel==='Çalışma Sonucu',
+        contextualResultMarkup:renderServiceVisitSummary(planCompletedModel).includes('<dt>Çalışma Sonucu</dt>')&&renderServiceVisitSummary(finalWorkflowModel).includes('<dt>Kurulum Sonucu</dt>'),
+        finalEmptyContinuationHidden:!finalWithoutContinuationHtml.includes('<h2>Devam / sonraki adım</h2>'),
+        finalContinuationShown:finalWithContinuationHtml.includes('<h2>Devam / sonraki adım</h2>')&&finalWithContinuationHtml.includes('Takip notu'),
+        nonFinalContinuationPreserved:nonFinalWithoutContinuationHtml.includes('<h2>Devam / sonraki adım</h2>'),
+        resultAndContinuation:firstHtml.includes('Devreye alma testi kaldı')&&firstHtml.includes('Teknik engel'),
+        missingProductDescription:firstHtml.includes('P-404 · TEST PRODUCT')&&firstHtml.includes('P-UNKNOWN'),
+        technicianDurations:firstHtml.includes('Teknisyen Bir')&&firstHtml.includes('3')&&firstHtml.includes('Teknisyen İki')&&firstHtml.includes('2'),
+        documents:firstHtml.includes('Saha_Fotograflari.pdf')&&firstHtml.includes('Vida Besleme Sistemleri Kurulum Raporu'),
+        noDocumentsSection:!secondHtml.includes('Dokümanlar / ekler'),
+        unfinishedBlocked:unfinished===null,
+        ambiguousLegacyBlocked:legacyUnsafe===null,
+        longContentPreserved:longHtml.includes('Uzun açıklama')&&longHtml.includes('Kalan iş'),
+        actionEnabled:enabled,
+        previewOpen:preview.open&&activeDimPrintPreview?.type==='service-visit-summary',
+        previewSelectedOnly:previewText.includes('Montaj ve ilk testler')&&!previewText.includes('Yalnızca ikinci ziyarette'),
+        documentNames:dimPrintDocumentName('installation-file',summaryItem)==='DIM_Kurulum_Dosyasi_SO-0005'&&dimPrintDocumentName('set-list',summaryItem)==='DIM_Set_Listesi_SO-0005'&&dimPrintDocumentName('service-visit-summary',summaryItem)==='DIM_Servis_Ziyaret_Ozeti_SO-0005',
+        missingOrderName:dimPrintDocumentName('installation-file',{salesOrderNumber:''})==='DIM_Kurulum_Dosyasi'&&dimPrintDocumentName('set-list',{})==='DIM_Set_Listesi'&&dimPrintDocumentName('service-visit-summary',{})==='DIM_Servis_Ziyaret_Ozeti',
+        safeOrderName:dimPrintDocumentName('installation-file',{salesOrderNumber:'SO/00:*5'})==='DIM_Kurulum_Dosyasi_SO005',
+        printHtmlTitle:renderDimPrintHtml(dimPrintDocumentName('service-visit-summary',summaryItem),firstHtml).includes('<title>DIM_Servis_Ziyaret_Ozeti_SO-0005</title>'),
+        activePrintTitles:titleDuringPrint==='DIM_Servis_Ziyaret_Ozeti_SO-0005'&&iframeTitleDuringPrint==='DIM_Servis_Ziyaret_Ozeti_SO-0005',
+        applicationTitleRestored:document.title===applicationTitle,
+        existingDocuments:Boolean(dimPrintDocumentTypes.get('installation-file'))&&Boolean(dimPrintDocumentTypes.get('set-list'))
+      };
+      closeInstallationFilePreview();document.querySelector('#serviceEntryDialog').close();record.installationSchedule=originalSchedule;record.serviceVisits=originalVisits;
+      return result;
+    })()`);
+    Object.entries(state).forEach(([name,value])=>assert.equal(value,true,`Servis Ziyaret Özeti kontrolü başarısız: ${name}`));
+  } finally {
+    await protocol.evaluate(`if(document.querySelector('#installationFilePreviewDialog')?.open)closeInstallationFilePreview();if(document.querySelector('#serviceEntryDialog')?.open)document.querySelector('#serviceEntryDialog').close();`).catch(()=>{});
+    await logout();
+  }
+});
+
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {
   assert.deepEqual(pageErrors, []);
 });
