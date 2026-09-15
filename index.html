@@ -21,7 +21,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=179">
+  <link rel="stylesheet" href="styles.css?v=183">
 </head>
 <body>
   <div id="storageWarning" class="storage-warning" role="alert" hidden><strong>Yerel kayıt uyarısı</strong><span></span><button id="exportLocalData" type="button" title="İndirilen yedek müşteri ve kullanıcı bilgileri içerebilir; güvenli saklayın.">Ham verileri yedekle</button></div>
@@ -315,9 +315,16 @@
   </dialog>
 
   <dialog id="installationDetailDialog" class="installation-detail-dialog">
-    <div class="dialog-header"><div><p class="eyebrow">KURULUM TALEBİ</p><h2 id="detailDialogTitle">Kurulum detayı</h2><p id="detailDialogSubtitle" class="muted"></p></div><div class="dialog-header-actions"><button id="toggleDetailFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button id="closeInstallationDetail" class="icon-button" type="button" aria-label="Kapat">×</button></div></div>
+    <div class="dialog-header"><div><p class="eyebrow">KURULUM TALEBİ</p><h2 id="detailDialogTitle">Kurulum detayı</h2><p id="detailDialogSubtitle" class="muted"></p></div><div class="dialog-header-actions"><button id="openInstallationFile" class="secondary-button installation-file-trigger" type="button" title="Kurulum Dosyası önizlemesini aç"><span aria-hidden="true">▤</span> Kurulum Dosyası</button><button id="toggleDetailFullscreen" class="icon-button fullscreen-button" type="button" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button id="closeInstallationDetail" class="icon-button" type="button" aria-label="Kapat">×</button></div></div>
     <div id="installationDetailBody" class="installation-detail-body"></div>
     <div class="dialog-actions"><button id="detailDeleteButton" class="danger-button role-hidden" type="button">Sil</button><button id="detailCloseButton" class="secondary-button" type="button">Kapat</button></div>
+  </dialog>
+
+  <dialog id="installationFilePreviewDialog" class="installation-file-preview-dialog workspace-fullscreen-dialog">
+    <div class="dialog-header"><div><p class="eyebrow">BELGE ÖNİZLEME</p><h2>Kurulum Dosyası</h2><p id="installationFilePreviewSubtitle" class="muted"></p></div><button id="closeInstallationFilePreview" class="icon-button" type="button" aria-label="Kapat">×</button></div>
+    <div class="installation-file-preview-note">A4 önizleme · Profesyonel PDF için yazdırma ayarlarında “Üstbilgiler ve altbilgiler” seçeneğini kapatın.</div>
+    <div id="installationFilePreviewBody" class="installation-file-preview-body"></div>
+    <div class="dialog-actions"><button id="cancelInstallationFilePreview" class="secondary-button" type="button">Kapat</button><button id="printInstallationFile" class="primary-button" type="button"><span aria-hidden="true">▤</span> Yazdır / PDF Kaydet</button></div>
   </dialog>
 
   <dialog id="salesChangeReviewDialog" class="sales-change-review-dialog">
@@ -585,6 +592,7 @@
   <script src="js/organization.js?v=165"></script>
   <script src="js/sales-changes.js?v=169"></script>
   <script src="js/goodwill.js?v=165"></script>
+  <script src="js/installation-file-print.js?v=6"></script>
   <script src="word-report-docx.js?v=96"></script>
 </body>
 </html>

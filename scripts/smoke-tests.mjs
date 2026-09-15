@@ -186,7 +186,7 @@ test('Ayrılan JavaScript dosyaları sırayla yükleniyor ve çevrimdışı list
     'app.js','js/planning-calendar.js','js/customer-list.js','js/dashboard.js',
     'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js',
     'js/customers.js','js/app-events.js','js/operation-policy.js','js/reports.js',
-    'js/organization.js','js/sales-changes.js','js/goodwill.js'
+    'js/organization.js','js/sales-changes.js','js/goodwill.js','js/installation-file-print.js'
   ];
   const scripts=[...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match=>match[1]);
   const start=scripts.findIndex(source=>source.split('?')[0]==='app.js');
@@ -1282,6 +1282,92 @@ test('390 px mobil ekranda sayfa taşmıyor; veri alanları ve pencereler erişi
   } finally {
     if (await protocol.evaluate(`!document.querySelector('#appView').classList.contains('hidden')`)) await logout();
     await protocol.command('Emulation.clearDeviceMetricsOverride');
+  }
+});
+
+test('Kurulum Detayı bağımsız ve A4 uyumlu Kurulum Dosyası önizlemesi oluşturuyor', async () => {
+  await loginAs('Yönetici');
+  try {
+    const state=await protocol.evaluate(`(() => {
+      showView('installations');
+      const record=installations[0];
+      record.installationAmount=987654.32;
+      openInstallationDetail(record.id);
+      document.querySelector('#openInstallationFile').click();
+      const preview=document.querySelector('#installationFilePreviewDialog');
+      const body=document.querySelector('#installationFilePreviewBody');
+      const documentText=body.textContent;
+      const previewHeading=body.querySelector('.installation-file-heading h1');
+      const previewCustomer=body.querySelector('.installation-file-heading strong');
+      const longRecord=structuredClone(record);
+      longRecord.orderProducts=Array.from({length:12},(_,index)=>({partNo:'TEST-'+index,description:'Uzun liste test ürünü '+index,qty:index+1,setInfo:''}));
+      longRecord.shipment={history:[]};
+      const longHtml=renderInstallationFile(buildInstallationFileModel(longRecord));
+      const englishBefore=language;
+      language='en';
+      const englishHtml=renderInstallationFile(buildInstallationFileModel(record));
+      language=englishBefore;
+      const layoutCss=dimInstallationPrintStyles();
+      const scenarioModel=buildInstallationFileModel(record);
+      scenarioModel.plans=Array.from({length:3},(_,index)=>({number:index+1,date:'2026-09-'+String(16+index).padStart(2,'0'),start:'09:00',end:'17:00',technicians:['Test Teknisyeni'],hours:8,activity:'Kurulum',productControl:'Gerekli',checklist:'Zorunlu',note:'Planlama notu '+(index+1)}));
+      scenarioModel.visits=Array.from({length:3},(_,index)=>({number:index+1,plannedDate:'2026-09-'+String(16+index).padStart(2,'0'),actualDate:'2026-09-'+String(16+index).padStart(2,'0'),technicians:['Test Teknisyeni'],result:'Kurulum tamamlandı',hours:8,productStatus:'Ürünler tam',checklistStatus:'Uygun',completedWork:'Planlanan çalışma tamamlandı.',remainingWork:'',missingProducts:[],nextDate:'',notes:'',reports:[],shared:true}));
+      scenarioModel.goodwill=[{number:'GW-TEST-001',type:'CPS Goodwill',status:'Tamamlandı'}];
+      const scenarioHtml=renderInstallationFile(scenarioModel);
+      const shortModel=buildInstallationFileModel(record);
+      shortModel.products=[];shortModel.plans=[];shortModel.visits=[];shortModel.goodwill=[];
+      const shortHtml=renderInstallationFile(shortModel);
+      return {
+        detailOpen:document.querySelector('#installationDetailDialog').open,
+        previewOpen:preview.open,
+        triggerInHeader:Boolean(document.querySelector('#installationDetailDialog .dialog-header-actions #openInstallationFile')),
+        hasDocument:Boolean(body.querySelector('.installation-file-document')),
+        hasCustomer:documentText.includes(record.customer),
+        hasOrder:documentText.includes(record.salesOrderNumber),
+        excludesAmount:!documentText.includes('Kurulum tutarı')&&!documentText.includes('987.654'),
+        excludesHistory:!documentText.includes('Değişiklik geçmişi')&&!documentText.includes('Talep inceleme geçmişi'),
+        longListBreak:/installation-file-page-break/.test(longHtml),
+        englishTitle:englishHtml.includes('Installation File'),
+        a4:/@page\{size:A4 portrait/.test(layoutCss),
+        fluidProductBreak:/\.installation-file-page-break\{break-before:auto!important;page-break-before:auto!important\}/.test(layoutCss),
+        repeatedTableHeaders:/\.installation-file-table thead\{display:table-header-group\}/.test(layoutCss),
+        visitKeptTogether:/\.installation-file-visit\{[^}]*break-inside:avoid-page;page-break-inside:avoid/.test(layoutCss),
+        footerReserved:/@page\{size:A4 portrait;margin:11mm 11mm 25mm\}/.test(layoutCss)&&/\.installation-file-footer\{position:static;right:auto;bottom:auto;left:auto;[^}]*page-break-inside:avoid/.test(layoutCss),
+        refinedHeader:scenarioHtml.includes('installation-file-heading')&&scenarioHtml.includes('<h1>Kurulum Dosyası</h1>'),
+        headerHierarchy:parseFloat(getComputedStyle(previewHeading).fontSize)>parseFloat(getComputedStyle(previewCustomer).fontSize),
+        planningHierarchy:scenarioHtml.includes('installation-file-plan-details')&&scenarioHtml.includes('installation-file-plan-activity'),
+        multiScenario:(scenarioHtml.match(/installation-file-visit/g)||[]).length>=3&&(scenarioHtml.match(/<tr>/g)||[]).length>=3,
+        goodwillScenario:scenarioHtml.includes('GW-TEST-001')&&scenarioHtml.includes('installation-file-goodwill'),
+        shortScenario:shortHtml.includes('installation-file-document')&&!shortHtml.includes('installation-file-product-table'),
+        browserHeaderHint:document.querySelector('.installation-file-preview-note').textContent.includes('Üstbilgiler ve altbilgiler'),
+        printAction:document.querySelector('#printInstallationFile').textContent.includes('Yazdır')
+      };
+    })()`);
+    assert.equal(state.detailOpen,true);
+    assert.equal(state.previewOpen,true);
+    assert.equal(state.triggerInHeader,true);
+    assert.equal(state.hasDocument,true);
+    assert.equal(state.hasCustomer,true);
+    assert.equal(state.hasOrder,true);
+    assert.equal(state.excludesAmount,true);
+    assert.equal(state.excludesHistory,true);
+    assert.equal(state.longListBreak,true);
+    assert.equal(state.englishTitle,true);
+    assert.equal(state.a4,true);
+    assert.equal(state.fluidProductBreak,true);
+    assert.equal(state.repeatedTableHeaders,true);
+    assert.equal(state.visitKeptTogether,true);
+    assert.equal(state.footerReserved,true);
+    assert.equal(state.refinedHeader,true);
+    assert.equal(state.headerHierarchy,true);
+    assert.equal(state.planningHierarchy,true);
+    assert.equal(state.multiScenario,true);
+    assert.equal(state.goodwillScenario,true);
+    assert.equal(state.shortScenario,true);
+    assert.equal(state.browserHeaderHint,true);
+    assert.equal(state.printAction,true);
+    await protocol.evaluate(`closeInstallationFilePreview(); closeInstallationDetail();`);
+  } finally {
+    await logout();
   }
 });
 

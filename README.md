@@ -96,6 +96,11 @@ Komut `Account Name`, `First Name`, `Last Name`, `Email`, `Mobile` ve `Phone` al
 - Mobil uyumlu arayüz
 - Offline durum algılama ve salt-okunur uyarısı
 - Uygulama manifesti ve çevrimdışı önbellek altyapısı
+- Kurulum Detay ekranından veri tabanlı, A4 uyumlu Kurulum Dosyası önizlemesi ve tarayıcı üzerinden yazdırma/PDF kaydetme
+
+### Kurulum Dosyası çıktısı
+
+Kurulum Detay ekranındaki `Kurulum Dosyası` işlemi, ekrandaki pencereyi kopyalamak yerine kayıt verilerinden tema bağımsız bir A4 belge oluşturur. Önizleme açıldıktan sonra tarayıcının `Yazdır / PDF Kaydet` akışı kullanılabilir. Belge aktif arayüz dilini izler; uzun ürün, plan ve saha çalışması bilgilerini kontrollü devam sayfalarına taşır. Kurulum tutarı ile ayrıntılı değişiklik, sevkiyat ve onay geçmişleri bu V1 çıktısına dahil edilmez.
 
 ## Güvenlik notu
 
