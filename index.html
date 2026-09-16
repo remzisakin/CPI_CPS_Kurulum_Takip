@@ -21,7 +21,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=193">
+  <link rel="stylesheet" href="styles.css?v=195">
 </head>
 <body>
   <div id="storageWarning" class="storage-warning" role="alert" hidden><strong>Yerel kayıt uyarısı</strong><span></span><button id="exportLocalData" type="button" title="İndirilen yedek müşteri ve kullanıcı bilgileri içerebilir; güvenli saklayın.">Ham verileri yedekle</button></div>
@@ -79,21 +79,23 @@
     <main class="main-content">
       <section id="dashboardView" class="view active-view">
         <div class="page-heading"><div><p id="dashboardDate" class="eyebrow"></p><h1 id="welcomeHeading">Merhaba, Tevfik</h1><p id="welcomeDescription">Kurulum operasyonlarının bugünkü görünümü.</p></div><button id="newInstallationButton" class="primary-button sales-action">＋ Yeni kurulum</button></div>
-        <div class="stat-grid">
+        <div class="stat-grid dashboard-stat-grid">
           <article class="stat-card dark" role="button" tabindex="0" data-dashboard-filter="active"><div class="stat-icon">▦</div><span id="dashboardActiveLabel">AKTİF KURULUM</span><strong id="activeCount">0</strong><small id="dashboardActiveNote"></small></article>
-          <article class="stat-card" role="button" tabindex="0" data-dashboard-filter="week"><div class="stat-icon blue">□</div><span>BU HAFTA</span><strong id="dashboardWeekCount">0</strong><small id="dashboardWeekNote"></small></article>
-          <article class="stat-card" role="button" tabindex="0" data-dashboard-filter="attention"><div class="stat-icon amber">!</div><span id="dashboardAttentionLabel">DİKKAT GEREKTİREN</span><strong id="attentionCount">0</strong><small id="dashboardAttentionNote"></small></article>
-          <article class="stat-card" role="button" tabindex="0" data-dashboard-filter="overrun"><div class="stat-icon coral">↗</div><span id="dashboardOverrunLabel">SÜRE AŞIMI</span><strong id="overrunCount">0</strong><small id="dashboardOverrunNote"></small></article>
+          <article class="stat-card dashboard-attention-stat" role="button" tabindex="0" data-dashboard-filter="attention"><div class="stat-icon coral">!</div><span id="dashboardAttentionLabel">DİKKAT GEREKTİREN</span><strong id="attentionCount">0</strong><small id="dashboardAttentionNote">Aksiyon veya karar bekleyenler</small></article>
+          <article class="stat-card dashboard-today-stat" role="button" tabindex="0" data-dashboard-filter="today"><div class="stat-icon blue">□</div><span>BUGÜN PLANLI</span><strong id="dashboardTodayCount">0</strong><small id="dashboardTodayNote">Bugünün çalışma planları</small></article>
         </div>
 
-        <div class="content-grid">
-          <section class="panel installations-panel">
-            <div class="panel-header"><div><h2>Aktif kurulumlar</h2><p>Öncelik ve planlanan tarihe göre</p></div><button id="showAllButton" class="text-link">Tümünü gör →</button></div>
-            <div class="table-wrap"><table><thead><tr><th>MÜŞTERİ / SİPARİŞ</th><th>DURUM</th><th>PLANLANAN TARİH</th><th>TEKNİSYEN</th><th>İLERLEME</th><th></th></tr></thead><tbody id="installationRows"></tbody></table></div>
+        <div class="content-grid dashboard-operational-grid">
+          <section class="panel dashboard-attention-panel">
+            <div class="panel-header"><div><h2>Dikkat gerektirenler</h2><p>Signal, sıradaki aksiyon ve sorumlu</p></div><button id="showAllButton" class="text-link" type="button">Tümünü gör →</button></div>
+            <div class="dashboard-attention-summary">
+              <div id="dashboardAttentionBreakdown" class="dashboard-summary-group" aria-label="Dikkat türleri"></div>
+              <div class="dashboard-owner-summary"><span>Aksiyon kimde?</span><div id="dashboardOwnerDistribution" class="dashboard-summary-group"></div></div>
+            </div>
+            <div id="dashboardAttentionList" class="dashboard-attention-list"></div>
           </section>
           <aside class="right-column">
             <section class="panel agenda-panel"><div class="panel-header"><div><h2>Bugünün programı</h2><p id="dashboardAgendaSummary">Planlı aktivite yok</p></div><button class="icon-button" type="button" data-dashboard-open-calendar aria-label="Takvimi aç">•••</button></div><div id="agendaList"></div></section>
-            <section class="panel alerts-panel"><div class="panel-header"><div><h2 id="dashboardAlertsTitle">Kritik uyarılar</h2><p>İşlem bekleyen konular</p></div><span id="dashboardAlertCount" class="alert-count">0</span></div><div id="alertsList"></div></section>
           </aside>
         </div>
       </section>
@@ -581,14 +583,14 @@
   <script src="app.js?v=171"></script>
   <script src="js/planning-calendar.js?v=166"></script>
   <script src="js/customer-list.js?v=165"></script>
-  <script src="js/dashboard.js?v=167"></script>
+  <script src="js/dashboard.js?v=170"></script>
   <script src="js/installation-workflows.js?v=169"></script>
   <script src="js/service-reports.js?v=169"></script>
-  <script src="js/service-workflows.js?v=171"></script>
+  <script src="js/service-workflows.js?v=172"></script>
   <script src="js/operational-state.js?v=1"></script>
   <script src="js/operational-state-ui.js?v=6"></script>
   <script src="js/customers.js?v=165"></script>
-  <script src="js/app-events.js?v=171"></script>
+  <script src="js/app-events.js?v=172"></script>
   <script src="js/operation-policy.js?v=168"></script>
   <script src="js/reports.js?v=169"></script>
   <script src="js/organization.js?v=166"></script>

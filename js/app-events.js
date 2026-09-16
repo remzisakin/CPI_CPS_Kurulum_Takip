@@ -140,4 +140,4 @@ $('#orderEditForm').addEventListener('submit',event=>{if(event.submitter?.value=
 const agenda=[['09:00','Anka Endüstri','1. Kurulum · Gürcan Girgin'],['13:30','Marmara Teknoloji','Ön kontrol · Cihan Eraslan'],['16:00','Eksen Otomasyon','Devam ziyareti · Zemzem Daşdemir']];
 $('#agendaList').innerHTML=agenda.map(x=>`<div class="agenda-item"><time>${x[0]}</time><div class="line"></div><div><b>${x[1]}</b><small>${x[2]}</small></div></div>`).join('');
 const alerts=[['Süre aşımı','Eksen Otomasyon planlanan süreyi 4 saat aştı.'],['Eksik ürün','Nova Ambalaj için 2 ürün sevk edilmedi.'],['Geciken rapor','Delta Sistem kurulum raporu bekleniyor.']];
-$('#alertsList').innerHTML=alerts.map(x=>`<div class="alert-item"><span class="alert-icon">!</span><div><b>${x[0]}</b><p>${x[1]}</p></div></div>`).join('');
+const legacyAlertsList=$('#alertsList');if(legacyAlertsList)legacyAlertsList.innerHTML=alerts.map(x=>`<div class="alert-item"><span class="alert-icon">!</span><div><b>${x[0]}</b><p>${x[1]}</p></div></div>`).join('');

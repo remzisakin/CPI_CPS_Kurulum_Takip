@@ -12,8 +12,40 @@ function visibleInstallationListRecords(){
   if(currentUser?.role==='technician')return parentRecords.filter(item=>['awaitingPlanning','planned','inService','completed'].includes(item.workflowStage)||goodwillWorkOrders(item.id).some(order=>installationAssignedToUser(order)));
   return parentRecords;
 }
-function dashboardWeekRange(){const now=new Date(),start=new Date(now);start.setHours(0,0,0,0);start.setDate(start.getDate()-((start.getDay()+6)%7));const end=new Date(start);end.setDate(end.getDate()+7);return{start:localDateKey(start),end:localDateKey(end)}}
 function dashboardPlans(item){return activeServiceWorkPlans(item).filter(plan=>currentUser?.role!=='technician'||plan.slots.some(slot=>(slot.technicians||[]).includes(currentUser.name)))}
+const DASHBOARD_ATTENTION_SIGNALS=Object.freeze(['ACTION_REQUIRED','DELAYED','BLOCKED']);
+function dashboardSummaryBucket(){return{count:0,ids:[]}}
+function buildDashboardOperationalSummary(items,options={}){
+  const today=localDateKey(options.today||new Date()),records=[],seenIds=new Set(),statesById=new Map(),activeIds=[],attentionIds=[],attentionItems=[],dueTodayIds=[],dueTodayItems=[],waitingIds=[],todayProgram=[];
+  const attentionBySignal=Object.fromEntries(DASHBOARD_ATTENTION_SIGNALS.map(signal=>[signal,dashboardSummaryBucket()]));
+  const attentionByOwnerRole={sales:dashboardSummaryBucket(),supervisor:dashboardSummaryBucket(),technician:dashboardSummaryBucket(),unresolved:dashboardSummaryBucket()};
+  (Array.isArray(items)?items:[]).forEach(item=>{
+    if(!item||item.recordType==='workOrder'||item.recordType==='goodwill'||item.workOrderType==='goodwill')return;
+    const id=Number(item.id),key=Number.isFinite(id)?id:String(item.id||'');
+    if(!key||seenIds.has(key))return;
+    seenIds.add(key);records.push(item);
+    const state=resolveOperationalState(item,{today});statesById.set(key,state);
+    if(!['draft','completed'].includes(item.workflowStage))activeIds.push(key);
+    if(DASHBOARD_ATTENTION_SIGNALS.includes(state.primarySignal)){
+      attentionIds.push(key);attentionItems.push({id:key,item,state});
+      const signalBucket=attentionBySignal[state.primarySignal];signalBucket.count+=1;signalBucket.ids.push(key);
+      if(state.requiresAction){
+        const role=state.actionOwnerRole||'unresolved',ownerBucket=attentionByOwnerRole[role]||(attentionByOwnerRole[role]=dashboardSummaryBucket());
+        ownerBucket.count+=1;ownerBucket.ids.push(key);
+      }
+    }
+    if(state.primarySignal==='DUE_TODAY'){dueTodayIds.push(key);dueTodayItems.push({id:key,item,state})}
+    if(state.primarySignal==='WAITING')waitingIds.push(key);
+    activeServiceWorkPlans(item).filter(plan=>compareDateOnly(plan.date,today)===0).forEach(plan=>{
+      const resolved=servicePlanResolved(item,plan),starts=plan.slots.map(slot=>slot.startTime||'09:00').sort();
+      const metadata=workPlanMetadata(item,plan.id),technicians=[...new Set(plan.slots.flatMap(slot=>slot.technicians||[]).filter(Boolean))];
+      todayProgram.push({installationId:key,item,planId:plan.id,date:plan.date,startTime:starts[0]||'09:00',resolved,awaitingResult:!resolved,isDueToday:state.primarySignal==='DUE_TODAY'&&state.signalReason?.planId===plan.id,activityType:metadata.activityType,technicians});
+    });
+  });
+  todayProgram.sort((left,right)=>left.startTime.localeCompare(right.startTime)||String(left.installationId).localeCompare(String(right.installationId),undefined,{numeric:true})||String(left.planId).localeCompare(String(right.planId)));
+  return{recordIds:records.map(item=>{const id=Number(item.id);return Number.isFinite(id)?id:String(item.id||'')}),statesById,activeCount:activeIds.length,activeIds,attentionCount:attentionIds.length,attentionIds,attentionItems,attentionBySignal,dueTodayCount:dueTodayIds.length,dueTodayIds,dueTodayItems,waitingCount:waitingIds.length,waitingIds,attentionByOwnerRole,todayProgram};
+}
+function dashboardOperationalSummaryForUser(options={}){return buildDashboardOperationalSummary(dashboardRecordsForUser(),options)}
 function dashboardIssues(records){
   const issues=[],seen=new Set(),add=(item,type,message)=>{const key=`${item.id}-${type}`;if(seen.has(key))return;seen.add(key);issues.push({item,type,message})};
   userNotifications().filter(event=>event.actionRequired).forEach(event=>{const item=operationalRecord(event.installationId);if(item&&records.some(record=>Number(record.id)===Number(parentInstallationFor(item)?.id)))add(parentInstallationFor(item),notificationTypeLabel(event.type),event.message)});
@@ -31,25 +63,40 @@ function dashboardIssues(records){
   });
   return issues;
 }
-function dashboardRowTemplate(item){return `<tr data-dashboard-record="${item.id}" tabindex="0"><td><strong>${escapeHtml(item.customer)}</strong><small>${escapeHtml(item.salesOrderNumber)} · ${escapeHtml(item.ptd||'—')}</small></td><td><span class="status ${statusClass(item.status)}">${escapeHtml(item.status)}</span></td><td><strong>${escapeHtml(item.date||'—')}</strong><small>${escapeHtml(activePlanProgress(item)||'')}</small></td><td><div class="technician"><span class="mini-avatar">${escapeHtml(item.initials||'?')}</span>${escapeHtml(item.tech||'Atama bekliyor')}</div></td><td><span class="progress-bar"><i style="width:${Number(item.progress)||0}%"></i></span><small>%${Number(item.progress)||0}</small></td><td><button class="row-action" type="button" aria-label="Detay">›</button></td></tr>`}
+const DASHBOARD_ATTENTION_PRIORITY=Object.freeze({DELAYED:0,BLOCKED:1,ACTION_REQUIRED:2});
+const DASHBOARD_OWNER_LABELS=Object.freeze({sales:['Satış','Sales'],supervisor:['Servis Süpervizörü','Service Supervisor'],technician:['Servis Teknisyeni','Service Technician'],unresolved:['Belirsiz','Unresolved']});
+Object.assign(englishUi,{'BUGÜN PLANLI':'PLANNED TODAY','Aksiyon veya karar bekleyenler':'Awaiting action or decision','Bugünün çalışma planları':"Today's work plans",'Dikkat gerektirenler':'Needs attention','Signal, sıradaki aksiyon ve sorumlu':'Signal, next action and owner','Dikkat türleri':'Attention types','Aksiyon kimde?':'Who owns the action?','Satış':'Sales','Belirsiz':'Unresolved','Aktif aksiyon yok':'No active action','Şu anda dikkat gerektiren kurulum bulunmuyor.':'No installations currently require attention.','Planlı aktivite yok':'No planned activity','planlı aktivite':'planned activity','planlı aktiviteler':'planned activities','Sonuç girildi':'Result entered','Sonuç bekleniyor':'Awaiting result','Bugün için planlanmış çalışma bulunmuyor.':'No work is planned for today.'});
+function dashboardAttentionQueue(items){return items.map((entry,index)=>({...entry,index})).sort((left,right)=>(DASHBOARD_ATTENTION_PRIORITY[left.state.primarySignal]??99)-(DASHBOARD_ATTENTION_PRIORITY[right.state.primarySignal]??99)||left.index-right.index)}
+function dashboardAttentionRowTemplate(entry){
+  const {item,state}=entry,signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=operationalStateCompactOwnerLabel(state),reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]);
+  return `<button class="dashboard-attention-row" type="button" data-dashboard-record="${escapeHtml(entry.id)}"${reason?` title="${escapeHtml(reason)}"`:''}><span class="dashboard-record-identity"><strong>${escapeHtml(item.customer||'—')}</strong><small>${escapeHtml(item.salesOrderNumber||'—')}</small></span><span class="dashboard-operation-cell"><strong class="operational-signal operational-signal-${String(state.primarySignal).toLowerCase()}">${escapeHtml(signal)}</strong><span class="operational-list-action">${escapeHtml(action)}</span>${owner?`<small class="operational-list-owner" title="${escapeHtml(state.actionOwnerUsers?.join(', ')||owner)}">${escapeHtml(owner)}</small>`:''}</span></button>`;
+}
+function dashboardSummaryButton(label,count,filterKey,kind=''){return `<button class="dashboard-summary-chip ${kind}" type="button" data-dashboard-filter="${escapeHtml(filterKey)}"><span>${escapeHtml(label)}</span><strong>${count}</strong></button>`}
 function renderDashboard(){
-  if(!currentUser||!$('#dashboardView'))return;const records=dashboardRecordsForUser(),active=records.filter(item=>!['draft','completed'].includes(item.workflowStage)),range=dashboardWeekRange(),weekRecords=records.filter(item=>dashboardPlans(item).some(plan=>compareDateOnly(plan.date,range.start)>=0&&compareDateOnly(plan.date,range.end)<0)),issues=dashboardIssues(records),overruns=records.filter(item=>item.serviceOverrun||item.status==='Süre aşıldı'),today=localDateKey(),agenda=records.flatMap(item=>dashboardPlans(item).filter(plan=>compareDateOnly(plan.date,today)===0).map(plan=>({item,plan,start:plan.slots.map(slot=>slot.startTime||'09:00').sort()[0]||'09:00',people:planningSlotNames(plan.slots)}))).sort((a,b)=>a.start.localeCompare(b.start));
-  const copy={admin:['AKTİF OPERASYON','Tüm ekip ve bölgeler','İŞLEM BEKLEYEN','Onay, planlama ve saha riskleri','OPERASYON RİSKİ'],supervisor:['AKTİF OPERASYON','Servis ekibinin açık işleri','ONAY VE PLANLAMA','İnceleme veya planlama gerekli','PLANLAMA RİSKİ'],sales:['AKTİF TALEPLERİM','Size ait açık kayıtlar','AKSİYON BEKLEYEN','Düzeltme, sevkiyat veya takip','SÜRE AŞIMI'],technician:['ATANMIŞ İŞLERİM','Size atanmış açık çalışmalar','KAYIT BEKLEYEN','Servis kaydı veya saha riski','SÜRE AŞIMI']}[currentUser.role]||[];
-  $('#dashboardDate').textContent=new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'}).format(new Date()).toLocaleUpperCase('tr-TR');$('#dashboardActiveLabel').textContent=copy[0]||'AKTİF KURULUM';$('#dashboardActiveNote').textContent=copy[1]||'Açık işler';$('#dashboardAttentionLabel').textContent=copy[2]||'DİKKAT GEREKTİREN';$('#dashboardAttentionNote').textContent=copy[3]||'İşlem gerekli';$('#dashboardOverrunLabel').textContent=copy[4]||'SÜRE AŞIMI';$('#dashboardOverrunNote').textContent=overruns.length?'Planlanan süreyi aşan kayıtlar':'Süre aşımı bulunmuyor';$('#activeCount').textContent=active.length;$('#dashboardWeekCount').textContent=weekRecords.length;$('#dashboardWeekNote').textContent=`${agenda.length} çalışma bugün`;$('#attentionCount').textContent=issues.length;$('#overrunCount').textContent=overruns.length;
-  $('#installationRows').innerHTML=active.slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''),'tr')).slice(0,4).map(dashboardRowTemplate).join('')||'<tr><td colspan="6" class="dashboard-empty">Gösterilecek aktif kayıt bulunmuyor.</td></tr>';$('#dashboardAgendaSummary').textContent=agenda.length?`${agenda.length} planlı aktivite`:'Planlı aktivite yok';$('#agendaList').innerHTML=agenda.length?agenda.slice(0,5).map(entry=>`<button class="agenda-item" type="button" data-dashboard-record="${entry.item.id}"><time>${escapeHtml(entry.start)}</time><span class="line"></span><span><b>${escapeHtml(entry.item.customer)}</b><small>${escapeHtml(activityTypeLabel(workPlanMetadata(entry.item,entry.plan.id).activityType))} · ${escapeHtml(entry.people.join(', ')||'Atama bekliyor')}</small></span></button>`).join(''):'<p class="dashboard-empty">Bugün için planlanmış çalışma bulunmuyor.</p>';
-  $('#dashboardAlertCount').textContent=issues.length;$('#alertsList').innerHTML=issues.length?issues.slice(0,6).map(issue=>`<button class="alert-item" type="button" data-dashboard-record="${issue.item.id}"><span class="alert-icon">!</span><span><b>${escapeHtml(issue.type)}</b><p>${escapeHtml(issue.item.customer)} · ${escapeHtml(issue.message)}</p></span></button>`).join(''):'<p class="dashboard-empty">İşlem bekleyen kritik konu bulunmuyor.</p>';
-  $('#dashboardView').dataset.activeIds=active.map(item=>item.id).join(',');$('#dashboardView').dataset.weekIds=weekRecords.map(item=>item.id).join(',');$('#dashboardView').dataset.attentionIds=[...new Set(issues.map(issue=>issue.item.id))].join(',');$('#dashboardView').dataset.overrunIds=overruns.map(item=>item.id).join(',');
+  if(!currentUser||!$('#dashboardView'))return;
+  const summary=dashboardOperationalSummaryForUser(),queue=dashboardAttentionQueue(summary.attentionItems),todayIds=[...new Set(summary.todayProgram.map(entry=>entry.installationId))];
+  $('#dashboardDate').textContent=new Intl.DateTimeFormat(language==='en'?'en-GB':'tr-TR',{day:'2-digit',month:'long',year:'numeric',weekday:'long'}).format(new Date()).toLocaleUpperCase(language==='en'?'en-GB':'tr-TR');
+  $('#activeCount').textContent=summary.activeCount;$('#attentionCount').textContent=summary.attentionCount;$('#dashboardTodayCount').textContent=summary.todayProgram.length;
+  $('#dashboardAttentionBreakdown').innerHTML=DASHBOARD_ATTENTION_SIGNALS.filter(signal=>summary.attentionBySignal[signal].count>0).map(signal=>dashboardSummaryButton(operationalStateUiText(operationalStateSignalLabels[signal]),summary.attentionBySignal[signal].count,`attention${signal==='ACTION_REQUIRED'?'Action':signal[0]+signal.slice(1).toLowerCase()}`,`signal-${signal.toLowerCase()}`)).join('');
+  $('#dashboardOwnerDistribution').innerHTML=Object.entries(summary.attentionByOwnerRole).filter(([,bucket])=>bucket.count).map(([role,bucket])=>dashboardSummaryButton(operationalStateUiText(DASHBOARD_OWNER_LABELS[role]||DASHBOARD_OWNER_LABELS.unresolved),bucket.count,`owner${role[0].toUpperCase()}${role.slice(1)}`,'owner')).join('')||`<span class="dashboard-summary-empty">${escapeHtml(operationalStateUiText(['Aktif aksiyon yok','No active action']))}</span>`;
+  $('#dashboardAttentionList').innerHTML=queue.length?queue.map(dashboardAttentionRowTemplate).join(''):`<p class="dashboard-empty">${escapeHtml(operationalStateUiText(['Şu anda dikkat gerektiren kurulum bulunmuyor.','No installations currently require attention.']))}</p>`;
+  $('#dashboardAgendaSummary').textContent=summary.todayProgram.length?`${summary.todayProgram.length} ${operationalStateUiText(['planlı aktivite','planned activities'])}`:operationalStateUiText(['Planlı aktivite yok','No planned activity']);
+  $('#agendaList').innerHTML=summary.todayProgram.length?summary.todayProgram.map(entry=>`<button class="agenda-item" type="button" data-dashboard-record="${escapeHtml(entry.installationId)}"><time>${escapeHtml(entry.startTime)}</time><span class="line"></span><span><b>${escapeHtml(entry.item.customer||'—')}</b><small>${escapeHtml(activityTypeLabel(entry.activityType))} · ${escapeHtml(entry.technicians.join(', ')||operationalStateUiText(['Atama bekliyor','Awaiting assignment']))}</small><em class="dashboard-agenda-context ${entry.resolved?'is-resolved':'is-pending'}">${escapeHtml(operationalStateUiText(entry.resolved?['Sonuç girildi','Result entered']:['Sonuç bekleniyor','Awaiting result']))}</em></span></button>`).join(''):`<p class="dashboard-empty dashboard-agenda-empty">${escapeHtml(operationalStateUiText(['Bugün için planlanmış çalışma bulunmuyor.','No work is planned for today.']))}</p>`;
+  $('#agendaList').closest('.agenda-panel')?.classList.toggle('is-empty',!summary.todayProgram.length);
+  const view=$('#dashboardView');view.dataset.activeIds=summary.activeIds.join(',');view.dataset.attentionIds=summary.attentionIds.join(',');view.dataset.todayIds=todayIds.join(',');
+  Object.entries(summary.attentionBySignal).forEach(([signal,bucket])=>{view.dataset[`attention${signal==='ACTION_REQUIRED'?'Action':signal[0]+signal.slice(1).toLowerCase()}Ids`]=bucket.ids.join(',')});
+  Object.entries(summary.attentionByOwnerRole).forEach(([role,bucket])=>{view.dataset[`owner${role[0].toUpperCase()}${role.slice(1)}Ids`]=bucket.ids.join(',')});
 }
 function render(){
   const term=($('#searchInput')?.value||'').toLocaleLowerCase('tr');
   const statusFilter=$('#statusFilter')?.value||'';
   const visibleInstallations=visibleInstallationListRecords();
   const filtered=visibleInstallations.filter(x=>{const dashboardMatch=!dashboardDrilldownIds||dashboardDrilldownIds.has(Number(x.id)),columnMatch=Object.entries(columnFilters).every(([key,values])=>!values.size||values.has(String(columnValue(x,key))));return dashboardMatch&&columnMatch&&(!statusFilter||x.status===statusFilter)&&(`${x.customer} ${x.salesOrderNumber} ${x.projectName||''} ${x.ptd} ${x.salesEngineer}`.toLocaleLowerCase('tr').includes(term))});
-  $('#installationRows').innerHTML=visibleInstallations.slice(0,4).map(rowTemplate).join('');
+  const dashboardLegacyRows=$('#installationRows');if(dashboardLegacyRows)dashboardLegacyRows.innerHTML=visibleInstallations.slice(0,4).map(rowTemplate).join('');
   $('#allInstallationRows').innerHTML=filtered.map(installationRowTemplate).join('') || '<tr><td colspan="10">Aramanızla eşleşen kayıt bulunamadı.</td></tr>';
   $('#activeCount').textContent=visibleInstallations.length;
   $('#navCount').textContent=visibleInstallations.length;
-  $('#overrunCount').textContent=visibleInstallations.filter(x=>x.status==='Süre aşıldı').length;
+  const legacyOverrunCount=$('#overrunCount');if(legacyOverrunCount)legacyOverrunCount.textContent=visibleInstallations.filter(x=>x.status==='Süre aşıldı').length;
   $('#attentionCount').textContent=visibleInstallations.filter(x=>['Süre aşıldı','Sevkiyat bekliyor'].includes(x.status)).length;
   renderDashboard();
   updateNotificationIndicators();

@@ -97,7 +97,7 @@ $('#logoutButton').addEventListener('click',()=>{removeSessionItem('cps-session'
 $('#mainNav').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button){dashboardDrilldownIds=null;showView(button.dataset.view);render()}});
 $('#newInstallationButton').addEventListener('click',openNew);$$('.open-new').forEach(x=>x.addEventListener('click',openNew));
 $('#fillTestInstallation').addEventListener('click',fillTestInstallation);
-$('#showAllButton').addEventListener('click',()=>{dashboardDrilldownIds=null;showView('installations');render()});
+$('#showAllButton').addEventListener('click',()=>openDashboardFilter('attention'));
 function openDashboardFilter(key){const values=($('#dashboardView').dataset[`${key}Ids`]||'').split(',').filter(Boolean).map(Number);dashboardDrilldownIds=new Set(values);$('#searchInput').value='';$('#statusFilter').value='';clearAllColumnFilters();showView('installations');render()}
 $('#dashboardView').addEventListener('click',event=>{const calendar=event.target.closest('[data-dashboard-open-calendar]'),record=event.target.closest('[data-dashboard-record]'),card=event.target.closest('[data-dashboard-filter]');if(calendar){showView('calendar');return}if(record){openInstallationDetail(Number(record.dataset.dashboardRecord));return}if(card)openDashboardFilter(card.dataset.dashboardFilter)});
 $('#dashboardView').addEventListener('keydown',event=>{if(!['Enter',' '].includes(event.key))return;const card=event.target.closest('[data-dashboard-filter]');if(card){event.preventDefault();openDashboardFilter(card.dataset.dashboardFilter)}else{const record=event.target.closest('[data-dashboard-record]');if(record){event.preventDefault();openInstallationDetail(Number(record.dataset.dashboardRecord))}}});
