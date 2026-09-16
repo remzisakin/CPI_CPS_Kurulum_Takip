@@ -184,7 +184,7 @@ test('Ayrılan JavaScript dosyaları sırayla yükleniyor ve çevrimdışı list
   const worker=await readFile(join(projectRoot,'service-worker.js'),'utf8');
   const expected=[
     'app.js','js/planning-calendar.js','js/customer-list.js','js/dashboard.js',
-    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/operational-state.js',
+    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/operational-state.js','js/operational-state-ui.js',
     'js/customers.js','js/app-events.js','js/operation-policy.js','js/reports.js',
     'js/organization.js','js/sales-changes.js','js/goodwill.js','js/installation-file-print.js'
   ];
@@ -293,8 +293,8 @@ test('Çevrimdışı önbellek eksik dosyaya dayanıyor ve hassas veriyi saklam�
   offline=true;
   const navigation=await dispatch(`${origin}index.html`,'navigate');
   assert.equal(navigation.value.body,`${origin}offline.html`,'Çevrimdışı yeni açılışta güvenli açıklama gösterilmedi.');
-  const staticFile=await dispatch(`${origin}app.js?v=169`);
-  assert.equal(staticFile.value.body,`${origin}app.js?v=169`,'Önbellekteki statik betik bulunamadı.');
+  const staticFile=await dispatch(`${origin}app.js?v=170`);
+  assert.equal(staticFile.value.body,`${origin}app.js?v=170`,'Önbellekteki statik betik bulunamadı.');
   assert.equal((await dispatch(`${origin}vendor/docx.iife.js`)).value.networkError,true,'Eksik betiğe HTML yanıtı verilmemeli.');
   assert.equal((await dispatch(`${origin}unknown.js`)).handled,false,'Bilinmeyen dosyaya HTML yanıtı verilmemeli.');
   assert.equal((await dispatch(`${origin}other-page`,'navigate')).handled,false,'İlgisiz sayfanın çevrimdışı davranışı değişmemeli.');
@@ -1051,7 +1051,7 @@ test('Sevkiyat ve çalışma planı temel hesapları', async () => {
   })()`);
   assert.deepEqual(result, {
     ordered: 3, sent: 1, remaining: 2, partial: true, complete: false,
-    planCount: 2, firstPlanSlots: 2, eightHours: 8, lateLabel: '1 gün gecikmeli',
+    planCount: 2, firstPlanSlots: 2, eightHours: 8, lateLabel: '1 gün sonra',
   });
 });
 
@@ -1667,7 +1667,7 @@ test('Operational State karakterizasyonu: süre aşımı takvim gecikmesi değil
       const response={overrun:{serviceOverrun:overrun.serviceOverrun,status:overrun.status,stage:overrun.workflowStage,dateLabel:dateDifferenceLabel('2026-09-10',overrun.serviceVisits[0]?.actualVisitDate)},completeShipment:{complete:completeSummary.complete,remaining:completeSummary.remaining},incompleteShipment:{beforeComplete:incompleteBefore.complete,remaining:incompleteBefore.remaining,visitSaved:incomplete.serviceVisits.length,stage:incomplete.workflowStage,resolved:servicePlanResolved(incomplete,'p1')}};
       askConfirm=originalAskConfirm;installations=installations.filter(item=>!ids.includes(item.id));setStoredItem(NOTIFICATION_EVENT_STORE,JSON.stringify(notificationEvents().filter(event=>!ids.includes(event.installationId))));saveOperationalData();render();return response;
     })()`);
-    assert.deepEqual(result.overrun,{serviceOverrun:true,status:'Süre aşıldı',stage:'inService',dateLabel:'Planlandığı gün'});
+    assert.deepEqual(result.overrun,{serviceOverrun:true,status:'Süre aşıldı',stage:'inService',dateLabel:'Zamanında'});
     assert.deepEqual(result.completeShipment,{complete:true,remaining:0});
     assert.deepEqual(result.incompleteShipment,{beforeComplete:false,remaining:1,visitSaved:1,stage:'inService',resolved:true});
   } finally {
@@ -1869,6 +1869,132 @@ test('Operational State Resolver V1: legacy ziyaret, saflık ve yetkiden bağım
     return{unchanged:before===JSON.stringify(input),deterministic:JSON.stringify(first)===JSON.stringify(second),signal:first.primarySignal,next:first.context.nextPlanId,ownerRole:first.actionOwnerRole,ownerUsers:first.actionOwnerUsers,adminSame:JSON.stringify(first)===JSON.stringify(asAdmin)};
   })()`);
   assert.deepEqual(result,{unchanged:true,deterministic:true,signal:'WAITING',next:'future',ownerRole:null,ownerUsers:[],adminSame:true});
+});
+
+test('Kurulum Detayı Operational State pilotu semantic durumları, aksiyonu ve sorumluyu doğru sunar', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const previousLanguage=language;language='tr';
+    const day=offset=>{const date=new Date(localDateKey()+'T12:00:00');date.setDate(date.getDate()+offset);return localDateKey(date)};
+    const slot=(id,date,technicians=[])=>({id:id+'-slot',workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians});
+    const base={customer:'Pilot',salesOrderNumber:'PILOT-SO',salesEngineer:'Satış Kişisi',orderProducts:[],installationSchedule:[],serviceVisits:[]};
+    const view=item=>{const host=document.createElement('div');host.innerHTML=operationalStateCardMarkup({...base,...item});return{
+      signal:host.querySelector('[data-operational-signal]')?.textContent.trim(),
+      action:host.querySelector('[data-operational-action]')?.textContent.trim()||'',
+      owner:host.querySelector('[data-operational-owner-role]')?.textContent.trim()||'',
+      reason:host.querySelector('.operational-state-reason')?.textContent.trim()||'',
+      warnings:[...host.querySelectorAll('.operational-state-warnings span')].map(node=>node.textContent.trim()),
+      history:[...host.querySelectorAll('.operational-state-history span')].map(node=>node.textContent.trim())
+    }};
+    const output={
+      actionRequired:view({workflowStage:'awaitingReview',orderProducts:[{partNo:'P-1',qty:1}]}),
+      blocked:view({workflowStage:'planned',pendingSalesChangeRequest:{status:'pending'}}),
+      waiting:view({workflowStage:'planned',installationSchedule:[slot('future',day(1),['Teknisyen A'])]}),
+      dueToday:view({workflowStage:'planned',installationSchedule:[slot('today',day(0),['Teknisyen A','Teknisyen B'])]}),
+      delayed:view({workflowStage:'planned',installationSchedule:[slot('past',day(-1),['Teknisyen A'])]}),
+      completed:view({workflowStage:'completed',serviceOverrun:true,installationSchedule:[slot('complete','2026-09-14')],serviceVisits:[{workPlanId:'complete',actualVisitDate:'2026-09-16',serviceOutcome:'installationCompleted',completed:true}]}),
+      partialOwner:view({workflowStage:'draft',salesEngineer:'',createdBy:'sales.user'})
+    };
+    language=previousLanguage;return output;
+  })()`);
+  assert.deepEqual(result.actionRequired,{signal:'Aksiyon Gerekli',action:'Kurulum talebini incele',owner:'Servis Süpervizörü',reason:'Kurulum talebi servis incelemesi bekliyor.',warnings:['Eksik sevkiyat'],history:[]});
+  assert.equal(result.blocked.signal,'Bekleyen Karar');assert.equal(result.blocked.action,'Satış değişiklik talebini incele');assert.equal(result.blocked.owner,'Servis Süpervizörü');
+  assert.equal(result.waiting.signal,'Bekleniyor');assert.equal(result.waiting.action,'');assert.equal(result.waiting.owner,'');
+  assert.equal(result.dueToday.signal,'Bugün Planlı');assert.equal(result.dueToday.action,'Servis sonucunu gir');assert.equal(result.dueToday.owner,'Teknisyen A, Teknisyen B');
+  assert.equal(result.delayed.signal,'Gecikmiş');assert.match(result.delayed.reason,/tarihi geçti/);
+  assert.equal(result.completed.signal,'Tamamlandı');assert.equal(result.completed.action,'');assert.equal(result.completed.owner,'');assert.deepEqual(result.completed.history,[]);
+  assert.equal(result.partialOwner.owner,'Satış Mühendisi');assert.notEqual(result.partialOwner.owner,'sales.user');
+});
+
+test('Kurulum Detayı pilot kartı mevcut durum ve ilerlemeyi korur, girdiyi değiştirmez ve mobilde taşmaz', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const id=-9404,item={id,customer:'OPERATIONAL PILOT',salesOrderNumber:'PILOT-9404',salesEngineer:'İrem Oğuzkan',workflowStage:'planned',status:'Planlandı',progress:37,requestDate:'16 Eyl 2026',orderProducts:[],installationSchedule:[{id:'pilot-slot',workPlanId:'pilot-plan',date:localDateKey(),startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A','Teknisyen B']}],serviceVisits:[],attachments:[]};
+    const before=JSON.stringify(item),previous=[...installations];installations.push(item);openInstallationDetail(id);
+    const body=document.querySelector('#installationDetailBody'),card=body.querySelector('.operational-state-section'),result={
+      first:body.firstElementChild===card,
+      legacyStatus:document.querySelector('#detailDialogSubtitle')?.textContent.includes('Planlandı'),
+      legacyProgress:[...body.querySelectorAll('.detail-field span')].some(node=>node.textContent==='İlerleme')&&body.textContent.includes('%37'),
+      action:card?.querySelector('[data-operational-action]')?.dataset.operationalAction,
+      ownerCount:card?.querySelector('[data-operational-owner-role]')?.textContent.split(',').length,
+      unchanged:before===JSON.stringify(item),
+      structure:Boolean(card?.querySelector('.operational-state-heading')&&card?.querySelector('.operational-state-content'))
+    };
+    closeInstallationDetail();installations=previous;return result;
+  })()`);
+  assert.deepEqual(result,{first:true,legacyStatus:true,legacyProgress:true,action:'RECORD_SERVICE_RESULT',ownerCount:2,unchanged:true,structure:true});
+  const themes=await protocol.evaluate(`(() => {const previous=document.documentElement.dataset.theme,host=document.createElement('div');host.innerHTML=operationalStateCardMarkup({workflowStage:'awaitingReview',orderProducts:[],installationSchedule:[],serviceVisits:[]});document.body.append(host);const read=()=>{const content=getComputedStyle(host.querySelector('.operational-state-content')),signal=getComputedStyle(host.querySelector('.operational-signal'));return{content:content.backgroundColor,text:content.color,signal:signal.backgroundColor,signalText:signal.color}};document.documentElement.dataset.theme='dark';const dark=read();document.documentElement.dataset.theme='light';const light=read();document.documentElement.dataset.theme=previous;host.remove();return{dark,light}})()`);
+  assert.notDeepEqual(themes.dark,themes.light);
+  await protocol.command('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  const mobile=await protocol.evaluate(`(() => {const host=document.createElement('div');host.style.width='358px';host.innerHTML=operationalStateCardMarkup({workflowStage:'planned',orderProducts:[],installationSchedule:[{workPlanId:'mobile',date:localDateKey(),startTime:'09:00',endTime:'10:00',technicians:['Uzun İsimli Birinci Teknisyen','Uzun İsimli İkinci Teknisyen']}],serviceVisits:[]});document.body.append(host);const card=host.firstElementChild,result={fits:card.scrollWidth<=card.clientWidth+1,actionColumns:getComputedStyle(card.querySelector('.operational-state-action')).gridTemplateColumns.split(' ').length};host.remove();return result})()`);
+  await protocol.command('Emulation.clearDeviceMetricsOverride');
+  assert.equal(mobile.fits,true);assert.equal(mobile.actionColumns,1);
+});
+
+test('Operational State pilot sunumu business logic hesaplarını UI içinde tekrarlamaz', async () => {
+  const source=await readFile(join(projectRoot,'js/operational-state-ui.js'),'utf8');
+  assert.match(source,/resolveOperationalState\(item\)/);
+  for(const forbidden of ['dateOnlyRelation(','servicePlanResolved(','pendingContinuationPlanning','pendingSalesChangeRequest','shipmentSummary(','serviceOverrun']){
+    assert.equal(source.includes(forbidden),false,`UI sunumu business rule içeriyor: ${forbidden}`);
+  }
+});
+
+test('Planlama Performansı ve Servis Kaydı tarihleri güvenilir çalışma planıyla eşleşir', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const plan=(id,date)=>({id:id+'-slot',workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}),visit=(id,date,number)=>({workPlanId:id,visitNumber:number,actualVisitDate:date,serviceOutcome:'planCompleted',completed:true,technicianEntries:[],customerParticipantEntries:[],generatedReports:[]});
+    const item={workflowStage:'completed',orderProducts:[],installationSchedule:[plan('p1','2026-09-12'),plan('p2','2026-09-15'),plan('p3','2026-09-20'),plan('p4','2026-09-25')],serviceVisits:[visit('p1','2026-09-12',1),visit('p2','2026-09-17',2),visit('p3','2026-09-19',3),visit('unknown','2026-09-22',4)]};
+    const rows=planningPerformanceRows(item),host=document.createElement('div');host.innerHTML=planningPerformanceMarkup(item);document.body.append(host);
+    const performance={title:host.querySelector('.planning-performance h4')?.textContent.trim(),rowCount:host.querySelectorAll('.planning-performance-list article').length,labels:[...host.querySelectorAll('.planning-performance-list article>em')].map(node=>node.textContent.trim())};
+    const previousTheme=document.documentElement.dataset.theme;document.documentElement.dataset.theme='dark';const dark=getComputedStyle(host.querySelector('.planning-performance')).backgroundColor;document.documentElement.dataset.theme='light';const light=getComputedStyle(host.querySelector('.planning-performance')).backgroundColor;document.documentElement.dataset.theme=previousTheme;host.remove();
+    const detail=document.createElement('div');detail.innerHTML=serviceVisitsDetail(item.serviceVisits,item);const secondFields=Object.fromEntries([...detail.querySelectorAll('.service-visit-summary>article:nth-child(2) .detail-field')].map(field=>[field.querySelector('span')?.textContent.trim(),field.querySelector('strong')?.textContent.trim()]));
+    return{differences:[dateDifferenceLabel('2026-09-12','2026-09-12'),dateDifferenceLabel('2026-09-15','2026-09-17'),dateDifferenceLabel('2026-09-20','2026-09-19')],rows,performance,dark,light,secondFields,hasOldComparison:detail.textContent.includes('Tarih karşılaştırması')};
+  })()`);
+  assert.deepEqual(result.differences,['Zamanında','2 gün sonra','1 gün önce']);
+  assert.deepEqual(result.rows.slice(0,4).map(row=>({planned:row.plannedDate,actual:row.actualDate,difference:row.difference})),[
+    {planned:'2026-09-12',actual:'2026-09-12',difference:'Zamanında'},
+    {planned:'2026-09-15',actual:'2026-09-17',difference:'2 gün sonra'},
+    {planned:'2026-09-20',actual:'2026-09-19',difference:'1 gün önce'},
+    {planned:'2026-09-25',actual:'',difference:''}
+  ]);
+  assert.deepEqual({planned:result.rows[4].plannedDate,actual:result.rows[4].actualDate,difference:result.rows[4].difference},{planned:'',actual:'2026-09-22',difference:''});
+  assert.equal(result.performance.title,'Planlama Performansı');assert.equal(result.performance.rowCount,5);assert.deepEqual(result.performance.labels,['Zamanında','2 gün sonra','1 gün önce']);
+  assert.notEqual(result.dark,result.light);assert.equal(result.secondFields['Planlanan tarih'],'2026-09-15');assert.equal(result.secondFields['Gerçekleşen tarih'],'2026-09-17');assert.equal(result.hasOldComparison,false);
+  await protocol.command('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  const mobile=await protocol.evaluate(`(() => {const host=document.createElement('div');host.style.width='358px';host.innerHTML=planningPerformanceMarkup({installationSchedule:[{workPlanId:'p1',date:'2026-09-15',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}],serviceVisits:[{workPlanId:'p1',actualVisitDate:'2026-09-17',serviceOutcome:'planCompleted'}]});document.body.append(host);const panel=host.firstElementChild,result={fits:panel.scrollWidth<=panel.clientWidth+1,columns:getComputedStyle(panel.querySelector('article')).gridTemplateColumns.split(' ').length};host.remove();return result})()`);
+  await protocol.command('Emulation.clearDeviceMetricsOverride');
+  assert.equal(mobile.fits,true);assert.equal(mobile.columns,2);
+});
+
+test('Planlama Performansı legacy çoklu ziyaretlerde yalnız güvenilir sonuçlandırıcı tarihi kullanır', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const schedule=[{workPlanId:'p1',date:'2026-09-10',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}];
+    const visit=(serviceOutcome,actualVisitDate,extra={})=>({workPlanId:'p1',serviceOutcome,actualVisitDate,visitNumber:extra.visitNumber||1,technicianEntries:[],customerParticipantEntries:[],generatedReports:[],...extra});
+    const row=serviceVisits=>planningPerformanceRows({installationSchedule:schedule,serviceVisits})[0];
+    const cases={
+      planCompleted:row([visit('planCompleted','2026-09-10')]),
+      continuationThenCompleted:row([visit('continuation','2026-09-10'),visit('planCompleted','2026-09-12')]),
+      failedThenCompleted:row([visit('couldNotPerform','2026-09-10'),visit('planCompleted','2026-09-12')]),
+      continuationThenInstallation:row([visit('continuation','2026-09-10'),visit('installationCompleted','2026-09-13')]),
+      partialCompleted:row([visit('partialCompleted','2026-09-11')]),
+      continuationOnly:row([visit('continuation','2026-09-10')]),
+      failedOnly:row([visit('couldNotPerform','2026-09-10')]),
+      multipleUnresolved:row([visit('continuation','2026-09-10'),visit('couldNotPerform','2026-09-11')]),
+      multipleConcluding:row([visit('partialCompleted','2026-09-11'),visit('planCompleted','2026-09-12')]),
+      concludingThenUnresolved:row([visit('planCompleted','2026-09-12'),visit('continuation','2026-09-13')])
+    };
+    const serviceVisits=[visit('continuation','2026-09-10',{visitNumber:1}),visit('planCompleted','2026-09-12',{visitNumber:2,completed:true})],detail=document.createElement('div');
+    detail.innerHTML=serviceVisitsDetail(serviceVisits,{installationSchedule:schedule,serviceVisits});
+    const detailDates=[...detail.querySelectorAll('.service-visit-summary>article')].map(article=>[...article.querySelectorAll('.detail-field')].find(field=>field.querySelector('span')?.textContent.trim()==='Gerçekleşen tarih')?.querySelector('strong')?.textContent.trim());
+    return{cases,detailDates,resolved:servicePlanResolved({installationSchedule:schedule,serviceVisits},'p1')};
+  })()`);
+  const compact=row=>({actual:row.actualDate,difference:row.difference});
+  assert.deepEqual(compact(result.cases.planCompleted),{actual:'2026-09-10',difference:'Zamanında'});
+  assert.deepEqual(compact(result.cases.continuationThenCompleted),{actual:'2026-09-12',difference:'2 gün sonra'});
+  assert.deepEqual(compact(result.cases.failedThenCompleted),{actual:'2026-09-12',difference:'2 gün sonra'});
+  assert.deepEqual(compact(result.cases.continuationThenInstallation),{actual:'2026-09-13',difference:'3 gün sonra'});
+  assert.deepEqual(compact(result.cases.partialCompleted),{actual:'2026-09-11',difference:'1 gün sonra'});
+  for(const key of ['continuationOnly','failedOnly','multipleUnresolved','multipleConcluding'])assert.deepEqual(compact(result.cases[key]),{actual:'',difference:''});
+  assert.deepEqual(compact(result.cases.concludingThenUnresolved),{actual:'2026-09-12',difference:'2 gün sonra'});
+  assert.deepEqual(result.detailDates,['2026-09-10','2026-09-12']);
+  assert.equal(result.resolved,true);
 });
 
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {
