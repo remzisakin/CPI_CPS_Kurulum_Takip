@@ -6,6 +6,12 @@ function dashboardRecordsForUser(){
   if(currentUser.role==='technician')return records.filter(item=>installationAssignedToUser(item));
   return records.filter(item=>item.workflowStage!=='draft');
 }
+function visibleInstallationListRecords(){
+  const parentRecords=installations.filter(item=>item.recordType!=='workOrder'&&item.recordType!=='goodwill');
+  if(currentUser?.role==='supervisor')return parentRecords.filter(item=>item.workflowStage!=='draft');
+  if(currentUser?.role==='technician')return parentRecords.filter(item=>['awaitingPlanning','planned','inService','completed'].includes(item.workflowStage)||goodwillWorkOrders(item.id).some(order=>installationAssignedToUser(order)));
+  return parentRecords;
+}
 function dashboardWeekRange(){const now=new Date(),start=new Date(now);start.setHours(0,0,0,0);start.setDate(start.getDate()-((start.getDay()+6)%7));const end=new Date(start);end.setDate(end.getDate()+7);return{start:localDateKey(start),end:localDateKey(end)}}
 function dashboardPlans(item){return activeServiceWorkPlans(item).filter(plan=>currentUser?.role!=='technician'||plan.slots.some(slot=>(slot.technicians||[]).includes(currentUser.name)))}
 function dashboardIssues(records){
@@ -37,11 +43,10 @@ function renderDashboard(){
 function render(){
   const term=($('#searchInput')?.value||'').toLocaleLowerCase('tr');
   const statusFilter=$('#statusFilter')?.value||'';
-  const parentRecords=installations.filter(item=>item.recordType!=='workOrder'&&item.recordType!=='goodwill');
-  const visibleInstallations=currentUser?.role==='supervisor'?parentRecords.filter(item=>item.workflowStage!=='draft'):currentUser?.role==='technician'?parentRecords.filter(item=>['awaitingPlanning','planned','inService','completed'].includes(item.workflowStage)||goodwillWorkOrders(item.id).some(order=>installationAssignedToUser(order))):parentRecords;
+  const visibleInstallations=visibleInstallationListRecords();
   const filtered=visibleInstallations.filter(x=>{const dashboardMatch=!dashboardDrilldownIds||dashboardDrilldownIds.has(Number(x.id)),columnMatch=Object.entries(columnFilters).every(([key,values])=>!values.size||values.has(String(columnValue(x,key))));return dashboardMatch&&columnMatch&&(!statusFilter||x.status===statusFilter)&&(`${x.customer} ${x.salesOrderNumber} ${x.projectName||''} ${x.ptd} ${x.salesEngineer}`.toLocaleLowerCase('tr').includes(term))});
   $('#installationRows').innerHTML=visibleInstallations.slice(0,4).map(rowTemplate).join('');
-  $('#allInstallationRows').innerHTML=filtered.map(installationRowTemplate).join('') || '<tr><td colspan="9">Aramanızla eşleşen kayıt bulunamadı.</td></tr>';
+  $('#allInstallationRows').innerHTML=filtered.map(installationRowTemplate).join('') || '<tr><td colspan="10">Aramanızla eşleşen kayıt bulunamadı.</td></tr>';
   $('#activeCount').textContent=visibleInstallations.length;
   $('#navCount').textContent=visibleInstallations.length;
   $('#overrunCount').textContent=visibleInstallations.filter(x=>x.status==='Süre aşıldı').length;

@@ -42,6 +42,19 @@ function operationalStateOwnerLabel(state){
   if(state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length)return state.actionOwnerUsers.join(', ');
   return operationalStateUiText(roleLabels[state.actionOwnerRole]);
 }
+function operationalStatePrimarySignal(item){return resolveOperationalState(item).primarySignal}
+function operationalStateCompactOwnerLabel(state){
+  if(!state.actionOwnerRole)return'';
+  if(state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length){const [first,...others]=state.actionOwnerUsers;return`${first}${others.length?` +${others.length}`:''}`}
+  return operationalStateOwnerLabel(state);
+}
+function operationalStateListMarkup(item){
+  const state=resolveOperationalState(item),signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateCompactOwnerLabel(state):'',reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),fullOwner=state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length?state.actionOwnerUsers.join(', '):owner;
+  return `<div class="operational-list-cell" data-operational-list-signal="${escapeHtml(state.primarySignal)}">
+    <strong class="operational-signal operational-signal-${String(state.primarySignal||'normal').toLowerCase()}"${reason?` title="${escapeHtml(reason)}"`:''}>${escapeHtml(signal)}</strong>
+    ${action?`<span class="operational-list-action" data-operational-list-action="${escapeHtml(state.nextAction)}">${escapeHtml(action)}</span>${owner?`<small class="operational-list-owner" data-operational-list-owner-role="${escapeHtml(state.actionOwnerRole)}"${fullOwner?` title="${escapeHtml(fullOwner)}"`:''}>${escapeHtml(owner)}</small>`:''}`:''}
+  </div>`;
+}
 function operationalStateCardMarkup(item){
   const state=resolveOperationalState(item),signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateOwnerLabel(state):'',planDate=operationalStateDateLabel(state.signalReason?.date);
   const risks=(state.secondaryRisks||[]).map(risk=>operationalStateUiText(operationalStateRiskLabels[risk.code])).filter(Boolean);

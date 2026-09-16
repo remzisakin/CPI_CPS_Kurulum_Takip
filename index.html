@@ -21,7 +21,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=189">
+  <link rel="stylesheet" href="styles.css?v=191">
 </head>
 <body>
   <div id="storageWarning" class="storage-warning" role="alert" hidden><strong>Yerel kayıt uyarısı</strong><span></span><button id="exportLocalData" type="button" title="İndirilen yedek müşteri ve kullanıcı bilgileri içerebilir; güvenli saklayın.">Ham verileri yedekle</button></div>
@@ -116,7 +116,7 @@
         <div class="page-heading"><div><p class="eyebrow">OPERASYONLAR</p><h1>Kurulumlar</h1><p>Tüm sevkiyat ve kurulum işlerini takip edin.</p></div><button class="primary-button open-new sales-action">＋ Yeni kurulum</button></div>
         <section class="panel installation-list-panel">
           <div class="toolbar installation-toolbar"><input id="searchInput" type="search" placeholder="Müşteri, SO, PTD veya satış mühendisi ara..."><select id="statusFilter" aria-label="Duruma göre filtrele"><option value="">Tüm durumlar</option><option>Taslak</option><option>İnceleme bekliyor</option><option>Satış düzeltmesi bekliyor</option><option>Planlama bekliyor</option><option>Planlandı</option><option>Devam ediyor</option><option>Sevkiyat bekliyor</option><option>Süre aşıldı</option><option>Tamamlandı</option></select></div>
-          <div class="table-wrap"><table class="installations-table"><thead><tr><th><span class="filterable-heading">MÜŞTERİ<button type="button" data-column-filter="customer" aria-label="Müşteri filtresi">⌄</button></span></th><th><span class="filterable-heading">SO NO<button type="button" data-column-filter="salesOrderNumber" aria-label="SO No filtresi">⌄</button></span><small>SALES ORDER NUMBER</small></th><th><span id="installationDateColumnLabel" class="filterable-heading">TALEP TARİHİ<button type="button" data-column-filter="requestDate" aria-label="Talep tarihi filtresi">⌄</button></span></th><th><span class="filterable-heading">SATIŞ MÜHENDİSİ<button type="button" data-column-filter="salesEngineer" aria-label="Satış mühendisi filtresi">⌄</button></span></th><th><span class="filterable-heading">DURUM<button type="button" data-column-filter="status" aria-label="Durum filtresi">⌄</button></span></th><th><span class="filterable-heading">PLANLANAN KURULUM<button type="button" data-column-filter="plannedDate" aria-label="Planlanan kurulum filtresi">⌄</button></span></th><th><span class="filterable-heading">TEKNİSYEN<button type="button" data-column-filter="technician" aria-label="Teknisyen filtresi">⌄</button></span></th><th><span class="filterable-heading">İLERLEME<button type="button" data-column-filter="progress" aria-label="İlerleme filtresi">⌄</button></span></th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div>
+          <div class="table-wrap"><table class="installations-table"><thead><tr><th><span class="filterable-heading">MÜŞTERİ<button type="button" data-column-filter="customer" aria-label="Müşteri filtresi">⌄</button></span></th><th><span class="filterable-heading">SO NO<button type="button" data-column-filter="salesOrderNumber" aria-label="SO No filtresi">⌄</button></span><small>SALES ORDER NUMBER</small></th><th><span id="installationDateColumnLabel" class="filterable-heading">TALEP TARİHİ<button type="button" data-column-filter="requestDate" aria-label="Talep tarihi filtresi">⌄</button></span></th><th><span class="filterable-heading">SATIŞ MÜHENDİSİ<button type="button" data-column-filter="salesEngineer" aria-label="Satış mühendisi filtresi">⌄</button></span></th><th><span class="filterable-heading">DURUM<button type="button" data-column-filter="status" aria-label="Durum filtresi">⌄</button></span></th><th><span class="filterable-heading">OPERASYON<button type="button" data-column-filter="operationalSignal" aria-label="Operasyon filtresi">⌄</button></span></th><th><span class="filterable-heading">PLANLANAN KURULUM<button type="button" data-column-filter="plannedDate" aria-label="Planlanan kurulum filtresi">⌄</button></span></th><th><span class="filterable-heading">TEKNİSYEN<button type="button" data-column-filter="technician" aria-label="Teknisyen filtresi">⌄</button></span></th><th><span class="filterable-heading">İLERLEME<button type="button" data-column-filter="progress" aria-label="İlerleme filtresi">⌄</button></span></th><th></th></tr></thead><tbody id="allInstallationRows"></tbody></table></div>
           <div id="columnFilterPopover" class="column-filter-popover role-hidden" role="dialog" aria-label="Sütun filtresi"><div class="column-filter-header"><strong id="columnFilterTitle">Filtrele</strong><button id="closeColumnFilter" class="icon-button" type="button" aria-label="Kapat">×</button></div><input id="columnFilterSearch" type="search" placeholder="Listede ara..."><div id="columnFilterOptions" class="column-filter-options"></div><div class="column-filter-actions"><button id="clearColumnFilter" class="secondary-button" type="button">Temizle</button><button id="applyColumnFilter" class="primary-button" type="button">Uygula</button></div></div>
         </section>
       </section>
@@ -578,22 +578,22 @@
   <script src="demodata/user-data.js"></script>
   <script src="demodata/contact-data.js"></script>
   <!-- Bu klasik betiklerin yüklenme sırası bağımlılıkları korur; file:// ile açılışı destekler. -->
-  <script src="app.js?v=170"></script>
+  <script src="app.js?v=171"></script>
   <script src="js/planning-calendar.js?v=166"></script>
   <script src="js/customer-list.js?v=165"></script>
-  <script src="js/dashboard.js?v=166"></script>
+  <script src="js/dashboard.js?v=167"></script>
   <script src="js/installation-workflows.js?v=169"></script>
   <script src="js/service-reports.js?v=169"></script>
   <script src="js/service-workflows.js?v=171"></script>
   <script src="js/operational-state.js?v=1"></script>
-  <script src="js/operational-state-ui.js?v=2"></script>
+  <script src="js/operational-state-ui.js?v=3"></script>
   <script src="js/customers.js?v=165"></script>
   <script src="js/app-events.js?v=171"></script>
   <script src="js/operation-policy.js?v=167"></script>
   <script src="js/reports.js?v=169"></script>
   <script src="js/organization.js?v=166"></script>
   <script src="js/sales-changes.js?v=169"></script>
-  <script src="js/goodwill.js?v=166"></script>
+  <script src="js/goodwill.js?v=167"></script>
   <script src="js/installation-file-print.js?v=13"></script>
   <script src="word-report-docx.js?v=96"></script>
 </body>
