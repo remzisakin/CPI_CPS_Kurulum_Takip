@@ -184,7 +184,7 @@ test('Ayrılan JavaScript dosyaları sırayla yükleniyor ve çevrimdışı list
   const worker=await readFile(join(projectRoot,'service-worker.js'),'utf8');
   const expected=[
     'app.js','js/planning-calendar.js','js/customer-list.js','js/dashboard.js',
-    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/operational-state.js','js/operational-state-ui.js',
+    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/operational-state.js','js/supervisor-operational-policy.js','js/operational-state-ui.js',
     'js/customers.js','js/app-events.js','js/operation-policy.js','js/reports.js',
     'js/organization.js','js/sales-changes.js','js/goodwill.js','js/installation-file-print.js'
   ];
@@ -1874,6 +1874,56 @@ test('Operational State Resolver V1: legacy ziyaret, saflık ve yetkiden bağım
   assert.deepEqual(result,{unchanged:true,deterministic:true,signal:'WAITING',next:'future',ownerRole:null,ownerUsers:[],adminSame:true});
 });
 
+test('Supervisor Faz 7.1 policy summary resolver sahipligini primary ve oversight olarak ayirir', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const today='2026-09-16',slot=(id,date,technicians=['Teknisyen A'])=>({id:id+'-slot',workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians});
+    const base=(id,workflowStage,extra={})=>({id,customer:'SUP '+Math.abs(id),salesOrderNumber:'SUP-'+Math.abs(id),workflowStage,status:'Test',orderProducts:[],installationSchedule:[],serviceVisits:[],...extra});
+    const records=[
+      base(-9801,'awaitingReview'),
+      base(-9802,'planned',{pendingSalesChangeRequest:{status:'pending'}}),
+      base(-9803,'awaitingPlanning'),
+      base(-9804,'inService',{pendingContinuationPlanning:true}),
+      base(-9805,'planned',{installationSchedule:[slot('today','2026-09-16',['Teknisyen A','Teknisyen B'])]}),
+      base(-9806,'planned',{installationSchedule:[slot('past','2026-09-15',['Teknisyen C'])]}),
+      base(-9807,'planned',{installationSchedule:[slot('missing','2026-09-16',[])]}),
+      base(-9808,'planned',{installationSchedule:[slot('future','2026-09-17',['Teknisyen D'])]}),
+      base(-9809,'completed',{serviceOverrun:true,installationSchedule:[slot('done','2026-09-15',['Teknisyen E'])],serviceVisits:[{workPlanId:'done',serviceOutcome:'installationCompleted',completed:true}]}),
+      base(-9810,'planned'),
+      base(-9811,'planned',{serviceOverrun:true,installationSchedule:[slot('overrun','2026-09-17',['Teknisyen F'])]}),
+      base(-9812,'planned',{orderProducts:[{partNo:'P-1',qty:2}],shipment:{history:[]},installationSchedule:[slot('shipment','2026-09-17',['Teknisyen G'])]}),
+      base(-9813,'planned',{installationSchedule:[slot('inactive','2026-09-16',['Teknisyen H'])],inactiveWorkPlanIds:['inactive']}),
+      base(-9814,'inService',{installationSchedule:[slot('resolved','2026-09-15',['Teknisyen I'])],serviceVisits:[{workPlanId:'resolved',serviceOutcome:'planCompleted',completed:true}]}),
+      {...base(-9815,'awaitingReview'),recordType:'workOrder',workOrderType:'goodwill'},
+      base(-9801,'awaitingReview')
+    ];
+    const before=JSON.stringify(records),statesById=new Map(records.map(item=>[item.id,resolveOperationalState(item,{today})])),originalResolver=resolveOperationalState;
+    let resolverCalls=0;resolveOperationalState=(...args)=>{resolverCalls+=1;return originalResolver(...args)};
+    let first,second,dashboard;try{first=buildSupervisorOperationalSummary(records,{today,statesById});second=buildSupervisorOperationalSummary(records,{today,statesById});dashboard=buildDashboardOperationalSummary(records,{today})}finally{resolveOperationalState=originalResolver}
+    const project=summary=>({
+      primary:summary.primaryActions.map(entry=>({id:entry.id,category:entry.category,planningKind:entry.planningKind,signal:entry.state.primarySignal,action:entry.state.nextAction,role:entry.state.actionOwnerRole,users:entry.state.actionOwnerUsers,confidence:entry.state.ownerConfidence})),
+      oversight:summary.oversight.map(entry=>({id:entry.id,signal:entry.state.primarySignal,action:entry.state.nextAction,role:entry.state.actionOwnerRole,users:entry.state.actionOwnerUsers,confidence:entry.state.ownerConfidence})),
+      primaryIds:summary.primaryIds,oversightIds:summary.oversightIds,counts:summary.counts,categories:Object.fromEntries(Object.entries(summary.primaryByCategory).map(([key,value])=>[key,{count:value.count,ids:value.ids}])),oversightBySignal:Object.fromEntries(Object.entries(summary.oversightBySignal).map(([key,value])=>[key,{count:value.count,ids:value.ids}]))
+    });
+    return{unchanged:before===JSON.stringify(records),resolverCalls,first:project(first),deterministic:JSON.stringify(project(first))===JSON.stringify(project(second)),dashboard:{attentionIds:dashboard.attentionIds,dueTodayIds:dashboard.dueTodayIds,waitingIds:dashboard.waitingIds}};
+  })()`);
+assert.equal(result.unchanged,true);assert.equal(result.resolverCalls,14);assert.equal(result.deterministic,true);
+  assert.deepEqual(result.first.primary,[
+    {id:-9801,category:'decision',planningKind:null,signal:'ACTION_REQUIRED',action:'REVIEW_INSTALLATION_REQUEST',role:'supervisor',users:[],confidence:'HIGH'},
+    {id:-9802,category:'decision',planningKind:null,signal:'BLOCKED',action:'REVIEW_SALES_CHANGE_REQUEST',role:'supervisor',users:[],confidence:'HIGH'},
+    {id:-9803,category:'planning',planningKind:'initial',signal:'ACTION_REQUIRED',action:'CREATE_SERVICE_PLAN',role:'supervisor',users:[],confidence:'HIGH'},
+    {id:-9804,category:'planning',planningKind:'continuation',signal:'BLOCKED',action:'CREATE_CONTINUATION_PLAN',role:'supervisor',users:[],confidence:'HIGH'}
+  ]);
+  assert.deepEqual(result.first.oversight,[
+    {id:-9805,signal:'DUE_TODAY',action:'RECORD_SERVICE_RESULT',role:'technician',users:['Teknisyen A','Teknisyen B'],confidence:'HIGH'},
+    {id:-9806,signal:'DELAYED',action:'RECORD_SERVICE_RESULT',role:'technician',users:['Teknisyen C'],confidence:'HIGH'},
+    {id:-9807,signal:'DUE_TODAY',action:'RECORD_SERVICE_RESULT',role:'technician',users:[],confidence:'PARTIAL'}
+  ]);
+  assert.deepEqual(result.first.primaryIds,[-9801,-9802,-9803,-9804]);assert.deepEqual(result.first.oversightIds,[-9805,-9806,-9807]);assert.deepEqual(result.first.counts,{primary:4,oversight:3});
+  assert.deepEqual(result.first.categories,{decision:{count:2,ids:[-9801,-9802]},planning:{count:2,ids:[-9803,-9804]}});
+  assert.deepEqual(result.first.oversightBySignal,{DUE_TODAY:{count:2,ids:[-9805,-9807]},DELAYED:{count:1,ids:[-9806]}});
+  assert.deepEqual(result.dashboard,{attentionIds:[-9801,-9802,-9803,-9804,-9806],dueTodayIds:[-9805,-9807],waitingIds:[-9808,-9811,-9812]});
+});
+
 test('Dashboard Faz 6.1 aggregation signal, owner ve bugun gruplarini resolver uzerinden tekillestirir', async () => {
   const result=await protocol.evaluate(`(() => {
     const today='2026-09-16',slot=(id,date,technicians=['Teknisyen A'],extra={})=>({id:id+'-slot',workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians,...extra});
@@ -1970,6 +2020,36 @@ test('Dashboard Faz 6.2A sifir ozetlerini gizler, owner alanini sade ve program 
   assert.deepEqual(result.breakdown,['attentionAction']);assert.deepEqual(result.ownerDrilldown,[-9731,-9732]);assert.deepEqual(result.fullBreakdown,['attentionAction','attentionDelayed','attentionBlocked']);
   assert.deepEqual(result.owner,{exists:true,border:'0px',background:'rgba(0, 0, 0, 0)'});assert.deepEqual(result.empty,{isEmpty:true,summaryDisplay:'none',messagePadding:'0px'});
   assert.deepEqual(result.filled,{isEmpty:false,agendaCount:1,context:'Sonuç bekleniyor',gap:'12px'});assert.notEqual(result.dark,result.light);
+});
+
+test('Supervisor Faz 7.2 quick view primary aksiyon ve ekip oversight ayrimini liste drill-down ile sunar', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const previousInstallations=installations,previousUser=currentUser,previousTheme=document.documentElement.dataset.theme,previousLanguage=language;
+    const today=localDateKey(),pastDate=new Date(today+'T12:00:00');pastDate.setDate(pastDate.getDate()-1);const past=localDateKey(pastDate),slot=(id,date,technicians)=>({workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians});
+    const base=(id,workflowStage,extra={})=>({id,customer:'SUPERVISOR '+Math.abs(id),salesOrderNumber:'SUP-'+Math.abs(id),workflowStage,status:'Legacy',orderProducts:[],installationSchedule:[],serviceVisits:[],...extra});
+    const records=[base(-9841,'awaitingReview'),base(-9842,'planned',{pendingSalesChangeRequest:{status:'pending'}}),base(-9843,'awaitingPlanning'),base(-9844,'inService',{pendingContinuationPlanning:true}),base(-9845,'planned',{installationSchedule:[slot('today',today,['Teknisyen A','Teknisyen B'])]}),base(-9846,'planned',{installationSchedule:[slot('past',past,['Teknisyen C'])]}),base(-9847,'planned',{installationSchedule:[slot('future','2099-01-01',['Teknisyen D'])]}),base(-9848,'completed'),{...base(-9849,'awaitingReview'),recordType:'workOrder',workOrderType:'goodwill'}];
+    const dashboard=document.querySelector('#dashboardView'),quick=()=>document.querySelector('#dashboardSupervisorQuickViews'),read=()=>({hidden:quick().classList.contains('role-hidden'),text:quick().textContent.replace(/\\s+/g,' ').trim(),buttons:[...quick().querySelectorAll('[data-dashboard-filter]')].map(button=>({filter:button.dataset.dashboardFilter,count:Number(button.querySelector('strong')?.textContent||0)})),data:{primary:dashboard.dataset.supervisorPrimaryIds,decision:dashboard.dataset.supervisorDecisionIds,planning:dashboard.dataset.supervisorPlanningIds,oversight:dashboard.dataset.supervisorOversightIds,dueToday:dashboard.dataset.supervisorDueTodayIds,delayed:dashboard.dataset.supervisorDelayedIds},attention:Number(document.querySelector('#attentionCount').textContent),today:Number(document.querySelector('#dashboardTodayCount').textContent)});
+    installations=records;currentUser=userDirectory.find(user=>user.role==='supervisor');language='tr';dashboardDrilldownIds=null;renderDashboard();const supervisor=read();quick().querySelector('[data-dashboard-filter="supervisorPrimary"]').click();const primaryDrilldown=[...dashboardDrilldownIds];dashboardDrilldownIds=null;showView('dashboard');renderDashboard();quick().querySelector('[data-dashboard-filter="supervisorDecision"]').click();const decisionDrilldown=[...dashboardDrilldownIds];dashboardDrilldownIds=null;showView('dashboard');renderDashboard();quick().querySelector('[data-dashboard-filter="supervisorPlanning"]').click();const planningDrilldown=[...dashboardDrilldownIds];dashboardDrilldownIds=null;showView('dashboard');renderDashboard();quick().querySelector('[data-dashboard-filter="supervisorOversight"]').click();const oversightDrilldown=[...dashboardDrilldownIds];dashboardDrilldownIds=null;showView('dashboard');renderDashboard();quick().querySelector('[data-dashboard-filter="supervisorDueToday"]').click();const dueTodayDrilldown=[...dashboardDrilldownIds];dashboardDrilldownIds=null;showView('dashboard');renderDashboard();quick().querySelector('[data-dashboard-filter="supervisorDelayed"]').click();const delayedDrilldown=[...dashboardDrilldownIds];
+    dashboardDrilldownIds=null;currentUser=userDirectory.find(user=>user.role==='sales');renderDashboard();const salesHidden=read().hidden;currentUser=userDirectory.find(user=>user.role==='technician');renderDashboard();const technicianHidden=read().hidden;currentUser=userDirectory.find(user=>user.role==='admin');renderDashboard();const adminHidden=read().hidden;
+    currentUser=userDirectory.find(user=>user.role==='supervisor');installations=[base(-9850,'planned',{installationSchedule:[slot('future','2099-01-01',['Teknisyen D'])]})];renderDashboard();const zero=read();document.documentElement.dataset.theme='dark';const dark=getComputedStyle(quick()).backgroundColor;document.documentElement.dataset.theme='light';const light=getComputedStyle(quick()).backgroundColor;
+    installations=previousInstallations;currentUser=previousUser;document.documentElement.dataset.theme=previousTheme;language=previousLanguage;dashboardDrilldownIds=null;showView('dashboard');render();return{supervisor,primaryDrilldown,decisionDrilldown,planningDrilldown,oversightDrilldown,dueTodayDrilldown,delayedDrilldown,salesHidden,technicianHidden,adminHidden,zero,dark,light};
+  })()`);
+  assert.equal(result.supervisor.hidden,false);assert.match(result.supervisor.text,/Servis Süpervizöründe/);assert.match(result.supervisor.text,/Ekipten Sonuç Beklenenler/);
+  assert.deepEqual(result.supervisor.buttons,[{filter:'supervisorDecision',count:2},{filter:'supervisorPlanning',count:2},{filter:'supervisorPrimary',count:0},{filter:'supervisorDueToday',count:1},{filter:'supervisorDelayed',count:1},{filter:'supervisorOversight',count:0}]);
+  assert.deepEqual(result.supervisor.data,{primary:'-9841,-9842,-9843,-9844',decision:'-9841,-9842',planning:'-9843,-9844',oversight:'-9845,-9846',dueToday:'-9845',delayed:'-9846'});assert.deepEqual(result.primaryDrilldown,[-9841,-9842,-9843,-9844]);assert.deepEqual(result.decisionDrilldown,[-9841,-9842]);assert.deepEqual(result.planningDrilldown,[-9843,-9844]);assert.deepEqual(result.oversightDrilldown,[-9845,-9846]);assert.deepEqual(result.dueTodayDrilldown,[-9845]);assert.deepEqual(result.delayedDrilldown,[-9846]);
+  assert.equal(result.salesHidden,true);assert.equal(result.technicianHidden,true);assert.equal(result.adminHidden,true);assert.match(result.zero.text,/Şu anda doğrudan aksiyon bekleyen iş yok/);assert.match(result.zero.text,/Ekipte bekleyen sonuç yok/);assert.equal(result.zero.data.primary,'');assert.equal(result.zero.data.oversight,'');assert.notEqual(result.dark,result.light);
+});
+
+test('Supervisor Faz 7.2 quick view 390 px ve iki temada taşmadan okunur', async () => {
+  await protocol.command('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  try{
+    const result=await protocol.evaluate(`(() => {
+      const previousInstallations=installations,previousUser=currentUser,previousTheme=document.documentElement.dataset.theme,today=localDateKey();
+      const base=(id,workflowStage,extra={})=>({id,customer:'ÇOK UZUN SUPERVISOR KURULUM MÜŞTERİ ADI '+Math.abs(id),salesOrderNumber:'SUPERVISOR-LONG-'+Math.abs(id),workflowStage,status:'Legacy',orderProducts:[],installationSchedule:[],serviceVisits:[],...extra});
+      installations=[base(-9861,'awaitingReview'),base(-9862,'inService',{pendingContinuationPlanning:true}),base(-9863,'planned',{installationSchedule:[{workPlanId:'today',date:today,startTime:'09:00',endTime:'10:00',technicians:['Uzun İsimli Teknisyen Bir','Uzun İsimli Teknisyen İki']}]}),base(-9864,'planned',{installationSchedule:[{workPlanId:'past',date:'2020-01-01',startTime:'09:00',endTime:'10:00',technicians:['Uzun İsimli Teknisyen Üç']} ]})];currentUser=userDirectory.find(user=>user.role==='supervisor');renderDashboard();const dashboard=document.querySelector('#dashboardView'),quick=document.querySelector('#dashboardSupervisorQuickViews');document.documentElement.dataset.theme='dark';const dark={color:getComputedStyle(quick.querySelector('h2')).color,border:getComputedStyle(quick.querySelector('.is-primary')).borderLeftColor};document.documentElement.dataset.theme='light';const light={color:getComputedStyle(quick.querySelector('h2')).color,border:getComputedStyle(quick.querySelector('.is-primary')).borderLeftColor};const result={overflow:dashboard.scrollWidth<=dashboard.clientWidth+1,primary:quick.querySelector('.is-primary').textContent.replace(/\\s+/g,' ').trim(),oversight:quick.querySelector('.is-oversight').textContent.replace(/\\s+/g,' ').trim(),dark,light};installations=previousInstallations;currentUser=previousUser;document.documentElement.dataset.theme=previousTheme;render();return result;
+    })()`);
+    assert.equal(result.overflow,true);assert.match(result.primary,/Servis Süpervizöründe/);assert.match(result.oversight,/Ekipten Sonuç Beklenenler/);assert.notDeepEqual(result.dark,result.light);
+  }finally{await protocol.command('Emulation.clearDeviceMetricsOverride')}
 });
 
 test('Kurulum Detayı Operational State pilotu semantic durumları, aksiyonu ve sorumluyu doğru sunar', async () => {

@@ -21,7 +21,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=195">
+  <link rel="stylesheet" href="styles.css?v=196">
 </head>
 <body>
   <div id="storageWarning" class="storage-warning" role="alert" hidden><strong>Yerel kayıt uyarısı</strong><span></span><button id="exportLocalData" type="button" title="İndirilen yedek müşteri ve kullanıcı bilgileri içerebilir; güvenli saklayın.">Ham verileri yedekle</button></div>
@@ -95,6 +95,7 @@
             <div id="dashboardAttentionList" class="dashboard-attention-list"></div>
           </section>
           <aside class="right-column">
+            <section id="dashboardSupervisorQuickViews" class="panel dashboard-supervisor-quick-views role-hidden" aria-label="Supervisor operasyon özeti"></section>
             <section class="panel agenda-panel"><div class="panel-header"><div><h2>Bugünün programı</h2><p id="dashboardAgendaSummary">Planlı aktivite yok</p></div><button class="icon-button" type="button" data-dashboard-open-calendar aria-label="Takvimi aç">•••</button></div><div id="agendaList"></div></section>
           </aside>
         </div>
@@ -583,11 +584,12 @@
   <script src="app.js?v=171"></script>
   <script src="js/planning-calendar.js?v=166"></script>
   <script src="js/customer-list.js?v=165"></script>
-  <script src="js/dashboard.js?v=170"></script>
+  <script src="js/dashboard.js?v=171"></script>
   <script src="js/installation-workflows.js?v=169"></script>
   <script src="js/service-reports.js?v=169"></script>
   <script src="js/service-workflows.js?v=172"></script>
   <script src="js/operational-state.js?v=1"></script>
+  <script src="js/supervisor-operational-policy.js?v=1"></script>
   <script src="js/operational-state-ui.js?v=6"></script>
   <script src="js/customers.js?v=165"></script>
   <script src="js/app-events.js?v=172"></script>
