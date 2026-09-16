@@ -6,6 +6,23 @@ function workPlanMetadata(item,workPlanId){const slot=installationSchedule(item)
 function dateDifferenceLabel(planned,actual){if(!planned||!actual)return'';const plannedDate=new Date(`${planned}T12:00:00`),actualDate=new Date(`${actual}T12:00:00`);if(Number.isNaN(plannedDate.getTime())||Number.isNaN(actualDate.getTime()))return'';const days=Math.round((actualDate-plannedDate)/86400000);return days===0?'Zamanında':days>0?`${days} gün sonra`:`${Math.abs(days)} gün önce`}
 function planningPerformanceDate(value){if(!value)return'—';const date=new Date(`${value}T12:00:00`);return Number.isNaN(date.getTime())?'—':new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(date)}
 function planningPerformanceVisit(matches){const concluding=matches.filter(entry=>['planCompleted','partialCompleted','installationCompleted'].includes(entry.visit.serviceOutcome));return concluding.length===1?concluding[0].visit:null}
+function completedInstallationPlanPerformance(item){
+  if(item?.workflowStage!=='completed')return null;
+  const finalVisits=(item.serviceVisits||[]).filter(visit=>visit?.serviceOutcome==='installationCompleted');
+  if(finalVisits.length!==1)return null;
+  const visit=finalVisits[0],plans=serviceWorkPlans(item);
+  if(!visit.workPlanId&&plans.length!==1)return null;
+  const plan=servicePlanForVisit(item,visit);
+  if(!plan||servicePlanInactive(item,plan))return null;
+  const matches=serviceVisitsForPlan(item,plan.id);
+  if(!matches.some(entry=>entry.visit===visit)||planningPerformanceVisit(matches)!==visit)return null;
+  const snapshotDate=String(visit.plannedVisitDate||''),planDate=String(plan.date||'');
+  if(snapshotDate&&planDate&&snapshotDate!==planDate)return null;
+  const plannedDate=snapshotDate||planDate,actualDate=String(visit.actualVisitDate||'');
+  const differenceLabel=dateDifferenceLabel(plannedDate,actualDate),comparison=compareDateOnly(actualDate,plannedDate);
+  if(!plannedDate||!actualDate||!differenceLabel||comparison===null)return null;
+  return{plannedDate,actualDate,differenceLabel,relation:comparison===0?'onTime':comparison>0?'late':'early'};
+}
 function planningPerformanceRows(item){const plans=serviceWorkPlans(item),matchedVisits=new Set(),rows=plans.map((plan,index)=>{const matches=serviceVisitsForPlan(item,plan.id);matches.forEach(entry=>matchedVisits.add(entry.index));const visit=planningPerformanceVisit(matches),actualDate=visit?.actualVisitDate||'';return{label:`${index+1}. Çalışma`,workPlanId:plan.id,plannedDate:plan.date||'',actualDate,difference:dateDifferenceLabel(plan.date,actualDate)}});(item.serviceVisits||[]).forEach((visit,index)=>{if(matchedVisits.has(index))return;rows.push({label:`${index+1}. Servis Kaydı`,workPlanId:'',plannedDate:'',actualDate:visit.actualVisitDate||'',difference:''})});return rows}
 function planningPerformanceMarkup(item){const rows=planningPerformanceRows(item);if(!rows.length)return'';return`<div class="planning-performance"><h4>Planlama Performansı</h4><div class="planning-performance-list">${rows.map(row=>`<article><strong>${escapeHtml(row.label)}</strong><span><small>Planlanan</small><b>${escapeHtml(planningPerformanceDate(row.plannedDate))}</b></span><i aria-hidden="true">→</i><span><small>Gerçekleşen</small><b>${escapeHtml(planningPerformanceDate(row.actualDate))}</b></span>${row.difference?`<em>${escapeHtml(row.difference)}</em>`:''}</article>`).join('')}</div></div>`}
 function activePlanProgress(item){const plans=activeServiceWorkPlans(item);if(plans.length<=1)return'';const next=nextServicePlan(item),index=Math.max(0,plans.findIndex(plan=>plan.id===(next?.id||plans.at(-1)?.id)));return`${index+1}. çalışma · ${plans.length} plan`}

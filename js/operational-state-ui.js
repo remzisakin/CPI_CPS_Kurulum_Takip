@@ -48,11 +48,25 @@ function operationalStateCompactOwnerLabel(state){
   if(state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length){const [first,...others]=state.actionOwnerUsers;return`${first}${others.length?` +${others.length}`:''}`}
   return operationalStateOwnerLabel(state);
 }
+function operationalStateClosureLabel(performance){
+  if(!performance)return'';
+  if(language!=='en'){
+    if(performance.relation==='onTime')return'Zamanında';
+    const days=performance.differenceLabel.match(/^\d+/)?.[0];
+    if(!days)return'';
+    return performance.relation==='late'?`${days} gün geç`:`${days} gün erken`;
+  }
+  if(performance.relation==='onTime')return'On time';
+  const days=performance.differenceLabel.match(/^\d+/)?.[0];
+  if(!days)return'';
+  return performance.relation==='late'?`${days} day${days==='1'?'':'s'} later`:`${days} day${days==='1'?'':'s'} earlier`;
+}
 function operationalStateListMarkup(item){
-  const state=resolveOperationalState(item),signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateCompactOwnerLabel(state):'',reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),fullOwner=state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length?state.actionOwnerUsers.join(', '):owner;
+  const state=resolveOperationalState(item),signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateCompactOwnerLabel(state):'',reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),fullOwner=state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length?state.actionOwnerUsers.join(', '):owner,closure=state.primarySignal==='COMPLETED'&&typeof completedInstallationPlanPerformance==='function'?completedInstallationPlanPerformance(item):null,closureLabel=operationalStateClosureLabel(closure);
   return `<div class="operational-list-cell" data-operational-list-signal="${escapeHtml(state.primarySignal)}">
     <strong class="operational-signal operational-signal-${String(state.primarySignal||'normal').toLowerCase()}"${reason?` title="${escapeHtml(reason)}"`:''}>${escapeHtml(signal)}</strong>
     ${action?`<span class="operational-list-action" data-operational-list-action="${escapeHtml(state.nextAction)}">${escapeHtml(action)}</span>${owner?`<small class="operational-list-owner" data-operational-list-owner-role="${escapeHtml(state.actionOwnerRole)}"${fullOwner?` title="${escapeHtml(fullOwner)}"`:''}>${escapeHtml(owner)}</small>`:''}`:''}
+    ${closureLabel?`<small class="operational-list-closure"><span>${escapeHtml(operationalStateUiText(['Son çalışma','Final work']))}</span> <strong>· ${escapeHtml(closureLabel)}</strong></small>`:''}
   </div>`;
 }
 function operationalStateCardMarkup(item){
