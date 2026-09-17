@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cps-public-shell-v212';
+const CACHE_NAME = 'cps-public-shell-v214';
 const OWN_CACHE_PREFIXES = ['cps-public-shell-', 'cps-kurulum-'];
 const OFFLINE_PAGE = './offline.html';
 
@@ -15,10 +15,10 @@ const PUBLIC_SHELL_ASSETS = [
   './js/installation-workflows.js?v=169',
   './js/service-reports.js?v=169',
   './js/service-workflows.js?v=172',
-  './js/completion-review.js?v=1',
+  './js/completion-review.js?v=3',
   './js/operational-state.js?v=2',
   './js/supervisor-operational-policy.js?v=2',
-  './js/operational-state-ui.js?v=6',
+  './js/operational-state-ui.js?v=8',
   './js/customers.js?v=165',
   './js/app-events.js?v=173',
   './js/operation-policy.js?v=168',

@@ -6,7 +6,8 @@ const operationalStateActionLabels={
   SEND_FOR_REVIEW:['İncelemeye gönder','Send for review'],REVIEW_INSTALLATION_REQUEST:['Kurulum talebini incele','Review installation request'],
   CORRECT_AND_RESUBMIT:['Düzelt ve yeniden gönder','Correct and resubmit'],REVIEW_SALES_CHANGE_REQUEST:['Satış değişiklik talebini incele','Review sales change request'],
   RESPOND_TO_SALES_CHANGE_CORRECTION:['Değişiklik düzeltmesine cevap ver','Respond to change correction'],CREATE_SERVICE_PLAN:['Servis çalışma planı oluştur','Create service work plan'],
-  CREATE_CONTINUATION_PLAN:['Devam çalışma planı oluştur','Create continuation work plan'],RECORD_SERVICE_RESULT:['Servis sonucunu gir','Enter service result']
+  CREATE_CONTINUATION_PLAN:['Devam çalışma planı oluştur','Create continuation work plan'],RECORD_SERVICE_RESULT:['Servis sonucunu gir','Enter service result'],
+  REVIEW_COMPLETION_SUBMISSION:['Kurulum kapanışını incele','Review installation closure'],REVISE_COMPLETION_SUBMISSION:['Kapanış kaydını düzelt','Revise closure submission']
 };
 const operationalStateReasonLabels={
   NO_CURRENT_OPERATIONAL_ACTION:['Şu anda zorunlu bir operasyonel aksiyon bulunmuyor.','There is no required operational action at this time.'],
@@ -22,6 +23,8 @@ const operationalStateReasonLabels={
   ACTIVE_PLAN_DUE_TODAY:['Çalışma bugün için planlandı ve servis sonucu bekleniyor.','The work is planned for today and its service result is pending.'],
   ACTIVE_PLAN_DATE_PASSED_UNRESOLVED:['Planlanan çalışma tarihi geçti ve servis sonucu henüz girilmedi.','The planned work date has passed and the service result has not yet been entered.'],
   ACTIVE_PLAN_DATE_UNAVAILABLE:['Aktif çalışma planının tarihi güvenilir biçimde belirlenemedi.','The active work plan date could not be determined reliably.'],
+  COMPLETION_REVIEW_PENDING:['Teknisyenin kapanış gönderimi servis kararını bekliyor.','The technician closure submission is awaiting a service decision.'],
+  COMPLETION_REVIEW_REVISION_REQUESTED:['Kapanış gönderimi teknisyen düzeltmesi bekliyor.','The closure submission is awaiting technician revision.'],
   NO_UNRESOLVED_ACTIVE_PLAN:['Çözülmemiş aktif bir çalışma planı bulunmuyor.','There is no unresolved active work plan.'],
   UNSUPPORTED_WORKFLOW_STATE:['Bu kayıt için güvenilir bir sıradaki aksiyon belirlenemedi.','A reliable next action could not be determined for this record.']
 };
@@ -32,6 +35,10 @@ const operationalStateRiskLabels={
 };
 
 function operationalStateUiText(pair){return pair?.[language==='en'?1:0]||''}
+function operationalStateSignalLabel(state){
+  if(state?.signalReason?.code==='PENDING_CONTINUATION_PLANNING')return operationalStateUiText(operationalStateSignalLabels.ACTION_REQUIRED);
+  return operationalStateUiText(operationalStateSignalLabels[state?.primarySignal]);
+}
 function operationalStateDateLabel(value){
   const date=/^\d{4}-\d{2}-\d{2}$/.test(String(value||''))?new Date(`${value}T12:00:00`):null;
   return date&&!Number.isNaN(date.getTime())?new Intl.DateTimeFormat(language==='en'?'en-GB':'tr-TR',{dateStyle:'long'}).format(date):'';
@@ -62,7 +69,7 @@ function operationalStateClosureLabel(performance){
   return performance.relation==='late'?`${days} day${days==='1'?'':'s'} later`:`${days} day${days==='1'?'':'s'} earlier`;
 }
 function operationalStateListMarkup(item){
-  const state=resolveOperationalState(item),signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateCompactOwnerLabel(state):'',reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),fullOwner=state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length?state.actionOwnerUsers.join(', '):owner,closure=state.primarySignal==='COMPLETED'&&typeof completedInstallationPlanPerformance==='function'?completedInstallationPlanPerformance(item):null,closureLabel=operationalStateClosureLabel(closure);
+  const state=resolveOperationalState(item),signal=operationalStateSignalLabel(state),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateCompactOwnerLabel(state):'',reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),fullOwner=state.ownerConfidence==='HIGH'&&state.actionOwnerUsers?.length?state.actionOwnerUsers.join(', '):owner,closure=state.primarySignal==='COMPLETED'&&typeof completedInstallationPlanPerformance==='function'?completedInstallationPlanPerformance(item):null,closureLabel=operationalStateClosureLabel(closure);
   return `<div class="operational-list-cell" data-operational-list-signal="${escapeHtml(state.primarySignal)}">
     <strong class="operational-signal operational-signal-${String(state.primarySignal||'normal').toLowerCase()}"${reason?` title="${escapeHtml(reason)}"`:''}>${escapeHtml(signal)}</strong>
     ${action?`<span class="operational-list-action" data-operational-list-action="${escapeHtml(state.nextAction)}">${escapeHtml(action)}</span>${owner?`<small class="operational-list-owner" data-operational-list-owner-role="${escapeHtml(state.actionOwnerRole)}"${fullOwner?` title="${escapeHtml(fullOwner)}"`:''}>${escapeHtml(owner)}</small>`:''}`:''}
@@ -70,7 +77,7 @@ function operationalStateListMarkup(item){
   </div>`;
 }
 function operationalStateCardMarkup(item){
-  const state=resolveOperationalState(item),signal=operationalStateUiText(operationalStateSignalLabels[state.primarySignal]),reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateOwnerLabel(state):'',planDate=operationalStateDateLabel(state.signalReason?.date);
+  const state=resolveOperationalState(item),signal=operationalStateSignalLabel(state),reason=operationalStateUiText(operationalStateReasonLabels[state.signalReason?.code]),action=state.nextAction!=='NONE'?operationalStateUiText(operationalStateActionLabels[state.nextAction]):'',owner=action?operationalStateOwnerLabel(state):'',planDate=operationalStateDateLabel(state.signalReason?.date);
   const risks=(state.secondaryRisks||[]).map(risk=>operationalStateUiText(operationalStateRiskLabels[risk.code])).filter(Boolean);
   return `<section class="detail-section operational-state-section" aria-label="${escapeHtml(operationalStateUiText(['Operasyon durumu','Operational status']))}">
     <div class="operational-state-heading"><span>${escapeHtml(operationalStateUiText(['OPERASYON DURUMU','OPERATIONAL STATUS']))}</span><strong class="operational-signal operational-signal-${String(state.primarySignal||'normal').toLowerCase()}" data-operational-signal="${escapeHtml(state.primarySignal)}">${escapeHtml(signal)}</strong></div>
