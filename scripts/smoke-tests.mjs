@@ -2005,7 +2005,9 @@ test('Dashboard Faz 6.2 drill-down, satir navigasyonu, tema ve 390 px sunumunu k
 });
 
 test('Dashboard Faz 6.2A sifir ozetlerini gizler, owner alanini sade ve program bos durumunu kompakt tutar', async () => {
-  const result=await protocol.evaluate(`(() => {
+  await protocol.command('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  try{
+    const result=await protocol.evaluate(`(() => {
     const previousInstallations=installations,previousUser=currentUser,previousTheme=document.documentElement.dataset.theme;
     const base=(id,stage,extra={})=>({id,customer:'POLISH '+Math.abs(id),salesOrderNumber:'POLISH-'+Math.abs(id),workflowStage:stage,status:'Legacy',orderProducts:[],installationSchedule:[],serviceVisits:[],...extra});
     currentUser=userDirectory.find(user=>user.role==='admin');installations=[base(-9731,'awaitingReview'),base(-9732,'awaitingReview')];renderDashboard();
@@ -2016,10 +2018,11 @@ test('Dashboard Faz 6.2A sifir ozetlerini gizler, owner alanini sade ve program 
     const fullBreakdown=[...dashboard.querySelectorAll('#dashboardAttentionBreakdown [data-dashboard-filter]')].map(button=>button.dataset.dashboardFilter),row=dashboard.querySelector('.dashboard-attention-row'),rowStyle=getComputedStyle(row),filledPanel=dashboard.querySelector('.agenda-panel'),filled={isEmpty:filledPanel.classList.contains('is-empty'),agendaCount:dashboard.querySelectorAll('#agendaList .agenda-item').length,context:dashboard.querySelector('.dashboard-agenda-context')?.textContent.trim(),gap:rowStyle.columnGap};
     const visibleOwner=dashboard.querySelector('#dashboardOwnerDistribution [data-dashboard-filter="ownerSupervisor"]');document.documentElement.dataset.theme='dark';const dark=getComputedStyle(visibleOwner).color;document.documentElement.dataset.theme='light';const light=getComputedStyle(visibleOwner).color;
     installations=previousInstallations;currentUser=previousUser;document.documentElement.dataset.theme=previousTheme;dashboardDrilldownIds=null;render();return{breakdown,owner:ownerVisual,empty,ownerDrilldown,fullBreakdown,filled,dark,light};
-  })()`);
-  assert.deepEqual(result.breakdown,['attentionAction']);assert.deepEqual(result.ownerDrilldown,[-9731,-9732]);assert.deepEqual(result.fullBreakdown,['attentionAction','attentionDelayed','attentionBlocked']);
-  assert.deepEqual(result.owner,{exists:true,border:'0px',background:'rgba(0, 0, 0, 0)'});assert.deepEqual(result.empty,{isEmpty:true,summaryDisplay:'none',messagePadding:'0px'});
-  assert.deepEqual(result.filled,{isEmpty:false,agendaCount:1,context:'Sonuç bekleniyor',gap:'12px'});assert.notEqual(result.dark,result.light);
+    })()`);
+    assert.deepEqual(result.breakdown,['attentionAction']);assert.deepEqual(result.ownerDrilldown,[-9731,-9732]);assert.deepEqual(result.fullBreakdown,['attentionAction','attentionDelayed','attentionBlocked']);
+    assert.deepEqual(result.owner,{exists:true,border:'0px',background:'rgba(0, 0, 0, 0)'});assert.deepEqual(result.empty,{isEmpty:true,summaryDisplay:'none',messagePadding:'0px'});
+    assert.deepEqual(result.filled,{isEmpty:false,agendaCount:1,context:'Sonuç bekleniyor',gap:'12px'});assert.notEqual(result.dark,result.light);
+  }finally{await protocol.command('Emulation.clearDeviceMetricsOverride')}
 });
 
 test('Supervisor Faz 7.2 quick view primary aksiyon ve ekip oversight ayrimini liste drill-down ile sunar', async () => {
