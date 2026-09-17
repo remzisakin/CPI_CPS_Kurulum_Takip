@@ -184,7 +184,7 @@ test('Ayrılan JavaScript dosyaları sırayla yükleniyor ve çevrimdışı list
   const worker=await readFile(join(projectRoot,'service-worker.js'),'utf8');
   const expected=[
     'app.js','js/planning-calendar.js','js/customer-list.js','js/dashboard.js',
-    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/operational-state.js','js/supervisor-operational-policy.js','js/operational-state-ui.js',
+    'js/installation-workflows.js','js/service-reports.js','js/service-workflows.js','js/completion-review.js','js/operational-state.js','js/supervisor-operational-policy.js','js/operational-state-ui.js',
     'js/customers.js','js/app-events.js','js/operation-policy.js','js/reports.js',
     'js/organization.js','js/sales-changes.js','js/goodwill.js','js/installation-file-print.js'
   ];
@@ -2294,6 +2294,79 @@ test('Kurulum Listesi Operasyon hücresi 390 px, tema ve TR/EN sunumunda erişil
     const previousTheme=document.documentElement.dataset.theme,previousLanguage=language,item={workflowStage:'planned',orderProducts:[],installationSchedule:[{workPlanId:'mobile',date:localDateKey(),startTime:'09:00',endTime:'10:00',technicians:['Çok Uzun İsimli Birinci Teknisyen','Çok Uzun İsimli İkinci Teknisyen']}],serviceVisits:[]},host=document.createElement('table');host.className='installations-table';host.style.width='1280px';host.innerHTML='<tbody><tr><td class="installation-operation-cell">'+operationalStateListMarkup(item)+'</td></tr></tbody>';document.body.append(host);const cell=host.querySelector('.installation-operation-cell'),read=()=>{const action=getComputedStyle(host.querySelector('.operational-list-action')),owner=getComputedStyle(host.querySelector('.operational-list-owner')),signal=getComputedStyle(host.querySelector('.operational-signal')),cellStyle=getComputedStyle(cell);return{actionColor:action.color,ownerColor:owner.color,signalColor:signal.color,whiteSpace:action.whiteSpace,cellWidth:cell.getBoundingClientRect().width,scrollWidth:cell.scrollWidth,maxWidth:cellStyle.maxWidth}};document.documentElement.dataset.theme='dark';const dark=read();document.documentElement.dataset.theme='light';const light=read();language='en';host.querySelector('td').innerHTML=operationalStateListMarkup(item);const english=host.textContent.trim();language='tr';const turkish=operationalStateListMarkup(item);document.documentElement.dataset.theme=previousTheme;language=previousLanguage;host.remove();return{dark,light,english,turkish,tableOverflow:getComputedStyle(document.querySelector('.table-wrap')).overflowX};})()`);
   await protocol.command('Emulation.clearDeviceMetricsOverride');
   assert.equal(result.dark.whiteSpace,'normal');assert.equal(result.dark.maxWidth,'245px');assert.ok(result.dark.scrollWidth<=result.dark.cellWidth+1);assert.notDeepEqual({action:result.dark.actionColor,owner:result.dark.ownerColor,signal:result.dark.signalColor},{action:result.light.actionColor,owner:result.light.ownerColor,signal:result.light.signalColor});assert.match(result.english,/Enter service result/);assert.match(result.turkish,/Servis sonucunu gir/);assert.match(result.tableOverflow,/auto|scroll/);
+});
+
+test('Completion Review foundation: contract normalization güvenli ve immutable çalışır', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const input={targetVisitId:' visit-1 ',status:'pending',submissionRevision:'2',submittedBy:'Teknisyen',submittedAt:'2026-09-17T08:00:00.000Z',decisionCategory:'',decisionNote:'',decidedBy:'',decidedAt:'',ignored:'value'};
+    const before=JSON.stringify(input),normalized=normalizeCompletionReview(input);
+    const partial=normalizeCompletionReview({targetVisitId:'visit-2',status:'revisionRequested'});
+    return {before,after:JSON.stringify(input),normalized,partial,missing:normalizeCompletionReview(undefined),malformed:normalizeCompletionReview({targetVisitId:'visit-3',status:'unknown'})};
+  })()`);
+  assert.equal(result.before,result.after);
+  assert.deepEqual(result.normalized,{targetVisitId:'visit-1',status:'pending',submissionRevision:2,submittedBy:'Teknisyen',submittedAt:'2026-09-17T08:00:00.000Z',decisionCategory:'',decisionNote:'',decidedBy:'',decidedAt:''});
+  assert.deepEqual(result.partial,{targetVisitId:'visit-2',status:'revisionRequested',submissionRevision:1,submittedBy:'',submittedAt:'',decisionCategory:'',decisionNote:'',decidedBy:'',decidedAt:''});
+  assert.equal(result.missing,null);assert.equal(result.malformed,null);
+});
+
+test('Completion Review foundation: history append-only ve submission snapshot bağımsızdır', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const visit={visitId:'visit-1',workPlanId:'plan-1',actualVisitDate:'2026-09-17',serviceOutcome:'installationCompleted',completedWork:'Kurulum tamamlandı',remainingWork:'',blockerReason:'',blockerDetails:'',productStatus:'missing',missingProducts:['P-1'],technicians:['Teknisyen A'],technicianEntries:[{name:'Teknisyen A',travelDuration:1,travelUnit:'Saat',siteDuration:4,siteUnit:'Saat',privateField:'ignored'}],attachments:[{name:'ignored.pdf'}]};
+    const sourceBefore=JSON.stringify(visit),snapshot=createCompletionSubmissionSnapshot(visit),history=[{type:'completion-submitted',targetVisitId:'visit-1',actor:'Teknisyen A',timestamp:'2026-09-17T08:00:00.000Z',snapshot}];
+    const oldEntryBefore=JSON.stringify(history[0]),appended=appendCompletionReviewHistory(history,{type:'revision-requested',targetVisitId:'visit-1',actor:'Supervisor',timestamp:'2026-09-17T09:00:00.000Z',decisionCategory:'missing-information',decisionNote:'Bilgi tamamlanmalı'});
+    visit.completedWork='Sonradan değiştirildi';visit.missingProducts.push('P-2');history[0].actor='Değiştirildi';snapshot.completedWork='Snapshot dışından değiştirildi';
+    const invalid=appendCompletionReviewHistory(appended,{type:'unknown',targetVisitId:'visit-1',actor:'Supervisor',timestamp:'2026-09-17T10:00:00.000Z'}),supported=['completion-submitted','revision-requested','completion-resubmitted','continuation-required','completion-approved'].map(type=>Boolean(createCompletionReviewHistoryEntry({type,targetVisitId:'visit-1',actor:'Test',timestamp:'2026-09-17T10:00:00.000Z'})));
+    return {sourceBefore,snapshotSourceAfter:JSON.stringify({...visit,completedWork:'Kurulum tamamlandı',missingProducts:['P-1']}),snapshot:appended[0].snapshot,oldEntryBefore,oldEntryAfter:JSON.stringify(appended[0]),originalLength:history.length,appendedLength:appended.length,invalidLength:invalid.length,newEntry:appended[1],hasAttachments:Object.hasOwn(appended[0].snapshot,'attachments'),supported};
+  })()`);
+  assert.equal(result.sourceBefore,result.snapshotSourceAfter);
+  assert.equal(result.oldEntryBefore,result.oldEntryAfter);
+  assert.equal(result.originalLength,1);assert.equal(result.appendedLength,2);assert.equal(result.invalidLength,2);
+  assert.equal(result.snapshot.completedWork,'Kurulum tamamlandı');assert.deepEqual(result.snapshot.missingProducts,['P-1']);assert.equal(result.hasAttachments,false);
+  assert.deepEqual(result.supported,[true,true,true,true,true]);
+  assert.deepEqual(result.newEntry,{type:'revision-requested',targetVisitId:'visit-1',actor:'Supervisor',timestamp:'2026-09-17T09:00:00.000Z',decisionCategory:'missing-information',decisionNote:'Bilgi tamamlanmalı'});
+});
+
+test('Completion Review foundation: continuation source explicit ilişki ve güvenli legacy fallback ile çözülür', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const exact={visitId:'visit-exact',workPlanId:'p1',serviceOutcome:'continuation'},other={visitId:'visit-other',workPlanId:'p1',serviceOutcome:'couldNotPerform'};
+    const read=(item,relation)=>resolveContinuationSourceVisit(item,relation)?.visitId||null;
+    const explicitItem={serviceVisits:[exact,other]},legacySingle={serviceVisits:[{visitId:'legacy-one',serviceOutcome:'continuation'}]},legacyAmbiguous={serviceVisits:[{visitId:'legacy-a',serviceOutcome:'continuation'},{visitId:'legacy-b',serviceOutcome:'couldNotPerform'}]},legacyResolved={serviceVisits:[{visitId:'legacy-planned',serviceOutcome:'continuation',continuationPlannedAt:'2026-09-17T10:00:00.000Z'}]},missingId={serviceVisits:[{serviceOutcome:'continuation'}]};
+    const before=JSON.stringify({explicitItem,legacySingle,legacyAmbiguous,legacyResolved,missingId});
+    const values={direct:read(explicitItem,{sourceVisitId:'visit-other'}),slots:read(explicitItem,{slots:[{sourceVisitId:'visit-exact'},{sourceVisitId:'visit-exact'}]}),invalidExplicit:read(legacySingle,{sourceVisitId:'missing-target'}),conflictingSlots:read(explicitItem,{slots:[{sourceVisitId:'visit-exact'},{sourceVisitId:'visit-other'}]}),single:read(legacySingle,{}),ambiguous:read(legacyAmbiguous,{}),none:read(legacyResolved,{}),missingId:read(missingId,{})};
+    const after=JSON.stringify({explicitItem,legacySingle,legacyAmbiguous,legacyResolved,missingId});
+    return {before,after,values};
+  })()`);
+  assert.equal(result.before,result.after);
+  assert.deepEqual(result.values,{direct:'visit-other',slots:'visit-exact',invalidExplicit:null,conflictingSlots:null,single:'legacy-one',ambiguous:null,none:null,missingId:null});
+});
+
+test('Completion Review foundation: yeni servis ziyareti kimliği benzersiz ve düzenlemede sabittir', async () => {
+  const fixtureId=-973001;
+  await loginAs('Servis Süpervisörü');
+  try{
+    const result=await protocol.evaluate(`(async()=>{
+      const technician=userDirectory.find(user=>user.role==='technician'),originalAskConfirm=askConfirm;askConfirm=async()=>true;
+      const item={id:${fixtureId},customer:'VISIT ID FOUNDATION',salesOrderNumber:'VISIT-ID-1',workflowStage:'planned',status:'Planlandı',progress:15,orderProducts:[{partNo:'VID-1',description:'Test ürünü',qty:1}],shipment:{history:[{id:'ship-visit-id',shipmentDate:'2026-09-01',items:[{partNo:'VID-1',quantity:1}]}]},installationSchedule:[{id:'vid-slot-1',workPlanId:'vid-plan-1',date:'2026-09-17',startTime:'09:00',endTime:'11:00',technicians:[technician.name]},{id:'vid-slot-2',workPlanId:'vid-plan-2',date:'2099-09-18',startTime:'09:00',endTime:'11:00',technicians:[technician.name]}],serviceVisits:[]};
+      const submit=async()=>{const form=document.querySelector('#serviceEntryForm');form.elements.actualVisitDate.value='2026-09-17';form.elements.serviceOutcome.value='planCompleted';updateServiceFields();form.elements.productStatus.value='complete';form.elements.checklistStatus.value='appropriate';form.elements.completedWork.value='Kimlik testi';serviceTechnicians=[{name:technician.name,travelDuration:0,travelUnit:'Saat',siteDuration:1,siteUnit:'Saat'}];form.dispatchEvent(new SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:form.querySelector('.primary-button[value="default"]')}));await new Promise(resolve=>setTimeout(resolve,80));if(document.querySelector('#serviceEntryDialog').open)document.querySelector('#serviceEntryDialog').close()};
+      installations.push(item);saveOperationalData();openServiceEntry(item.id);await submit();const created=item.serviceVisits[0]?.visitId;
+      openServiceEntry(item.id);loadServiceWorkPlan(item,'vid-plan-1');item.serviceVisits[0].callerVisitId='should-not-replace';await submit();const edited=item.serviceVisits[0]?.visitId;
+      const generated=[createServiceVisitId(),createServiceVisitId(),stableServiceVisitId({}),stableServiceVisitId({})],legacy={workPlanId:'legacy-plan',serviceOutcome:'continuation'},legacyBefore=JSON.stringify(legacy),legacyRead=serviceVisitsForPlan({installationSchedule:[{workPlanId:'legacy-plan',date:'2026-09-17'}],serviceVisits:[legacy]},'legacy-plan').length;
+      askConfirm=originalAskConfirm;installations=installations.filter(record=>record.id!==item.id);saveOperationalData();render();return {created,edited,generated,legacyBefore,legacyAfter:JSON.stringify(legacy),legacyRead};
+    })()`);
+    assert.ok(result.created?.startsWith('visit-'));assert.equal(result.edited,result.created);assert.equal(new Set(result.generated).size,4);assert.equal(result.legacyBefore,result.legacyAfter);assert.equal(result.legacyRead,1);
+  }finally{
+    await protocol.evaluate(`(()=>{askConfirm=async(message,options={})=>(await showActionDialog({...options,message}))!==null;['#serviceEntryDialog','#standardActionDialog'].forEach(selector=>{const dialog=document.querySelector(selector);if(dialog?.open)dialog.close()});installations=installations.filter(record=>record.id!==${fixtureId});saveOperationalData();render()})()`).catch(()=>{});
+    if(await protocol.evaluate(`!document.querySelector('#appView').classList.contains('hidden')`).catch(()=>false))await logout();
+  }
+});
+
+test('Completion Review foundation mevcut completed resolver ve supervisor özetini değiştirmez', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const item={id:-973002,customer:'LEGACY COMPLETED',salesOrderNumber:'LEGACY-COMPLETE',workflowStage:'completed',status:'Tamamlandı',progress:100,completedAt:'2026-09-17T12:00:00.000Z',orderProducts:[],installationSchedule:[{workPlanId:'legacy-final',date:'2026-09-17',startTime:'09:00',endTime:'10:00',technicians:['Teknisyen A']}],serviceVisits:[{workPlanId:'legacy-final',actualVisitDate:'2026-09-17',serviceOutcome:'installationCompleted',completed:true}]};
+    const before=JSON.stringify(item),state=resolveOperationalState(item,{today:'2026-09-17'}),summary=buildSupervisorOperationalSummary([item],{today:'2026-09-17'});
+    return {before,after:JSON.stringify(item),state:{workflowState:state.workflowState,primarySignal:state.primarySignal,nextAction:state.nextAction},primaryCount:summary.primaryActions.length,oversightCount:summary.oversight.length,hasReview:Object.hasOwn(item,'completionReview')};
+  })()`);
+  assert.equal(result.before,result.after);assert.deepEqual(result.state,{workflowState:'completed',primarySignal:'COMPLETED',nextAction:'NONE'});assert.deepEqual({primary:result.primaryCount,oversight:result.oversightCount},{primary:0,oversight:0});assert.equal(result.hasReview,false);
 });
 
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {
