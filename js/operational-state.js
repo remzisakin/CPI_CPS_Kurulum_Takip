@@ -2,7 +2,7 @@ const OPERATIONAL_SIGNALS=Object.freeze({
   NORMAL:'NORMAL',WAITING:'WAITING',ACTION_REQUIRED:'ACTION_REQUIRED',DUE_TODAY:'DUE_TODAY',DELAYED:'DELAYED',BLOCKED:'BLOCKED',COMPLETED:'COMPLETED'
 });
 const OPERATIONAL_ACTIONS=Object.freeze({
-  NONE:'NONE',SEND_FOR_REVIEW:'SEND_FOR_REVIEW',REVIEW_INSTALLATION_REQUEST:'REVIEW_INSTALLATION_REQUEST',CORRECT_AND_RESUBMIT:'CORRECT_AND_RESUBMIT',REVIEW_SALES_CHANGE_REQUEST:'REVIEW_SALES_CHANGE_REQUEST',RESPOND_TO_SALES_CHANGE_CORRECTION:'RESPOND_TO_SALES_CHANGE_CORRECTION',CREATE_SERVICE_PLAN:'CREATE_SERVICE_PLAN',CREATE_CONTINUATION_PLAN:'CREATE_CONTINUATION_PLAN',RECORD_SERVICE_RESULT:'RECORD_SERVICE_RESULT'
+  NONE:'NONE',SEND_FOR_REVIEW:'SEND_FOR_REVIEW',REVIEW_INSTALLATION_REQUEST:'REVIEW_INSTALLATION_REQUEST',REVIEW_COMPLETION_SUBMISSION:'REVIEW_COMPLETION_SUBMISSION',REVISE_COMPLETION_SUBMISSION:'REVISE_COMPLETION_SUBMISSION',CORRECT_AND_RESUBMIT:'CORRECT_AND_RESUBMIT',REVIEW_SALES_CHANGE_REQUEST:'REVIEW_SALES_CHANGE_REQUEST',RESPOND_TO_SALES_CHANGE_CORRECTION:'RESPOND_TO_SALES_CHANGE_CORRECTION',CREATE_SERVICE_PLAN:'CREATE_SERVICE_PLAN',CREATE_CONTINUATION_PLAN:'CREATE_CONTINUATION_PLAN',RECORD_SERVICE_RESULT:'RECORD_SERVICE_RESULT'
 });
 const OPERATIONAL_RISKS=Object.freeze({
   INCOMPLETE_SHIPMENT:'INCOMPLETE_SHIPMENT',SERVICE_OVERRUN:'SERVICE_OVERRUN',EXTENDED_SHIFT:'EXTENDED_SHIFT',PAST_UNRESOLVED_PLAN:'PAST_UNRESOLVED_PLAN',PLAN_DUE_TODAY:'PLAN_DUE_TODAY'
@@ -12,6 +12,24 @@ function operationalNoOwner(){return{role:null,users:[],confidence:'HIGH'}}
 function operationalRoleOwner(role){return{role,users:[],confidence:'HIGH'}}
 function operationalSalesOwner(item){const salesEngineer=String(item?.salesEngineer||'').trim(),createdBy=String(item?.createdBy||'').trim();if(salesEngineer)return{role:'sales',users:[salesEngineer],confidence:'HIGH'};if(createdBy)return{role:'sales',users:[createdBy],confidence:'PARTIAL'};return{role:'sales',users:[],confidence:'PARTIAL'}}
 function operationalTechnicianOwner(plan){const users=[...new Set((plan?.slots||[]).flatMap(slot=>slot.technicians||[]).map(name=>String(name||'').trim()).filter(Boolean))];return{role:'technician',users,confidence:users.length?'HIGH':'PARTIAL'}}
+function operationalCompletionReviewContext(item){
+  const review=normalizeCompletionReview(item?.completionReview);
+  if(!review)return null;
+  const visit=(Array.isArray(item?.serviceVisits)?item.serviceVisits:[]).find(entry=>String(entry?.visitId||'').trim()===review.targetVisitId);
+  if(!visit||visit.serviceOutcome!=='installationCompleted')return null;
+  return{review,visit};
+}
+function operationalCompletionRevisionOwner(item,context){
+  const submittedBy=String(context?.review?.submittedBy||'').trim(),directory=typeof userDirectory==='undefined'?[]:userDirectory;
+  const submittingTechnician=directory.find(user=>user?.role==='technician'&&(user.name===submittedBy||user.username===submittedBy));
+  if(submittingTechnician)return{role:'technician',users:[String(submittingTechnician.name||submittedBy).trim()],confidence:'HIGH'};
+  const visitUsers=[...(Array.isArray(context?.visit?.technicians)?context.visit.technicians:[]),...(Array.isArray(context?.visit?.technicianEntries)?context.visit.technicianEntries:[]).map(entry=>entry?.name)];
+  const normalizedVisitUsers=[...new Set(visitUsers.map(name=>String(name||'').trim()).filter(Boolean))];
+  if(normalizedVisitUsers.length)return{role:'technician',users:normalizedVisitUsers,confidence:'HIGH'};
+  const workPlanId=String(context?.visit?.workPlanId||'').trim(),plan=workPlanId?serviceWorkPlans(item).find(entry=>entry.id===workPlanId):null;
+  const planOwner=operationalTechnicianOwner(plan);
+  return planOwner.users.length?planOwner:{role:'technician',users:[],confidence:'PARTIAL'};
+}
 function operationalReason(code,details={}){return{code,...details}}
 function operationalRisk(code,details={}){return{code,...details}}
 
@@ -26,12 +44,16 @@ function operationalRiskState(item,unresolvedPlans,isCompleted){
 }
 
 function resolveOperationalState(item,options={}){
-  const record=item||{},today=localDateKey(options.today||new Date()),workflowState=String(record.workflowStage||'unknown'),activePlans=activeServiceWorkPlans(record),unresolvedPlans=unresolvedActiveServiceWorkPlans(record),nextPlan=unresolvedPlans[0]||null,isCompleted=workflowState==='completed',riskState=operationalRiskState(record,unresolvedPlans,isCompleted);
+  const record=item||{},today=localDateKey(options.today||new Date()),workflowState=String(record.workflowStage||'unknown'),activePlans=activeServiceWorkPlans(record),unresolvedPlans=unresolvedActiveServiceWorkPlans(record),nextPlan=unresolvedPlans[0]||null,isCompleted=workflowState==='completed',completionReviewContext=operationalCompletionReviewContext(record),riskState=operationalRiskState(record,unresolvedPlans,isCompleted);
   let primarySignal=OPERATIONAL_SIGNALS.NORMAL,signalReason=operationalReason('NO_CURRENT_OPERATIONAL_ACTION'),nextAction=OPERATIONAL_ACTIONS.NONE,owner=operationalNoOwner(),confidence='HIGH';
   const choose=(signal,reason,action=OPERATIONAL_ACTIONS.NONE,nextOwner=operationalNoOwner(),nextConfidence='HIGH')=>{primarySignal=signal;signalReason=reason;nextAction=action;owner=nextOwner;confidence=nextConfidence};
 
   if(isCompleted){
     choose(OPERATIONAL_SIGNALS.COMPLETED,operationalReason('WORKFLOW_COMPLETED'));
+  }else if(completionReviewContext?.review.status==='pending'){
+    choose(OPERATIONAL_SIGNALS.ACTION_REQUIRED,operationalReason('COMPLETION_REVIEW_PENDING',{targetVisitId:completionReviewContext.review.targetVisitId}),OPERATIONAL_ACTIONS.REVIEW_COMPLETION_SUBMISSION,operationalRoleOwner('supervisor'));
+  }else if(completionReviewContext?.review.status==='revisionRequested'){
+    choose(OPERATIONAL_SIGNALS.ACTION_REQUIRED,operationalReason('COMPLETION_REVIEW_REVISION_REQUESTED',{targetVisitId:completionReviewContext.review.targetVisitId}),OPERATIONAL_ACTIONS.REVISE_COMPLETION_SUBMISSION,operationalCompletionRevisionOwner(record,completionReviewContext));
   }else if(workflowState==='draft'){
     choose(OPERATIONAL_SIGNALS.ACTION_REQUIRED,operationalReason('WORKFLOW_DRAFT'),OPERATIONAL_ACTIONS.SEND_FOR_REVIEW,operationalSalesOwner(record));
   }else if(workflowState==='returnedToSales'){

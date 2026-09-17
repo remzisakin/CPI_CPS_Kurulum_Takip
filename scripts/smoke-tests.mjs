@@ -1677,7 +1677,7 @@ test('Faz 7.3B installationCompleted kapanış incelemesi oluşturur ve mevcut p
     assert.equal(result.targetVisitId,'review-target');assert.equal(result.planResolved,true);assert.equal(result.futureActive,true);assert.deepEqual(result.inactive,['legacy-inactive']);assert.equal(result.nextPlan,'review-plan-2');
     assert.equal(result.history.length,2);assert.equal(result.history[1].type,'completion-submitted');assert.equal(result.history[1].targetVisitId,'review-target');assert.equal(result.history[1].submissionRevision,1);assert.equal(result.history[1].snapshot.serviceOutcome,'installationCompleted');assert.equal(result.history[1].snapshot.completedWork,'');assert.equal(result.snapshotStable,true);
     assert.equal(result.unrelatedVisitUnchanged,true);assert.equal(result.scheduleUnchanged,true);assert.equal(result.historyUnchanged,true);assert.equal(result.todayPlanResolved,true);
-    assert.deepEqual(result.resolver,{signal:'WAITING',action:'NONE',owner:null});assert.equal(result.supervisorPrimary,0);
+    assert.deepEqual(result.resolver,{signal:'ACTION_REQUIRED',action:'REVIEW_COMPLETION_SUBMISSION',owner:'supervisor'});assert.equal(result.supervisorPrimary,1);
     assert.deepEqual(result.guard,{historyLength:2,reviewSame:true,visitSame:true,originalHistoryLength:2});
   }finally{
     await protocol.evaluate(`(()=>{askConfirm=async(message,options={})=>(await showActionDialog({...options,message}))!==null;['#serviceEntryDialog','#standardActionDialog'].forEach(selector=>{const dialog=document.querySelector(selector);if(dialog?.open)dialog.close()});installations=installations.filter(record=>record.id!==${fixtureId});saveOperationalData();render()})()`).catch(()=>{});
@@ -2397,6 +2397,45 @@ test('Completion Review foundation mevcut completed resolver ve supervisor özet
     return {before,after:JSON.stringify(item),state:{workflowState:state.workflowState,primarySignal:state.primarySignal,nextAction:state.nextAction},primaryCount:summary.primaryActions.length,oversightCount:summary.oversight.length,hasReview:Object.hasOwn(item,'completionReview')};
   })()`);
   assert.equal(result.before,result.after);assert.deepEqual(result.state,{workflowState:'completed',primarySignal:'COMPLETED',nextAction:'NONE'});assert.deepEqual({primary:result.primaryCount,oversight:result.oversightCount},{primary:0,oversight:0});assert.equal(result.hasReview,false);
+});
+
+test('Completion Review resolver geçerli hedefi, önceliği ve technician owner fallback sırasını korur', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const technician=userDirectory.find(user=>user.role==='technician'),supervisor=userDirectory.find(user=>user.role==='supervisor');
+    const slot=(workPlanId,date,technicians=[])=>({id:workPlanId+'-slot',workPlanId,date,startTime:'09:00',endTime:'10:00',technicians});
+    const visit=(visitId,workPlanId,technicians=[],entries=[])=>({visitId,workPlanId,actualVisitDate:'2026-09-17',serviceOutcome:'installationCompleted',technicians,technicianEntries:entries});
+    const base=(id,status='pending')=>({id,workflowStage:'inService',status:'Devam ediyor',orderProducts:[],installationSchedule:[slot('target-plan','2026-09-17',['Plan Teknisyeni A','Plan Teknisyeni B']),slot('future-plan','2099-09-18',['Gelecek Teknisyeni'])],serviceVisits:[visit('target-visit','target-plan')],completionReview:{targetVisitId:'target-visit',status,submittedBy:'',submissionRevision:1}});
+    const read=item=>{const state=resolveOperationalState(item,{today:'2026-09-17'});return{signal:state.primarySignal,reason:state.signalReason.code,action:state.nextAction,role:state.actionOwnerRole,users:state.actionOwnerUsers,ownerConfidence:state.ownerConfidence,requiresAction:state.requiresAction,isWaiting:state.isWaiting,isCompleted:state.isCompleted}};
+    const pending=base(-974001);
+    const submitted=base(-974002,'revisionRequested');submitted.completionReview.submittedBy=technician.name;
+    const submittedNonTechnician=base(-974003,'revisionRequested');submittedNonTechnician.completionReview.submittedBy=supervisor.name;submittedNonTechnician.serviceVisits[0].technicians=['Ziyaret Teknisyeni A','Ziyaret Teknisyeni B'];submittedNonTechnician.serviceVisits[0].technicianEntries=[{name:'Ziyaret Teknisyeni B'},{name:'Ziyaret Teknisyeni C'}];
+    const planFallback=base(-974004,'revisionRequested');
+    const roleOnly=base(-974005,'revisionRequested');roleOnly.installationSchedule=[slot('target-plan','2026-09-17'),slot('future-plan','2099-09-18')];
+    const exactTarget=base(-974006,'revisionRequested');exactTarget.serviceVisits.unshift(visit('other-visit','target-plan',['Yanlış İlk Ziyaret Teknisyeni']));exactTarget.serviceVisits[1].technicians=['Doğru Hedef Teknisyeni'];
+    const malformed=base(-974007);malformed.completionReview={targetVisitId:'target-visit',status:'unknown'};
+    const missingTarget=base(-974008);missingTarget.completionReview.targetVisitId='missing-visit';
+    const wrongOutcome=base(-974009);wrongOutcome.serviceVisits[0].serviceOutcome='planCompleted';
+    const completed={...base(-974010),workflowStage:'completed'};
+    const historical={...base(-974011),workflowStage:'completed',completionReview:{targetVisitId:'target-visit',status:'approved'}};
+    return{technicianName:technician.name,pending:read(pending),submitted:read(submitted),visitFallback:read(submittedNonTechnician),planFallback:read(planFallback),roleOnly:read(roleOnly),exactTarget:read(exactTarget),malformed:read(malformed),missingTarget:read(missingTarget),wrongOutcome:read(wrongOutcome),completed:read(completed),historical:read(historical)};
+  })()`);
+  assert.deepEqual(result.pending,{signal:'ACTION_REQUIRED',reason:'COMPLETION_REVIEW_PENDING',action:'REVIEW_COMPLETION_SUBMISSION',role:'supervisor',users:[],ownerConfidence:'HIGH',requiresAction:true,isWaiting:false,isCompleted:false});
+  assert.equal(result.submitted.action,'REVISE_COMPLETION_SUBMISSION');assert.equal(result.submitted.reason,'COMPLETION_REVIEW_REVISION_REQUESTED');assert.deepEqual(result.submitted.users,[result.technicianName]);assert.equal(result.submitted.ownerConfidence,'HIGH');
+  assert.deepEqual(result.visitFallback.users,['Ziyaret Teknisyeni A','Ziyaret Teknisyeni B','Ziyaret Teknisyeni C']);assert.equal(result.visitFallback.ownerConfidence,'HIGH');
+  assert.deepEqual(result.planFallback.users,['Plan Teknisyeni A','Plan Teknisyeni B']);assert.equal(result.planFallback.ownerConfidence,'HIGH');
+  assert.deepEqual(result.roleOnly.users,[]);assert.equal(result.roleOnly.role,'technician');assert.equal(result.roleOnly.ownerConfidence,'PARTIAL');
+  assert.deepEqual(result.exactTarget.users,['Doğru Hedef Teknisyeni']);
+  for(const fallback of [result.malformed,result.missingTarget,result.wrongOutcome]){assert.equal(fallback.signal,'WAITING');assert.equal(fallback.action,'NONE');assert.equal(fallback.isWaiting,true)}
+  for(const completed of [result.completed,result.historical]){assert.equal(completed.signal,'COMPLETED');assert.equal(completed.action,'NONE');assert.equal(completed.isCompleted,true)}
+});
+
+test('Completion Review supervisor helper yalnız pending review aksiyonunu decision grubuna alır', async () => {
+  const result=await protocol.evaluate(`(() => {
+    const technician=userDirectory.find(user=>user.role==='technician'),slot=(id,date)=>({id:id+'-slot',workPlanId:id,date,startTime:'09:00',endTime:'10:00',technicians:[technician.name]}),make=(id,status)=>({id,workflowStage:'inService',status:'Devam ediyor',orderProducts:[],installationSchedule:[slot('target','2026-09-17'),slot('future','2099-09-18')],serviceVisits:[{visitId:'visit-'+id,workPlanId:'target',actualVisitDate:'2026-09-17',serviceOutcome:'installationCompleted',technicians:[technician.name]}],completionReview:{targetVisitId:'visit-'+id,status,submittedBy:technician.name,submissionRevision:1}});
+    const pending=make(-974020,'pending'),revision=make(-974021,'revisionRequested'),summary=buildSupervisorOperationalSummary([pending,revision],{today:'2026-09-17'});
+    return{primary:summary.primaryActions.map(entry=>({id:entry.id,category:entry.category,action:entry.state.nextAction})),oversight:summary.oversight.map(entry=>entry.id),decision:summary.primaryByCategory.decision,planning:summary.primaryByCategory.planning,counts:summary.counts};
+  })()`);
+  assert.deepEqual(result.primary,[{id:-974020,category:'decision',action:'REVIEW_COMPLETION_SUBMISSION'}]);assert.deepEqual(result.oversight,[]);assert.deepEqual(result.decision,{count:1,ids:[-974020]});assert.deepEqual(result.planning,{count:0,ids:[]});assert.deepEqual(result.counts,{primary:1,oversight:0});
 });
 
 test('Test edilen akışlarda JavaScript hatası oluşmuyor', () => {
