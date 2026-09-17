@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cps-public-shell-v215';
+const CACHE_NAME = 'cps-public-shell-v217';
 const OWN_CACHE_PREFIXES = ['cps-public-shell-', 'cps-kurulum-'];
 const OFFLINE_PAGE = './offline.html';
 
@@ -7,21 +7,21 @@ const OFFLINE_PAGE = './offline.html';
 const PUBLIC_SHELL_ASSETS = [
   './index.html',
   OFFLINE_PAGE,
-  './styles.css?v=197',
+  './styles.css?v=198',
   './app.js?v=171',
   './js/planning-calendar.js?v=166',
   './js/customer-list.js?v=165',
   './js/dashboard.js?v=171',
   './js/installation-workflows.js?v=169',
   './js/service-reports.js?v=169',
-  './js/service-workflows.js?v=172',
-  './js/completion-review.js?v=4',
+  './js/service-workflows.js?v=174',
+  './js/completion-review.js?v=6',
   './js/operational-state.js?v=2',
   './js/supervisor-operational-policy.js?v=2',
   './js/operational-state-ui.js?v=8',
   './js/customers.js?v=165',
-  './js/app-events.js?v=173',
-  './js/operation-policy.js?v=168',
+  './js/app-events.js?v=175',
+  './js/operation-policy.js?v=169',
   './js/reports.js?v=169',
   './js/organization.js?v=166',
   './js/sales-changes.js?v=169',

@@ -116,6 +116,145 @@ function resolveContinuationSourceVisit(item,relation){
   return candidates.length===1?candidates[0]:null;
 }
 
+function continuationDecisionForVisit(item,visitId){
+  const id=String(visitId||'').trim();
+  if(!id)return null;
+  return[...(item?.completionReviewHistory||[])].reverse().find(event=>event?.type==='continuation-required'&&String(event.targetVisitId||'').trim()===id)||null;
+}
+
+function continuationPlansUsingSource(item,visitId,plans=serviceWorkPlans(item)){
+  const id=String(visitId||'').trim();
+  return id?plans.filter(plan=>continuationExplicitSourceVisitId(plan)===id):[];
+}
+
+function continuationPendingContext(item){
+  const latest=completionReviewLastDecision(item),events=latest?.type==='continuation-required'?[latest]:[];
+  for(const decision of events){
+    const visit=(item.serviceVisits||[]).find(entry=>String(entry?.visitId||'').trim()===String(decision.targetVisitId).trim());
+    if(!visit)continue;
+    const linkedPlans=continuationPlansUsingSource(item,visit.visitId);
+    if(!linkedPlans.length)return{visit,decision,linkedPlans,pending:true};
+  }
+  return null;
+}
+
+function continuationPlanningContext(item){
+  const pending=continuationPendingContext(item);
+  if(pending)return pending;
+  const plans=serviceWorkPlans(item),linked=plans.map(plan=>({plan,sourceVisitId:continuationExplicitSourceVisitId(plan)})).filter(entry=>entry.sourceVisitId);
+  for(const entry of linked.slice().reverse()){
+    const visit=(item.serviceVisits||[]).find(candidate=>String(candidate?.visitId||'').trim()===entry.sourceVisitId);
+    if(!visit)continue;
+    return{visit,decision:continuationDecisionForVisit(item,visit.visitId),linkedPlans:[entry.plan],pending:false};
+  }
+  return null;
+}
+
+function continuationFuturePlans(item){
+  const today=localDateKey();
+  return unresolvedActiveServiceWorkPlans(item).filter(plan=>compareDateOnly(plan.date,today)>0&&!continuationExplicitSourceVisitId(plan));
+}
+
+function continuationContextField(label,value){
+  const text=String(value??'').trim();
+  return text?`<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(text)}</strong></div>`:'';
+}
+
+function continuationContextMarkup(item,context){
+  if(!context?.visit)return'';
+  const visit=context.visit,decision=context.decision,technicians=(visit.technicianEntries||[]).map(entry=>entry.name).filter(Boolean),names=technicians.length?technicians:(visit.technicians||[]).filter(Boolean),hours=typeof serviceVisitHours==='function'?serviceVisitHours(visit):0,blocker=[visit.blockerReason,visit.blockerDetails].filter(Boolean).join(' · '),missing=(visit.missingProducts||[]).map(partNo=>completionReviewProductLabel(item,partNo)).filter(Boolean),linkedPlan=context.linkedPlans?.[0],futurePlans=context.pending?continuationFuturePlans(item):[];
+  const primary=[continuationContextField('Supervisor kararı',decision?.decisionNote),continuationContextField('Kalan işler',visit.remainingWork),continuationContextField('Problem / engel',blocker),continuationContextField('Eksik ürünler',missing.join(', '))].join('');
+  const secondary=[continuationContextField('Kaynak ziyaret',completionReviewDate(visit.actualVisitDate)),continuationContextField('Önceki ekip',names.join(', ')),continuationContextField('Gerçekleşen süre',hours?`${hours.toLocaleString('tr-TR',{maximumFractionDigits:2})} saat`:''),continuationContextField('Yapılan işler',visit.completedWork),continuationContextField('Kalan adam-saat',Number(visit.remainingManHours)>0?String(visit.remainingManHours):''),continuationContextField('Önerilen uzmanlık',visit.requiredSpecialty),continuationContextField('Müşteri uygunluğu',visit.customerAvailability),continuationContextField('Karar kaydı',decision?[decision.actor,completionReviewDateTime(decision.timestamp)].filter(Boolean).join(' · '):'')].join('');
+  const linked=`<div class="continuation-context-link"><button class="secondary-button" type="button" data-open-continuation-source-visit="${escapeHtml(visit.visitId)}">Tam Servis Kaydına Git</button>${linkedPlan?`<span>${escapeHtml(linkedPlan.date||'Tarihsiz')} planına bağlı</span>`:''}</div>`;
+  const choice=context.pending&&futurePlans.length?`<div class="continuation-plan-choice"><p>Mevcut gelecek planlardan hiçbiri otomatik seçilmedi. İlişkiyi siz belirleyin.</p><div><select id="continuationExistingPlanSelect"><option value="">Mevcut planı seçin</option>${futurePlans.map((plan,index)=>`<option value="${escapeHtml(plan.id)}">${index+1}. çalışma · ${escapeHtml(completionReviewDate(plan.date))}</option>`).join('')}</select><button class="secondary-button" type="button" data-link-continuation-plan>Bu ziyaretin devam planı yap</button><button class="secondary-button" type="button" data-create-continuation-plan>Yeni Devam Planı Oluştur</button></div></div>`:'';
+  return`<header><div><span>DEVAM BAĞLAMI</span><h3>Neden tekrar gidiyoruz?</h3></div><small>Bu bilgiler yalnızca planlama kararına yardımcı olur; yeni plana otomatik aktarılmaz.</small></header><div class="continuation-context-primary">${primary||'<p>Supervisor devam çalışması gerektiğini belirtti.</p>'}</div><details><summary>Ziyaret ve planlama referansları</summary><div class="continuation-context-secondary">${secondary}</div></details>${linked}${choice}`;
+}
+
+function createContinuationDraftPlan(sourceVisitId){
+  const id=String(sourceVisitId||'').trim();
+  if(!id)return null;
+  const existing=planningScheduleDraft.find(slot=>String(slot.sourceVisitId||'').trim()===id);
+  if(existing)return existing.workPlanId;
+  const workPlanId=`work-${Date.now()}-${Math.random().toString(36).slice(2,5)}`;
+  planningScheduleDraft.push({id:`person-${Date.now()}-${Math.random().toString(36).slice(2,5)}`,workPlanId,workPlanNote:'',sourceVisitId:id,date:'',startTime:'',endTime:'',overtimeHours:0,technicians:[],activityType:'continuation',productControl:'required',checklistRequirement:'required'});
+  return workPlanId;
+}
+
+function initializePlanningContinuationContext(item){
+  const form=$('#planningForm');delete form.dataset.continuationSourceVisitId;delete form.dataset.continuationTargetPlanId;
+  const context=continuationPlanningContext(item);if(!context?.visit)return;
+  form.dataset.continuationSourceVisitId=context.visit.visitId;
+  const linked=context.linkedPlans?.[0];if(linked)form.dataset.continuationTargetPlanId=linked.id;
+  if(context.pending&&!continuationFuturePlans(item).length)form.dataset.continuationTargetPlanId=createContinuationDraftPlan(context.visit.visitId)||'';
+}
+
+function renderPlanningContinuationContext(item){
+  const container=$('#planningContinuationContext'),context=continuationPlanningContext(item);
+  if(!container)return;
+  container.innerHTML=context?continuationContextMarkup(item,context):'';
+  container.classList.toggle('role-hidden',!context);
+}
+
+function setContinuationPlanSource(planId,sourceVisitId){
+  const item=planningCurrentItem(),id=String(sourceVisitId||'').trim(),target=String(planId||'').trim();
+  if(!item||!id||!target)return{ok:false,code:'SOURCE_REQUIRED'};
+  const existingUsage=continuationPlansUsingSource(item,id).find(plan=>plan.id!==target);
+  if(existingUsage)return{ok:false,code:'SOURCE_ALREADY_LINKED'};
+  const targetPlan=serviceWorkPlans(item).find(plan=>plan.id===target),targetSource=targetPlan&&continuationExplicitSourceVisitId(targetPlan);
+  if(targetSource&&targetSource!==id)return{ok:false,code:'PLAN_ALREADY_LINKED'};
+  const draftUsage=[...new Set(planningScheduleDraft.filter(slot=>String(slot.sourceVisitId||'').trim()===id).map(slot=>slot.workPlanId))].filter(value=>value!==target);
+  if(draftUsage.length)return{ok:false,code:'SOURCE_ALREADY_LINKED'};
+  let found=false;planningScheduleDraft=planningScheduleDraft.map(slot=>{if(slot.workPlanId!==target)return slot;found=true;return{...slot,sourceVisitId:id}});
+  return found?{ok:true}:{ok:false,code:'PLAN_NOT_FOUND'};
+}
+
+function validateContinuationPlanRelations(item,slots){
+  const groups=[...new Set(slots.map(slot=>slot.workPlanId))].map(id=>({id,slots:slots.filter(slot=>slot.workPlanId===id)})),sources=new Map();
+  for(const group of groups){
+    const hasExplicit=continuationHasExplicitSource(group),sourceVisitId=continuationExplicitSourceVisitId(group);
+    if(hasExplicit&&!sourceVisitId)return{ok:false,code:'AMBIGUOUS_SOURCE'};
+    if(!sourceVisitId)continue;
+    if(!(item.serviceVisits||[]).some(visit=>String(visit.visitId||'').trim()===sourceVisitId)||!continuationDecisionForVisit(item,sourceVisitId))return{ok:false,code:'SOURCE_INVALID'};
+    if(sources.has(sourceVisitId)&&sources.get(sourceVisitId)!==group.id)return{ok:false,code:'SOURCE_ALREADY_LINKED'};
+    sources.set(sourceVisitId,group.id);
+    const original=serviceWorkPlans(item).find(plan=>plan.id===group.id),originalSource=original&&continuationExplicitSourceVisitId(original);
+    if(originalSource&&originalSource!==sourceVisitId)return{ok:false,code:'PLAN_ALREADY_LINKED'};
+  }
+  return{ok:true,sources};
+}
+
+function applyContinuationPlanRelations(item,relationValidation,timestamp){
+  const sources=relationValidation?.sources||new Map();
+  if(!sources.size)return false;
+  (item.serviceVisits||[]).forEach(visit=>{if(sources.has(String(visit.visitId||'').trim()))visit.continuationPlannedAt=visit.continuationPlannedAt||timestamp});
+  const pending=continuationPendingContext(item),otherOpen=(item.serviceVisits||[]).some(visit=>['continuation','couldNotPerform'].includes(visit?.serviceOutcome)&&!visit?.continuationPlannedAt);item.pendingContinuationPlanning=Boolean((pending&&!sources.has(String(pending.visit.visitId||'').trim()))||otherOpen);
+  return true;
+}
+
+function setContinuationSourceVisitReadOnly(enabled){
+  const form=$('#serviceEntryForm'),dialog=$('#serviceEntryDialog');if(!form||!dialog)return;
+  const controls=[...form.querySelectorAll('input,select,textarea,button')],canClose=control=>control.matches('[value="cancel"],#toggleServiceFullscreen');
+  if(enabled){
+    form.dataset.continuationReadOnly='true';dialog.dataset.returnToPlanning='true';
+    controls.forEach(control=>{if(canClose(control))return;control.dataset.continuationReadOnlyDisabled=control.disabled?'true':'false';control.disabled=true});
+    form.querySelector('.primary-button[value="default"]')?.classList.add('role-hidden');
+    return;
+  }
+  controls.forEach(control=>{if(!Object.hasOwn(control.dataset,'continuationReadOnlyDisabled'))return;control.disabled=control.dataset.continuationReadOnlyDisabled==='true';delete control.dataset.continuationReadOnlyDisabled});
+  delete form.dataset.continuationReadOnly;delete dialog.dataset.returnToPlanning;
+  form.querySelector('.primary-button[value="default"]')?.classList.remove('role-hidden');
+}
+
+function openContinuationSourceVisit(item,visitId){
+  const index=(item?.serviceVisits||[]).findIndex(visit=>String(visit?.visitId||'').trim()===String(visitId||'').trim()),visit=index>=0?item.serviceVisits[index]:null,plan=visit&&servicePlanForVisit(item,visit);
+  if(!visit||!plan){showToast('Kaynak servis kaydı bulunamadı.');return}
+  const planning=$('#planningDialog'),dialog=$('#serviceEntryDialog'),form=$('#serviceEntryForm');planning.close();
+  $('#serviceWorkPlanSelect').innerHTML=serviceWorkPlans(item).map((entry,planIndex)=>`<option value="${escapeHtml(entry.id)}">${planIndex+1}. Çalışma · ${escapeHtml(entry.date)}</option>`).join('');
+  $('#serviceInstallationId').value=item.id;loadServiceVisitV2(item,index,plan.id);serviceOutcomeOptions(item,plan.id,visit.serviceOutcome||'');$('#serviceActualDate').value=visit.actualVisitDate||'';$('#serviceVisitIndex').value=index;$('#serviceWorkPlanId').value=plan.id;$('#serviceWorkPlanSelect').value=plan.id;
+  form.dataset.reportOnly='true';setContinuationSourceVisitReadOnly(true);
+  dialog.querySelector('.dialog-header h2').textContent='Servis Kaydı';setServiceFullscreen(false);translateInterface(dialog);dialog.showModal();
+}
+
 const COMPLETION_REVIEW_DECISIONS=Object.freeze({APPROVE:'approve',REVISION:'revision',CONTINUATION:'continuation'});
 const COMPLETION_REVIEW_REVISION_REASONS=Object.freeze([
   {value:'service-information',label:['Eksik/hatalı servis bilgisi','Missing/incorrect service information']},

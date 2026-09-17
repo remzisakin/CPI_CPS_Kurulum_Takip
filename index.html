@@ -21,7 +21,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=197">
+  <link rel="stylesheet" href="styles.css?v=198">
 </head>
 <body>
   <div id="storageWarning" class="storage-warning" role="alert" hidden><strong>Yerel kayıt uyarısı</strong><span></span><button id="exportLocalData" type="button" title="İndirilen yedek müşteri ve kullanıcı bilgileri içerebilir; güvenli saklayın.">Ham verileri yedekle</button></div>
@@ -378,6 +378,7 @@
       <div class="dialog-header"><div><p class="eyebrow">SERVİS SUPERVISOR</p><h2>Servis planlaması</h2><p id="planningRecordTitle" class="muted"></p></div><div class="dialog-header-actions"><button class="icon-button fullscreen-button" type="button" data-dialog-fullscreen="planningDialog" aria-label="Tam ekran yap" title="Tam ekran yap">⛶</button><button class="icon-button" value="cancel" formnovalidate aria-label="Kapat">×</button></div></div>
       <div class="supervisor-notice">Bu alanlar yalnızca Servis Supervisor tarafından düzenlenir.</div>
       <div id="estimatedInstallationNotice" class="estimated-installation-notice"></div>
+      <section id="planningContinuationContext" class="planning-continuation-context role-hidden" aria-live="polite"></section>
       <section class="planning-schedule-section"><div class="planning-schedule-heading"><div><h3>Çalışma planları</h3><p>Her çalışma planının tarihini ve o gün kuruluma gidecek kişileri ayrı yönetin.</p></div><button id="addPlanningSlot" class="secondary-button" type="button">＋ Yeni çalışma planı ekle</button></div><div id="planningScheduleRows" class="planning-schedule-rows"></div></section>
       <div id="planningCapacitySummary" class="planning-capacity-summary"></div>
       <div id="planningConflictPanel" class="planning-conflict-panel role-hidden"></div>
@@ -588,14 +589,14 @@
   <script src="js/dashboard.js?v=171"></script>
   <script src="js/installation-workflows.js?v=169"></script>
   <script src="js/service-reports.js?v=169"></script>
-  <script src="js/service-workflows.js?v=172"></script>
-  <script src="js/completion-review.js?v=4"></script>
+  <script src="js/service-workflows.js?v=174"></script>
+  <script src="js/completion-review.js?v=6"></script>
   <script src="js/operational-state.js?v=2"></script>
   <script src="js/supervisor-operational-policy.js?v=2"></script>
   <script src="js/operational-state-ui.js?v=8"></script>
   <script src="js/customers.js?v=165"></script>
-  <script src="js/app-events.js?v=173"></script>
-  <script src="js/operation-policy.js?v=168"></script>
+  <script src="js/app-events.js?v=175"></script>
+  <script src="js/operation-policy.js?v=169"></script>
   <script src="js/reports.js?v=169"></script>
   <script src="js/organization.js?v=166"></script>
   <script src="js/sales-changes.js?v=169"></script>
